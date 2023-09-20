@@ -1,0 +1,401 @@
+* CONFIGURAR O SISTEMA "SAC"
+***************************************
+#INCLUDE "wingdi.ch"
+#INCLUDE "winuser.ch"
+
+FUNCTION mast610(mmanut)
+*****************
+LOCAL MPRG:='SAC610',mtitulo:='CONFIGURACAO DO SISTEMA',opcao,;
+      demo_set:={},point:=0,m_set:={},mserie:='',mcod_acess := SPACE(20)
+
+IF ! ver_nivel(mprg,mtitulo,'1',nivel_acess,,'AMBIE')
+        RETURN NIL
+ENDIF
+
+CLEAR GETS
+op_tela(00,00,40,100,mtitulo,,1)
+m_set:={}
+sr_getconnection():exec("SELECT * FROM sacsetup",,.t.,@m_set)
+WHILE .T.
+        mserie := ver_serie()
+        exibi_prg(mprg)
+        setcor(1)
+        demo_set:={}
+        AADD(demo_set,'    C O N F I G U R A C A O   D A   E M P R E S A       ')
+        AADD(demo_set,'                                              ')
+        AADD(demo_set,'023 - Serie do Cadastro...............................: '+m_set[1,23]+' ')
+        AADD(demo_set,'016 - Data de Cadastro................................: '+DTOC(m_set[1,16]) +' ')
+        AADD(demo_set,'002 - Razao Social da Empresa.........................: '+m_set[1,2] +' ')
+        AADD(demo_set,'003 - Nome Fantasia...................................: '+m_set[1,3] +' ')
+        AADD(demo_set,'005 - Endereco........................................: '+m_set[1,5] +' ')
+        AADD(demo_set,'006 - Numero..........................................: '+m_set[1,6] +' ')
+        AADD(demo_set,'007 - Complemento.....................................: '+m_set[1,7] +' ')
+        AADD(demo_set,'008 - Bairro..........................................: '+m_set[1,8] +' ')
+        AADD(demo_set,'009 - Cidade..........................................: '+m_set[1,9] +' ')
+        AADD(demo_set,'010 - Estado..........................................: '+m_set[1,10]+' ')
+        AADD(demo_set,'011 - CEP.............................................: '+m_set[1,11] +' ')
+        AADD(demo_set,'012 - Telefone........................................: '+m_set[1,12] +' ')
+        AADD(demo_set,'013 - Email...........................................: '+m_set[1,13] +' ')
+        AADD(demo_set,'023 - CNPJ............................................: '+m_set[1,35] +' ')
+        AADD(demo_set,'014 - Inscricao Estadual..............................: '+m_set[1,14] +' ')
+        AADD(demo_set,'030 - Codigo de Acesso do Sistemas....................: '+m_set[1,30] +' ')
+        AADD(demo_set,'                                              ')
+        AADD(demo_set,'  C o n f i g u r a c o e s ')
+        AADD(demo_set,'                                              ')
+        AADD(demo_set,'004 - Utilizar [R]azao Social ou [F]antasia...........: '+m_set[1,4] +' ')
+        AADD(demo_set,'017 - Imprimir o Cabecalho............................: '+m_set[1,17]+' ')
+        AADD(demo_set,'020 - Cliente DEFAULT.................................: '+m_set[1,20]+' ')
+        AADD(demo_set,'024 - Cobrar os 10% [S/N].............................: '+m_set[1,24]+' ')
+        AADD(demo_set,'025 - Usar os GRUPOS para lancar Produtos.............: '+m_set[1,25]+' ')
+        AADD(demo_set,'026 - Modo de lancamento [1,2]........................: '+m_set[1,26]+' ')
+        AADD(demo_set,'027 - Informar Quantidade de Pessoas na Mesa [S/N]....: '+m_set[1,27]+' ')
+        AADD(demo_set,'031 - Mascara da Quantidade do sistema (9,999,999.999): '+m_set[1,31]+' ')
+        AADD(demo_set,'032 - Mascara do Valor do sistema......(9,999,999.99).: '+m_set[1,32]+' ')
+        AADD(demo_set,'033 - ICMS do Estado..................................: '+TRANSFORM(m_set[1,33],'999.99')+' ')
+        AADD(demo_set,'034 - Optante pelo SIMPLES NACIONAL...................: '+m_set[1,34]+' ')
+        mensagem('<ESC> Retorna  -  <ENTER> p/Confirmar')
+        m_set[1,30]
+        point := ACHOICE(0,1,49,119,demo_set,,,point)
+        DO CASE
+                CASE LASTKEY() = 13
+                        mop := SUBSTR(demo_set[point],1,3)
+                        /*
+                        IF mop = '023'
+                                op_tela(10,10,12,110,'Numero de Serie',,'*')
+                                DEVPOS(1,1);DEVOUT('Numero de Serie.:')
+                                @ 1,COL()+1 GET m_set[1,23] PICT '999999'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        */
+                        IF mop = '002'
+                                op_tela(10,10,12,110,'RAZAO SOCIAL DA EMPRESA',,'*')
+                                DEVPOS(1,1);DEVOUT('RAZAO SOCIAL DA EMPRESA.:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '003'
+                                op_tela(10,10,12,110,'NOME FANTASIA DA EMPRESA',,'*')
+                                DEVPOS(1,1);DEVOUT('NOME FANTASIA DA EMPRESA.:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '005'
+                                op_tela(10,10,12,110,'ENDERECO DA EMPRESA',,'*')
+                                DEVPOS(1,1);DEVOUT('ENDERECO DA EMPRESA.:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '006'
+                                op_tela(10,10,12,110,'NUMERO',,'*')
+                                DEVPOS(1,1);DEVOUT('NUMERO.:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '007'
+                                op_tela(10,10,12,110,'COMPLEMENTO',,'*')
+                                DEVPOS(1,1);DEVOUT('COMPLEMENTO.:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '008'
+                                op_tela(10,10,12,110,'BAIRRO',,'*')
+                                DEVPOS(1,1);DEVOUT('BAIRRO.:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '009'
+                                op_tela(10,10,12,110,'CIDADE',,'*')
+                                DEVPOS(1,1);DEVOUT('CIDADE.:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '010'
+                                op_tela(10,10,12,110,'ESTADO',,'*')
+                                DEVPOS(1,1);DEVOUT('ESTADO.:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                       ELSEIF mop = '011'
+                                op_tela(10,10,12,110,'C E P',,'*')
+                                DEVPOS(1,1);DEVOUT('C E P.:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                       ELSEIF mop = '012'
+                                op_tela(10,10,12,110,'TELEFONE',,'*')
+                                DEVPOS(1,1);DEVOUT('TELEFONE.:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '013'
+                                op_tela(10,10,12,110,'EMAIL',,'*')
+                                DEVPOS(1,1);DEVOUT('EMAIL..:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)]
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '014'
+                                op_tela(10,10,12,110,'INSCRICAO ESTADUAL',,'*')
+                                DEVPOS(1,1);DEVOUT('INSCRICAO ESTADUAL.:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '004'
+                                op_tela(10,10,12,110,'Utilizar [R]azao Social ou [F]antasia',,'*')
+                                DEVPOS(1,1);DEVOUT('Utilizar [R]azao Social ou [F]antasia:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!' VALID m_set[1,VAL(mop)] $ 'R,F'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '017'
+                                op_tela(10,10,12,110,'Imprimir o Cabecalho',,'*')
+                                DEVPOS(1,1);DEVOUT('Imprimir o Cabecalho [S,N].:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!' VALID m_set[1,VAL(mop)] $ 'S,N'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '020'
+                                op_tela(10,10,12,110,'Cliente DEFAULT',,'*')
+                                DEVPOS(1,1);DEVOUT('Cliente DEFAULT.:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '035' .AND. cod_operado = '999'
+                                op_tela(10,10,12,110,'CNPJ',,'*')
+                                DEVPOS(1,1);DEVOUT('CNPJ.....:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '024'
+                                op_tela(10,10,12,110,'Cobrar os 10%',,'*')
+                                DEVPOS(1,1);DEVOUT('Cobrar os 10% [S/N]..:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!' VALID m_set[1,VAL(mop)] $ 'S,N'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '025'
+                                op_tela(10,10,12,110,'Usar os GRUPOS para lancar Produtos',,'*')
+                                DEVPOS(1,1);DEVOUT('Usar os GRUPOS para lancar Produtos [S,N].:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!' VALID m_set[1,VAL(mop)] $ 'S,N'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '026'
+                                op_tela(10,10,12,110,'Tipo de lancamento',,'*')
+                                DEVPOS(1,1);DEVOUT('Tipo de lancamento [1,2].:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!' VALID m_set[1,VAL(mop)] $ '1,2'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '029'
+                                op_tela(10,10,12,110,'Informar Quantidade de Pessoas na Mesa',,'*')
+                                DEVPOS(1,1);DEVOUT('Informar Quantidade de Pessoas na Mesa [S/N].:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!' VALID m_set[1,VAL(mop)] $ 'S,N'
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '030'
+                                op_tela(10,10,12,110,'Codigo de Acesso do Sistemas',,'*')
+                                DEVPOS(1,1);DEVOUT('Codigo de Acesso do Sistemas:')
+                                @ 1,COL()+1 GET m_set[1,30] PICT '@!' VALID IF(EMPTY(m_set[1,30]),.F.,.T.)
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '031'
+                                op_tela(10,10,12,110,'Mascara da Quantidade do sistema',,'*')
+                                DEVPOS(1,1);DEVOUT('Mascara da Quantidade do sistema:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!' VALID IF(EMPTY(m_set[1,VAL(mop)]),.F.,.T.)
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '032'
+                                op_tela(10,10,12,110,'Mascara da VALOR do sistema',,'*')
+                                DEVPOS(1,1);DEVOUT('Mascara da VALOR do sistema:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!' VALID IF(EMPTY(m_set[1,VAL(mop)]),.F.,.T.)
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '033'
+                                op_tela(10,10,12,110,'ICMS do Estado',,'*')
+                                DEVPOS(1,1);DEVOUT('ICMS do Estado (%):')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!' VALID IF(EMPTY(m_set[1,VAL(mop)]),.F.,.T.)
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSEIF mop = '034'
+                                op_tela(10,10,12,110,'Optante pelo SIMPLES NACIONAL',,'*')
+                                DEVPOS(1,1);DEVOUT('Optante pelo SIMPLES NACIONAL [S/N]:')
+                                @ 1,COL()+1 GET m_set[1,VAL(mop)] PICT '@!' VALID IF(EMPTY(m_set[1,VAL(mop)]),.F.,.T.)
+                                READ
+                                IF LASTKEY() = 27
+                                        wvw_lclosewindow()
+                                        LOOP
+                                ENDIF
+                                wvw_lclosewindow()
+                                LOOP
+                        ELSE
+                                LOOP
+                        ENDIF
+                        wvw_lclosewindow()
+                        RETURN NIL
+                CASE LASTKEY() = 27
+                        mserie := '1'+SUBSTR(m_set[1,30],4,1)+SUBSTR(m_set[1,30],2,1)+SUBSTR(m_set[1,30],5,1)+SUBSTR(m_set[1,30],3,1)+SUBSTR(m_set[1,30],1,1)
+                        IF op_simnao('S','Confirma as Configuracoes:') = 'S'
+                                sr_getconnection():exec("UPDATE sacsetup SET "+;
+                                " ver        = "+sr_cdbvalue(m_set[1,1])+;
+                                ",razao      = "+sr_cdbvalue(m_set[1,2])+;
+                                ",fantasia   = "+sr_cdbvalue(m_set[1,3])+;
+                                ",nome_cab   = "+sr_cdbvalue(m_set[1,4])+;
+                                ",end_firma  = "+sr_cdbvalue(m_set[1,5])+;
+                                ",numero     = "+sr_cdbvalue(m_set[1,6])+;
+                                ",complemento= "+sr_cdbvalue(m_set[1,7])+;
+                                ",bairro     = "+sr_cdbvalue(m_set[1,8])+;
+                                ",cidade     = "+sr_cdbvalue(m_set[1,9])+;
+                                ",uf         = "+sr_cdbvalue(m_set[1,10])+;
+                                ",cep        = "+sr_cdbvalue(m_set[1,11])+;
+                                ",fone       = "+sr_cdbvalue(m_set[1,12])+;
+                                ",email      = "+sr_cdbvalue(m_set[1,13])+;
+                                ",insc       = "+sr_cdbvalue(m_set[1,14])+;
+                                ",sysdatlm   = "+sr_cdbvalue(m_set[1,15])+;
+                                ",dataini    = "+sr_cdbvalue(m_set[1,16])+;
+                                ",cabecalho  = "+sr_cdbvalue(m_set[1,17])+;
+                                ",rodap1     = "+sr_cdbvalue(m_set[1,18])+;
+                                ",rodap2     = "+sr_cdbvalue(m_set[1,19])+;
+                                ",cli_def    = "+sr_cdbvalue(m_set[1,20])+;
+                                ",dez_perc   = "+sr_cdbvalue(m_set[1,24])+;
+                                ",usa_grupo  = "+sr_cdbvalue(m_set[1,25])+;
+                                ",tip_lanc   = "+sr_cdbvalue(m_set[1,26])+;
+                                ",qtd_pessoa = "+sr_cdbvalue(m_set[1,27])+;
+                                ",cod_acess  = "+sr_cdbvalue(m_set[1,30])+;
+                                ",masc_qtd   = "+sr_cdbvalue(m_set[1,31])+;
+                                ",masc_vlr   = "+sr_cdbvalue(m_set[1,32])+;
+                                ",icm_firma  = "+sr_cdbvalue(m_set[1,33])+;
+                                ",serie      = "+sr_cdbvalue(mserie)+;
+                                ",cnpj       = "+sr_cdbvalue(m_set[1,35])+;
+                                ",SIMP_NAC   = "+sr_cdbvalue(m_set[1,34]),,.f.)
+                                sr_getconnection():exec('COMMIT',,.f.)
+
+                        ENDIF
+                        m_set:={}
+                        sr_getconnection():exec("SELECT * FROM sacsetup",,.t.,@m_set)
+                        wvw_lclosewindow()
+                        exit
+        ENDCASE
+ENDDO
+RETURN NIL
+****************************** F I M ******************************
+

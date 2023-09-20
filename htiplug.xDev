@@ -1,0 +1,84 @@
+<!--
+################################################
+# xDevStudio Project - xdev@kssoftware.com.br  #
+# Created @ 26/02/2020 11:05:00                #
+#                                              #
+### Standard xDev Config - Layout v1.5 #########
+-->
+<project>
+   <option compiler="650949">
+   <option outputname="htiplug">
+   <option targettype="EXE">
+   <option outputpath="">
+   <option root="($)">
+   <option runpath="">
+   <option runparams="">
+   <option pathch="C:\xharbour997\include;C:\SQLRDD997\include;ch;C:\Borland\BCC55\Include;C:\helio\sismaster\CH">
+   <option pathlib="C:\xharbour977\lib;C:\SQLRDD997\lib\BC5;lib;C:\HELIO\SISMASTER">
+   <option pathobj="c:\helio\sismaster">
+   <option pathtooutput="c:\helio\sismaster">
+   <option defines="">
+   <option documentroot="">
+   <option makeincfile="Não">
+   <option taskprepare="">
+   <option taskfinalize="">
+
+   <compilerparam name="Harbour.xCompiler">
+      <option presetsname="11644">
+      <option fguilib="Gtwvw">
+      <option rdd2="Sim">
+   </compilerparam>
+
+   <compilerparam name="XHarbour.xCompiler">
+      <option presetsname="650949">
+   </compilerparam>
+
+   <unit filename="C:\SQLRDD997\include\firebird.ch" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\msg.ch" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\mysql.ch" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\mysql.h" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\oracle.ch" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\pgs.ch" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\sqlextern.ch" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\sqlodbc.ch" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\sqlora.ch" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\sqlrdd.ch" compile="Sim">
+   <unit filename="ch\directry.ch" compile="Sim">
+   <unit filename="ch\wingdi.ch" compile="Sim">
+   <unit filename="ch\winuser.ch" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\tip.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\dbfcdx.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\dbffpt.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\WVWTOOLS.LIB" compile="Sim">
+   <unit filename="C:\SQLRDD997\lib\BC5\fbclient_bc.lib" compile="Sim">
+   <unit filename="C:\SQLRDD997\lib\BC5\fbclient_ms.lib" compile="Sim">
+   <unit filename="C:\SQLRDD997\lib\BC5\libmysql.lib" compile="Sim">
+   <unit filename="C:\SQLRDD997\lib\BC5\libpq.lib" compile="Sim">
+   <unit filename="C:\SQLRDD997\lib\BC5\oci.lib" compile="Sim">
+   <unit filename="C:\SQLRDD997\lib\BC5\odbccp32.lib" compile="Sim">
+   <unit filename="C:\SQLRDD997\lib\BC5\sql.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\include\hbapi.h" compile="Sim">
+   <unit filename="C:\xHarbour997\include\WVWTOOLS.CH" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\codepage.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\common.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\ct.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\dbfntx.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\gtwin.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\hbsix.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\hsx.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\lang.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\libmisc.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\macro.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\pcrepos.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\pp.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\rdd.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\rtl.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\vm.lib" compile="Sim">
+   <unit filename="ch\hbdll.ch" compile="Sim">
+   <unit filename="ch\wintypes.ch" compile="Sim">
+   <unit filename="errorsys.prg" compile="Sim">
+   <unit filename="ConfigTerm.ini" compile="Não">
+   <unit filename="mastercfg.ini" compile="Não">
+   <unit filename="HTIPLUG.PRG" main="true" compile="Sim">
+   <unit filename="HTIPLUB.PRG" compile="Sim">
+</project>

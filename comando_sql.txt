@@ -1,0 +1,41 @@
+CREATE PROCEDURE SP_INSERTPEDIDO(
+STATUS VARCHAR(50),
+MESA INTEGER,
+USUARIO INTEGER,
+PESSOAS INTEGER,
+DIA DATE,
+HORA VARCHAR(50),
+OBSERVACAO VARCHAR(50),
+NOME_COMANDA VARCHAR(50))
+
+AS
+
+BEGIN
+ 
+IF((SELECT substring(:MESA FROM 1 FOR 1) FROM RDB$DATABASE) = 1) THEN
+
+ INSERT INTO mastmovcab
+ (data, status, mesa, pessoas, id_usuario, obs, nome_comanda,tipo) VALUES
+ (:DIA, :STATUS, SUBSTRING(:MESA FROM 2 FOR 5), 1,  :USUARIO, '', '','M');
+
+ELSE IF ((SELECT substring(:MESA FROM 1 FOR 1) FROM RDB$DATABASE) = 2) THEN
+ 
+ INSERT INTO mastmovcab
+ (data, status, mesa, pessoas, id_usuario, obs, nome_comanda,tipo) VALUES
+ (:DIA, :STATUS, SUBSTRING(:MESA FROM 2 FOR 5), 1,  :USUARIO, '','','Q');
+
+ELSE IF ((SELECT substring(:MESA FROM 1 FOR 1) FROM RDB$DATABASE) = 3) THEN
+ 
+ INSERT INTO mastmovcab
+ (data, status, mesa, pessoas, id_usuario, obs, nome_comanda,tipo) VALUES
+ (:DIA, :STATUS, SUBSTRING(:MESA FROM 2 FOR 5), 1,  :USUARIO, '', '','C');
+END
+
+
+
+
+INSERT INTO mastmovcab
+(data, status, mesa, pessoas, id_usuario, obs, nome_comanda,tipo) VALUES
+(cast('NOW' as timestamp), 'ABERTO', '[NUMERO_MESA_CARTAO]', 1, '[ID_USUARIO]', '[OBSERVACAO]', '[NOME_COMANDA]','M')
+
+EXECUTE PROCEDURE SP_INSERTPEDIDO ('ABERTO', [NUMERO_MESA_CARTAO], '[ID_USUARIO]', 1, CURRENT_DATE, CURRENT_TIME,'[OBSERVACAO]', '[NOME_COMANDA]')

@@ -1,0 +1,9 @@
+1   - 99 bebidas
+100 - 199 sobremesas
+200 - 299 porções
+300 - 399 carnes
+400 - 499 frango
+500 - 599 massas
+600 - 699 saladas
+700 - 799 peixes e frutos do mar
+800 - 899 antepastos e petiscos

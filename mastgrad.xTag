@@ -1,0 +1,291 @@
+<!--
+################################################
+# xDevStudio Project - xdev@kssoftware.com.br  #
+# Created @ 25/02/2020 11:38:44                #
+#                                              #
+### Standard xDev TagList - Layout v1.5 ########
+-->
+<taglist>
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_I_" args="<x> " scope="PUBLIC" type="ptPseudoFUNC" line="860">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_FILE_VER" args="<id> " scope="PUBLIC" type="ptPseudoFUNC" line="853">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_FILE_VER" args="<id> " scope="PUBLIC" type="ptPseudoFUNC" line="850">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_seconds" args=" " scope="PUBLIC" type="ptPseudoFUNC" line="830">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_dynsymFindName_r" args="<a>, <b> " scope="PUBLIC" type="ptPseudoFUNC" line="675">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_dynsymGetCase_r" args="<a>, <b> " scope="PUBLIC" type="ptPseudoFUNC" line="673">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_dynsymNew_r" args="<a>, <b> " scope="PUBLIC" type="ptPseudoFUNC" line="671">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_ISSPACE" args="<c> " scope="PUBLIC" type="ptPseudoFUNC" line="565">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_retnlllen" args="<llNumber>, <iWidth> " scope="PUBLIC" type="ptPseudoFUNC" line="423">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_retnintlen" args="<llNumber>, <iWidth> " scope="PUBLIC" type="ptPseudoFUNC" line="421">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_retptrGC" args="<voidPtr> " scope="PUBLIC" type="ptPseudoFUNC" line="419">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_retnllen" args="<lNumber>, <iWidth> " scope="PUBLIC" type="ptPseudoFUNC" line="417">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_retndlen" args="<dNumber>, <iWidth>, <iDec> " scope="PUBLIC" type="ptPseudoFUNC" line="415">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_retnl" args="<lNumber> " scope="PUBLIC" type="ptPseudoFUNC" line="413">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_retnd" args="<dNumber> " scope="PUBLIC" type="ptPseudoFUNC" line="411">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_retdl" args="<lJulian> " scope="PUBLIC" type="ptPseudoFUNC" line="409">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_retds" args="<szDate> " scope="PUBLIC" type="ptPseudoFUNC" line="407">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_retclenAdoptRaw" args="<szText>, <ulLen> " scope="PUBLIC" type="ptPseudoFUNC" line="405">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_retcStatic" args="<szText> " scope="PUBLIC" type="ptPseudoFUNC" line="402">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_retcAdopt" args="<szText> " scope="PUBLIC" type="ptPseudoFUNC" line="400">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_retc" args="<szText> " scope="PUBLIC" type="ptPseudoFUNC" line="397">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_ret" args=" " scope="PUBLIC" type="ptPseudoFUNC" line="395">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_pcount" args=" " scope="PUBLIC" type="ptPseudoFUNC" line="392">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_ARRAY_COUNTER_DEFAULT_HOLDERS" args=" " scope="PUBLIC" type="ptConstant" line="382">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_retc_const" args="<szText> " scope="PUBLIC" type="ptPseudoFUNC" line="378">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_retclen_buffer" args="<szText>, <ulLen> " scope="PUBLIC" type="ptPseudoFUNC" line="377">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="hb_retc_buffer" args="<szText> " scope="PUBLIC" type="ptPseudoFUNC" line="376">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_GARBAGE_FUNC" args=" " scope="PUBLIC" type="ptConstant" line="296">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="FAILURE" args=" " scope="PUBLIC" type="ptConstant" line="287">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="SUCCESS" args=" " scope="PUBLIC" type="ptConstant" line="286">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_ITEM_NEW" args="<hb> " scope="PUBLIC" type="ptPseudoFUNC" line="263">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_STRING_ALLOC" args=" " scope="PUBLIC" type="ptConstant" line="245">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="__HB_STRING_REALLOC" args=" " scope="PUBLIC" type="ptConstant" line="240">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_ITEM_PUT_NUMINTRAW" args="<p>, <v> " scope="PUBLIC" type="ptPseudoFUNC" line="217">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_ITEM_GET_NUMINTRAW" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="199">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="ISHASH" args="<n> " scope="PUBLIC" type="ptPseudoFUNC" line="195">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="ISPOINTER" args="<n> " scope="PUBLIC" type="ptPseudoFUNC" line="194">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="ISBLOCK" args="<n> " scope="PUBLIC" type="ptPseudoFUNC" line="193">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="ISOBJECT" args="<n> " scope="PUBLIC" type="ptPseudoFUNC" line="192">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="ISARRAY" args="<n> " scope="PUBLIC" type="ptPseudoFUNC" line="191">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="ISBYREF" args="<n> " scope="PUBLIC" type="ptPseudoFUNC" line="190">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="ISMEMO" args="<n> " scope="PUBLIC" type="ptPseudoFUNC" line="189">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="ISDATE" args="<n> " scope="PUBLIC" type="ptPseudoFUNC" line="188">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="ISLOG" args="<n> " scope="PUBLIC" type="ptPseudoFUNC" line="187">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="ISNUM" args="<n> " scope="PUBLIC" type="ptPseudoFUNC" line="186">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="ISCHAR" args="<n> " scope="PUBLIC" type="ptPseudoFUNC" line="185">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="ISNIL" args="<n> " scope="PUBLIC" type="ptPseudoFUNC" line="184">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_NUMERINT" args=" " scope="PUBLIC" type="ptConstant" line="176">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_NUMBER_INT" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="175">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_BADITEM" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="171">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_STRINGWR" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="170">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_OBJECT" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="169">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_GCITEM" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="168">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_SIMPLE" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="167">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_COMPLEX" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="166">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_ORDERABLE" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="165">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_NUMINT" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="164">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_NUMBER" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="163">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_NUMERIC" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="162">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_BYREF" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="161">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_MEMVAR" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="160">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_STRING" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="159">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_MEMO" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="158">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_HASH" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="157">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_POINTER" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="156">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_SYMBOL" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="155">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_LONG" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="154">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_LOGICAL" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="153">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_INTEGER" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="152">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_DOUBLE" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="151">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_DATE" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="150">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_BLOCK" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="149">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_ARRAY" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="148">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_NIL" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="147">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_BADITEM" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="143">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_STRINGWR" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="142">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_OBJECT" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="141">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_GCITEM" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="140">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_SIMPLE" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="139">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_COMPLEX" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="138">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_ORDERABLE" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="137">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_NUMINT" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="136">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_NUMERIC" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="135">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_NUMBER" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="134">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_BYREF" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="133">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_STRING" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="132">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_MEMVAR" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="131">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_MEMO" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="130">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_HASH" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="129">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_POINTER" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="128">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_SYMBOL" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="127">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_LONG" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="126">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_LOGICAL" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="125">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_INTEGER" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="124">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_DOUBLE" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="123">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_DATE" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="122">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_BLOCK" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="121">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_ARRAY" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="120">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_NIL" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="119">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IS_OF_TYPE" args="<p>, <t> " scope="PUBLIC" type="ptPseudoFUNC" line="106">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_OBJ_CLASS" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="94">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_ITEM_TYPE" args="<p> " scope="PUBLIC" type="ptPseudoFUNC" line="93">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_GCITEM" args=" " scope="PUBLIC" type="ptConstant" line="91">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_COMPLEX" args=" " scope="PUBLIC" type="ptConstant" line="90">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_ANY" args=" " scope="PUBLIC" type="ptConstant" line="89">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_NUMINT" args=" " scope="PUBLIC" type="ptConstant" line="88">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_NUMERIC" args=" " scope="PUBLIC" type="ptConstant" line="87">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_OBJECT" args=" " scope="PUBLIC" type="ptConstant" line="86">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_ARRAY" args=" " scope="PUBLIC" type="ptConstant" line="85">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_MEMVAR" args=" " scope="PUBLIC" type="ptConstant" line="84">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_BYREF" args=" " scope="PUBLIC" type="ptConstant" line="83">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_BLOCK" args=" " scope="PUBLIC" type="ptConstant" line="82">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_MEMO" args=" " scope="PUBLIC" type="ptConstant" line="81">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_MEMOFLAG" args=" " scope="PUBLIC" type="ptConstant" line="80">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_STRING" args=" " scope="PUBLIC" type="ptConstant" line="79">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_ALIAS" args=" " scope="PUBLIC" type="ptConstant" line="78">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_SYMBOL" args=" " scope="PUBLIC" type="ptConstant" line="77">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_LOGICAL" args=" " scope="PUBLIC" type="ptConstant" line="76">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_DATE" args=" " scope="PUBLIC" type="ptConstant" line="75">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_DOUBLE" args=" " scope="PUBLIC" type="ptConstant" line="74">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_LONG" args=" " scope="PUBLIC" type="ptConstant" line="73">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_HASH" args=" " scope="PUBLIC" type="ptConstant" line="72">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_INTEGER" args=" " scope="PUBLIC" type="ptConstant" line="71">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_POINTER" args=" " scope="PUBLIC" type="ptConstant" line="70">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_IT_NIL" args=" " scope="PUBLIC" type="ptConstant" line="69">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_MAX_ENUMERATIONS" args=" " scope="PUBLIC" type="ptConstant" line="66">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_MAX_WITH_OBJECTS" args=" " scope="PUBLIC" type="ptConstant" line="65">
+   <tag filename="C:\xHarbour997\include\hbapi.h" name="HB_MAX_MACRO_ARGS" args=" " scope="PUBLIC" type="ptConstant" line="64">
+   <tag filename="C:\helio\sismaster\ch\hbdll.ch" name="DC_RETVAL_MATH8" args=" " scope="PUBLIC" type="ptConstant" line="8">
+   <tag filename="C:\helio\sismaster\ch\hbdll.ch" name="DC_RETVAL_MATH4" args=" " scope="PUBLIC" type="ptConstant" line="7">
+   <tag filename="C:\helio\sismaster\ch\hbdll.ch" name="DC_CALL_STD" args=" " scope="PUBLIC" type="ptConstant" line="6">
+   <tag filename="C:\helio\sismaster\ch\hbdll.ch" name="DC_CALL_CDECL" args=" " scope="PUBLIC" type="ptConstant" line="5">
+   <tag filename="C:\helio\sismaster\ch\hbdll.ch" name="DC_BORLAND" args=" " scope="PUBLIC" type="ptConstant" line="4">
+   <tag filename="C:\helio\sismaster\ch\hbdll.ch" name="DC_MICROSOFT" args=" " scope="PUBLIC" type="ptConstant" line="3">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="ajusta_ponto" args="<tm> " scope="PUBLIC" type="ptFunction" line="627">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="Gecho" args="<tm> " scope="PUBLIC" type="ptFunction" line="619">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="Gget" args="<formato>, <tm> " scope="PUBLIC" type="ptFunction" line="671">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="pprint" args="<dados>, <tm> " scope="PUBLIC" type="ptFunction" line="698">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="GTermina" args=" " scope="PUBLIC" type="ptFunction" line="686">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="Gtrtecla" args="<tm> " scope="PUBLIC" type="ptFunction" line="518">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="Trataterminais" args="<numterm> " scope="PUBLIC" type="ptFunction" line="196">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="Main" args="<mforma> " scope="PUBLIC" type="ptFunction" line="8">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="Gclear" args="<tm> " scope="PUBLIC" type="ptFunction" line="486">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="Gdisplay" args="<dados>, <tm> " scope="PUBLIC" type="ptFunction" line="500">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="Gposcur" args="<linha>, <coluna>, <tm> " scope="PUBLIC" type="ptFunction" line="494">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="MYRUN" args="<cComando> " scope="PUBLIC" type="ptFunction" line="974">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="dcripto" args="<mexp> " scope="PUBLIC" type="ptFunction" line="794">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="MyRun2" args="<cRun> " scope="PUBLIC" type="ptFunction" line="982">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="limpa" args="<li>, <ci>, <lb>, <cb> " scope="PUBLIC" type="ptFunction" line="1083">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="print_grad" args=" " scope="PUBLIC" type="ptFunction" line="1007">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="atencao" args="<men>, <tipo> " scope="PUBLIC" type="ptFunction" line="783">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="GflushPrn" args="<tm> " scope="PUBLIC" type="ptFunction" line="712">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="sprint" args="<dados>, <tm> " scope="PUBLIC" type="ptFunction" line="705">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="GflushCom" args="<tm> " scope="PUBLIC" type="ptFunction" line="735">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="mensagem" args="<men> " scope="PUBLIC" type="ptFunction" line="777">
+   <tag filename="C:\HELIO\sismaster\mastgrad.prg" name="op_tela" args="<op_l>, <op_c>, <op_lb>, <op_cb>, <op_mensagem>, <mli>, <mcent>, <mclose> " scope="PUBLIC" type="ptFunction" line="759">
+   <tag filename="C:\helio\sismaster\errorsys.prg" name="ENVIA_ERRO" args="<aARQUI> " scope="PUBLIC" type="ptFunction" line="173">
+   <tag filename="C:\helio\sismaster\errorsys.prg" name="ErrorPreview" args="<cMess>, <cArq> " scope="PUBLIC" type="ptFunction" line="131">
+   <tag filename="C:\helio\sismaster\errorsys.prg" name="ErrorMessage" args="<oError> " scope="PUBLIC" type="ptFunction" line="91">
+   <tag filename="C:\helio\sismaster\errorsys.prg" name="DefError" args="<oError> " scope="PUBLIC" type="ptFunction" line="22">
+   <tag filename="C:\helio\sismaster\errorsys.prg" name="ErrorSys" args=" " scope="PUBLIC" type="ptProcedure" line="17">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="COLORREF" args=" " scope="PUBLIC" type="ptConstant" line="24">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="BYTE" args=" " scope="PUBLIC" type="ptConstant" line="25">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="TCHAR" args=" " scope="PUBLIC" type="ptConstant" line="26">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="DWORD" args=" " scope="PUBLIC" type="ptConstant" line="21">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="WORD" args=" " scope="PUBLIC" type="ptConstant" line="22">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="LPCTSTR" args=" " scope="PUBLIC" type="ptConstant" line="23">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="HINSTANCE" args=" " scope="PUBLIC" type="ptConstant" line="27">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="INT" args="<x> " scope="PUBLIC" type="ptPseudoFUNC" line="32">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="HWND" args=" " scope="PUBLIC" type="ptConstant" line="34">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="LPARAM" args=" " scope="PUBLIC" type="ptConstant" line="35">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="HMENU" args=" " scope="PUBLIC" type="ptConstant" line="28">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="HTREEITEM" args=" " scope="PUBLIC" type="ptConstant" line="29">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="INT" args=" " scope="PUBLIC" type="ptConstant" line="30">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="int" args="<x> " scope="PUBLIC" type="ptPseudoFUNC" line="10">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="HANDLE" args=" " scope="PUBLIC" type="ptConstant" line="12">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="HICON" args=" " scope="PUBLIC" type="ptConstant" line="13">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="VOID" args=" " scope="PUBLIC" type="ptConstant" line="6">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="UINT" args=" " scope="PUBLIC" type="ptConstant" line="7">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="int" args=" " scope="PUBLIC" type="ptConstant" line="8">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="HBITMAP" args=" " scope="PUBLIC" type="ptConstant" line="14">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="WNDPROC" args=" " scope="PUBLIC" type="ptConstant" line="18">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="BOOL" args=" " scope="PUBLIC" type="ptConstant" line="19">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="LPVOID" args=" " scope="PUBLIC" type="ptConstant" line="20">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="HCURSOR" args=" " scope="PUBLIC" type="ptConstant" line="15">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="HBRUSH" args=" " scope="PUBLIC" type="ptConstant" line="16">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="LPCSTR" args=" " scope="PUBLIC" type="ptConstant" line="17">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="LPOFNHOOKPROC" args=" " scope="PUBLIC" type="ptConstant" line="53">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="LPCFHOOKPROC" args=" " scope="PUBLIC" type="ptConstant" line="54">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="LPFRHOOKPROC" args=" " scope="PUBLIC" type="ptConstant" line="55">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="USHORT" args=" " scope="PUBLIC" type="ptConstant" line="49">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="PVOID" args=" " scope="PUBLIC" type="ptConstant" line="50">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="ULONG_PTR" args=" " scope="PUBLIC" type="ptConstant" line="51">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="LPPAGESETUPHOOK" args=" " scope="PUBLIC" type="ptConstant" line="56">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="BFFCALLBACK" args=" " scope="PUBLIC" type="ptConstant" line="61">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="HDC" args=" " scope="PUBLIC" type="ptConstant" line="63">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="HIMAGELIST" args=" " scope="PUBLIC" type="ptConstant" line="64">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="LPPAGEPAINTHOOK" args=" " scope="PUBLIC" type="ptConstant" line="57">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="LPPRINTHOOKPROC" args=" " scope="PUBLIC" type="ptConstant" line="58">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="LPSETUPHOOKPROC" args=" " scope="PUBLIC" type="ptConstant" line="59">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="char" args=" " scope="PUBLIC" type="ptConstant" line="39">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="LONG" args=" " scope="PUBLIC" type="ptConstant" line="40">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="BCHAR" args=" " scope="PUBLIC" type="ptConstant" line="41">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="HGLOBAL" args=" " scope="PUBLIC" type="ptConstant" line="36">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="WPARAM" args=" " scope="PUBLIC" type="ptConstant" line="37">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="HKEY" args=" " scope="PUBLIC" type="ptConstant" line="38">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="WCHAR" args=" " scope="PUBLIC" type="ptConstant" line="42">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="ULONG" args=" " scope="PUBLIC" type="ptConstant" line="46">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="UCHAR" args=" " scope="PUBLIC" type="ptConstant" line="47">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="SHORT" args=" " scope="PUBLIC" type="ptConstant" line="48">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="DOUBLE" args=" " scope="PUBLIC" type="ptConstant" line="43">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="LPTSTR" args=" " scope="PUBLIC" type="ptConstant" line="44">
+   <tag filename="C:\helio\sismaster\ch\wintypes.ch" name="LPSTR" args=" " scope="PUBLIC" type="ptConstant" line="45">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="HIST_VIEWTREE" args=" " scope="PUBLIC" type="ptConstant" line="90">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="HIST_ADDTOFAVORITES" args=" " scope="PUBLIC" type="ptConstant" line="89">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="HIST_FAVORITES" args=" " scope="PUBLIC" type="ptConstant" line="88">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="HIST_FORWARD" args=" " scope="PUBLIC" type="ptConstant" line="87">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="HIST_BACK" args=" " scope="PUBLIC" type="ptConstant" line="86">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VIEW_VIEWMENU" args=" " scope="PUBLIC" type="ptConstant" line="84">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VIEW_NEWFOLDER" args=" " scope="PUBLIC" type="ptConstant" line="83">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VIEW_NETDISCONNECT" args=" " scope="PUBLIC" type="ptConstant" line="82">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VIEW_NETCONNECT" args=" " scope="PUBLIC" type="ptConstant" line="81">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VIEW_PARENTFOLDER" args=" " scope="PUBLIC" type="ptConstant" line="80">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VIEW_SORTTYPE" args=" " scope="PUBLIC" type="ptConstant" line="79">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VIEW_SORTDATE" args=" " scope="PUBLIC" type="ptConstant" line="78">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VIEW_SORTSIZE" args=" " scope="PUBLIC" type="ptConstant" line="77">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VIEW_SORTNAME" args=" " scope="PUBLIC" type="ptConstant" line="76">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VIEW_DETAILS" args=" " scope="PUBLIC" type="ptConstant" line="75">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VIEW_LIST" args=" " scope="PUBLIC" type="ptConstant" line="74">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VIEW_SMALLICONS" args=" " scope="PUBLIC" type="ptConstant" line="73">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VIEW_LARGEICONS" args=" " scope="PUBLIC" type="ptConstant" line="72">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="STD_PRINT" args=" " scope="PUBLIC" type="ptConstant" line="68">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="STD_REPLACE" args=" " scope="PUBLIC" type="ptConstant" line="67">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="STD_FIND" args=" " scope="PUBLIC" type="ptConstant" line="66">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="STD_HELP" args=" " scope="PUBLIC" type="ptConstant" line="65">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="STD_PROPERTIES" args=" " scope="PUBLIC" type="ptConstant" line="64">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="STD_PRINTPRE" args=" " scope="PUBLIC" type="ptConstant" line="63">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="STD_FILESAVE" args=" " scope="PUBLIC" type="ptConstant" line="62">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="STD_FILEOPEN" args=" " scope="PUBLIC" type="ptConstant" line="61">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="STD_FILENEW" args=" " scope="PUBLIC" type="ptConstant" line="60">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="STD_DELETE" args=" " scope="PUBLIC" type="ptConstant" line="59">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="STD_REDO" args=" " scope="PUBLIC" type="ptConstant" line="58">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="STD_UNDO" args=" " scope="PUBLIC" type="ptConstant" line="57">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="STD_PASTE" args=" " scope="PUBLIC" type="ptConstant" line="56">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="STD_COPY" args=" " scope="PUBLIC" type="ptConstant" line="55">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="STD_CUT" args=" " scope="PUBLIC" type="ptConstant" line="54">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_FOCUSRECT" args=" " scope="PUBLIC" type="ptConstant" line="50">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_ROUNDRECT" args=" " scope="PUBLIC" type="ptConstant" line="49">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_RECTANGLE" args=" " scope="PUBLIC" type="ptConstant" line="48">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_BOXRAISED" args=" " scope="PUBLIC" type="ptConstant" line="47">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_TEXTBOX" args=" " scope="PUBLIC" type="ptConstant" line="46">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_LABELOBJ" args=" " scope="PUBLIC" type="ptConstant" line="45">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_COLORRECT" args=" " scope="PUBLIC" type="ptConstant" line="44">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_LINE" args=" " scope="PUBLIC" type="ptConstant" line="43">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_GRIDVERT" args=" " scope="PUBLIC" type="ptConstant" line="42">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_GRIDHORZ" args=" " scope="PUBLIC" type="ptConstant" line="41">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_BOXGET" args=" " scope="PUBLIC" type="ptConstant" line="40">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_OUTLINE" args=" " scope="PUBLIC" type="ptConstant" line="39">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_LABEL" args=" " scope="PUBLIC" type="ptConstant" line="38">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_BOXRECESSED" args=" " scope="PUBLIC" type="ptConstant" line="37">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_IMAGE" args=" " scope="PUBLIC" type="ptConstant" line="36">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_BOXGROUP" args=" " scope="PUBLIC" type="ptConstant" line="35">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_NORMALGET" args=" " scope="PUBLIC" type="ptConstant" line="33">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_TABPAGEFRAME" args=" " scope="PUBLIC" type="ptConstant" line="32">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WPO_TABCONTROLFRAME" args=" " scope="PUBLIC" type="ptConstant" line="31">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="COLOR_WINDOWTEXT" args=" " scope="PUBLIC" type="ptConstant" line="27">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="COLOR_BTNFACE" args=" " scope="PUBLIC" type="ptConstant" line="26">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="CRLF" args=" " scope="PUBLIC" type="ptConstant" line="24">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="CLR_DISABLED" args=" " scope="PUBLIC" type="ptConstant" line="22">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="CLR_UNSELECTED" args=" " scope="PUBLIC" type="ptConstant" line="21">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="CLR_BACKGROUND" args=" " scope="PUBLIC" type="ptConstant" line="20">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="CLR_BORDER" args=" " scope="PUBLIC" type="ptConstant" line="19">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="CLR_ENHANCED" args=" " scope="PUBLIC" type="ptConstant" line="18">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="CLR_STANDARD" args=" " scope="PUBLIC" type="ptConstant" line="17">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VK_INSERT" args=" " scope="PUBLIC" type="ptConstant" line="15">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VK_SCROLL" args=" " scope="PUBLIC" type="ptConstant" line="14">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VK_NUMLOCK" args=" " scope="PUBLIC" type="ptConstant" line="13">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="VK_CAPITAL" args=" " scope="PUBLIC" type="ptConstant" line="12">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WVW_TOOLBAR_ID" args=" " scope="PUBLIC" type="ptConstant" line="10">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WVW_CONTEXTMENU" args=" " scope="PUBLIC" type="ptConstant" line="8">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="WVW_DEFAULT_MENUKEYEVENT" args=" " scope="PUBLIC" type="ptConstant" line="6">
+   <tag filename="C:\xHarbour997\include\WVWTOOLS.CH" name="CRLF" args=" " scope="PUBLIC" type="ptConstant" line="0">
+</taglist>

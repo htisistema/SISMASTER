@@ -1,0 +1,529 @@
+MEMVAR getlist
+************************
+* COMISSAO FUNCIONARIOS
+************************
+FUNCTION mast52()
+*****************
+MEMVAR mdata_sis,nivel_acess,memp_resa
+LOCAL lba,cba,cons_merc:={},i:=0,mcod_fun:=0,mordem:='',cons_grup:={},ccomm:='',;
+      mtipo_rel,mdata1,mdata2,mtot_geral:=0,mtot_prod:=0,mgru_prod:=0,mgru_geral:=0,mprod_mais:='N'
+PRIVATE MPRG:='MAST52',mexcluir:='',mtit:='',mtipo:='',mpag:=0,;
+        mtipo_imp,mimp_tipo:=2,marq:=SPACE(35),mtraco := REPLI('=',132)
+
+IF ! ver_nivel(mprg,'COMISSAO FUNCIONARIOS','15',nivel_acess,,'AMBIE')
+        RETURN NIL
+ENDIF
+op_tela(15,10,21,90,' Relatorio COMISSAO FUNCIONARIOS ['+mprg+']')
+lba:=35
+cba:=70
+CLEAR GETS
+WHILE .T.
+        setcor(1)
+        limpa(0,0,lba,cba)
+        exibi_prg(mprg)
+        mcod_fun := 0
+        mtipo_rel := 'A'
+        mordem := 'A'
+        mdata1 := DATE() -30
+        mdata2 := DATE()
+        mprod_mais:='N'
+        mtot_geral := mtot_prod  := mgru_geral := mgru_prod  := 0
+        mensagem('Preencha os Campos - <ESC> p/Retornar')
+        DEVPOS(0,1);DEVOUT('Codigo do Funcionario ou deixa em Branco.:')
+        DEVPOS(1,1);DEVOUT('[R]esumo ou [E]xtrato....................:')
+        DEVPOS(2,1);DEVOUT('Comissao so nos 10% [S/N]................:')
+        DEVPOS(3,1);DEVOUT('Data inicial ............................:')
+        DEVPOS(4,1);DEVOUT('Data Final...............................:')
+        @ 0,45 GET mcod_fun PICT '999'
+        READ
+        IF LASTKEY() = 27
+                wvw_lclosewindow()
+                RETURN .T.
+        ENDIF
+        IF ! EMPTY(mcod_fun)
+                cons_merc := {}
+                sr_getconnection():exec("SELECT * FROM mastgrupo WHERE cod_graco = "+sr_cdbvalue(STRZERO(mcod_fun,3)),,.t.,@cons_merc)
+                IF LEN(cons_merc) = 0
+                        atencao('GRUPO nao em nosso Arquivo !!!')
+                        LOOP
+                ENDIF
+                setcor(3)
+                DEVPOS(1,49);DEVOUT(cons_merc[1,2])
+                setcor(1)
+                mtipo := 'GRUPO: '+STRZERO(mcod_fun,3)
+                ccomm := ccomm + " AND grupo = "+sr_cdbvalue(STRZERO(mcod_fun,3))
+        ENDIF
+        @ 1,45 GET mprod_mais PICT '@!' VALID mprod_mais $ 'S,N'
+        @ 2,45 GET mordem PICT '@!' VALID mordem $ 'A,C,G'
+        @ 3,45 GET mtipo_rel PICT '@!' VALID mtipo_rel $ 'S,A,M' WHEN mprod_mais = 'N'
+        @ 4,45 GET mdata1 VALID IF(EMPTY(mdata1),.F.,.T.)
+        @ 5,45 GET mdata2 VALID IF(EMPTY(mdata2),.F.,.T.)
+        READ
+        IF LASTKEY() = 27
+                LOOP
+        ENDIF
+        IF mprod_mais ='S'
+                mtipo_rel := 'S'
+        ENDIF
+        IF mtipo_rel = 'A'
+                mtit := 'MOVIMENTO DE PRODUTOS - Analitico'
+        ELSEIF mtipo_rel = 'S'
+                mtit := 'MOVIMENTO DE PRODUTOS - Sintetico'
+        ELSE
+                mtit := 'MOVIMENTO DE PRODUTOS - Sintetico Mesas'
+        ENDIF
+        mtipo := mtipo + ' - Periodo: '+DTOC(mdata1)+' a '+DTOC(mdata2)
+        IF mtipo_rel = 'A'
+                ccomm :="SELECT * FROM mastmov WHERE dat_pag IS NOT NULL AND data >= "+sr_cdbvalue(mdata1)+" AND data <= "+sr_cdbvalue(mdata2)
+                IF mordem = 'A'
+                        ccomm := ccomm + " ORDER BY descri"
+                        mtipo := 'Por Ordem de Alfabetica'
+                ELSEIF mordem = 'C'
+                        ccomm := ccomm + " ORDER BY cod_prod"
+                        mtipo := 'Por Ordem de Codigo'
+                ENDIF
+                IF ! EMPTY(mcod_fun)
+                        ccomm := ccomm + " AND grupo = "+sr_cdbvalue(STRZERO(mcod_fun,3))
+                ENDIF
+                IF mordem # 'G'
+                        cons_merc := {}
+                        //atencao(ccomm)
+                        sr_getconnection():exec(ccomm,,.t.,@cons_merc)
+                        IF LEN(cons_merc) = 0
+                                atencao('Nao existe nenhum produto em nosso Arquivo !!!')
+                                LOOP
+                        ENDIF
+                        IF ! imp_arq('MOV_PROD.REL','R')
+                                LOOP
+                        ENDIF
+                        mpag := 1
+                        cabecalho(mpag,mtit,mtipo,mprg)
+                        imprt(mtipo_imp,'C')
+                        DEVPOS(PROW()+1,00);DEVOUT(' Cod.')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('Descricao                     ')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('  Quantd.')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('    Preco')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('    Total')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('  Data  ')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('Local')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('  Doc.')
+                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                        i:= mtot_geral:=0
+                        FOR i = 1 TO LEN(cons_merc)
+                                mensagem('Produtos: '+cons_merc[i,5]+' - '+cons_merc[i,6])
+                                DEVPOS(PROW()+1,00);DEVOUT(cons_merc[i,5])
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(cons_merc[i,6])
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,7],'99,999.99'))
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,8],'99,999.99'))
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,8]*cons_merc[i,7],'99,999.99'))
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(cons_merc[i,3])
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(cons_merc[i,2])
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(cons_merc[i,1])
+                                mtot_geral := mtot_geral + (cons_merc[i,8]*cons_merc[i,7])
+                                mtot_prod  := mtot_prod + cons_merc[i,7]
+                                IF PROW() > 59
+                                        EJECT
+                                        mpag ++
+                                        cabecalho(mpag,mtit,mtipo,mprg)
+                                        imprt(mtipo_imp,'C')
+                                        DEVPOS(PROW()+1,00);DEVOUT(' Cod.')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('Descricao                     ')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('  Quantd.')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('    Preco')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('    Total')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('  Data  ')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('Local')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('  Doc.')
+                                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                ENDIF
+                        NEXT
+                        IF PROW() > 57
+                                EJECT
+                                mpag ++
+                                cabecalho(mpag,mtit,mtipo,mprg)
+                        ENDIF
+                        DEVPOS(PROW()+2,0);DEVOUT('Quantidade de Produtos: '+STRZERO(mtot_prod,8))
+                        DEVPOS(PROW()+1,0);DEVOUT('Valor Total em R$.....: '+TRANSFORM(mtot_geral,'99,999,999.99'))
+                ELSE
+                        cons_grup := {}
+                        sr_getconnection():exec("SELECT * FROM mastgrupo ORDER BY grupo",,.t.,@cons_grup)
+                        IF LEN(cons_grup) = 0
+                                atencao('Nao existe nenhum produto em nosso Arquivo !!!')
+                                LOOP
+                        ENDIF
+                        IF ! imp_arq('TABPRECO.REL','R')
+                                LOOP
+                        ENDIF
+                        mpag := 1
+                        cabecalho(mpag,mtit,mtipo,mprg)
+                        imprt(mtipo_imp,'C')
+                        y:=0
+                        FOR y = 1 TO LEN(cons_grup)
+                                mgru_prod := mgru_geral:=0
+                                ccomm :="SELECT mastmov.cod_prod,mastmov.descri,sum(mastmov.qtd),sum(mastmov.qtd*mastmov.preco) FROM mastmov,mastprod WHERE mastmov.dat_pag IS NOT NULL AND mastmov.data >= "+sr_cdbvalue(mdata1)+" AND mastmov.data <= "+sr_cdbvalue(mdata2)+' AND mastprod.grupo = '+sr_cdbvalue(cons_grup[h,1])+' AND mastprod.codigo = mastmov.cod_prod'
+                                IF ! EMPTY(mcod_fun)
+                                        ccomm := ccomm + " AND mastmov.grupo = "+sr_cdbvalue(STRZERO(mcod_fun,3))
+                                ENDIF
+                                ccomm := ccomm + "  GROUP BY mastmov.cod_prod,mastmov.cod_prod,mastmov.descri,mastmov.descri"
+                                IF mordem = 'A'
+                                        ccomm := ccomm + " ORDER BY mastmov.descri"
+                                        mtipo := 'Por Ordem de Alfabetica'
+                                ELSEIF mordem = 'C'
+                                        ccomm := ccomm + " ORDER BY mastmov.cod_prod"
+                                        mtipo := 'Por Ordem de Codigo'
+                                ENDIF
+                                cons_merc := {}
+                                sr_getconnection():exec(ccomm,,.t.,@cons_merc)
+                                IF LEN(cons_merc) = 0
+                                        LOOP
+                                ENDIF
+                                DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                DEVPOS(PROW()+1,00);DEVOUT(PADC('GRUPO: '+cons_grup[y,1]+' - '+cons_grup[y,2],80))
+                                DEVPOS(PROW()+1,00);DEVOUT(' Cod.')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('Descricao                     ')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('  Quantd.')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('    Preco')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('    Total')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('  Data  ')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('Local')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('  Doc.')
+                                DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                m:=0
+                                FOR m = 1 TO LEN(c_merc)
+                                        cons_merc := {}
+                                        sr_getconnection():exec(ccomm+' AND cod_prod = '+sr_cdbvalue(c_merc[m,1]),,.t.,@cons_merc)
+                                        IF LEN(cons_merc) = 0
+                                                LOOP
+                                        ENDIF
+                                        i:=0
+                                        FOR i = 1 TO LEN(cons_merc)
+                                                mensagem('Produtos: '+cons_merc[i,5]+' - '+cons_merc[i,6])
+                                                DEVPOS(PROW()+1,00);DEVOUT(cons_merc[i,5])
+                                                DEVPOS(PROW(),PCOL()+1);DEVOUT(cons_merc[i,6])
+                                                DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,7],'99,999.99'))
+                                                DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,8],'99,999.99'))
+                                                DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,8]*cons_merc[i,7],'99,999.99'))
+                                                DEVPOS(PROW(),PCOL()+1);DEVOUT(cons_merc[i,3])
+                                                DEVPOS(PROW(),PCOL()+1);DEVOUT(cons_merc[i,2])
+                                                DEVPOS(PROW(),PCOL()+1);DEVOUT(cons_merc[i,1])
+                                                mtot_geral := mtot_geral + (cons_merc[i,8]*cons_merc[i,7])
+                                                mtot_prod  := mtot_prod + cons_merc[i,7]
+                                                mgru_geral := mgru_geral + (cons_merc[i,8]*cons_merc[i,7])
+                                                mgru_prod  := mgru_prod + cons_merc[i,7]
+                                                IF PROW() > 58
+                                                        EJECT
+                                                        mpag ++
+                                                        cabecalho(mpag,mtit,mtipo,mprg)
+                                                        imprt(mtipo_imp,'C')
+                                                        DEVPOS(PROW()+1,00);DEVOUT(PADC('GRUPO: '+cons_grup[y,1]+' - '+cons_grup[y,2],80))
+                                                        DEVPOS(PROW()+1,00);DEVOUT(' Cod.')
+                                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('Descricao                     ')
+                                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('  Quantd.')
+                                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('    Preco')
+                                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('    Total')
+                                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('  Data  ')
+                                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('Local')
+                                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('  Doc.')
+                                                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                                ENDIF
+                                        NEXT
+                                NEXT
+                                DEVPOS(PROW()+2,0);DEVOUT('Quantidade: '+STRZERO(mgru_prod,4)+' - '+'Valor Total R$: '+TRANSFORM(mgru_geral,'999,999.99'))
+                        NEXT
+                        IF PROW() > 57
+                                EJECT
+                                mpag ++
+                                cabecalho(mpag,mtit,mtipo,mprg)
+                                imprt(mtipo_imp,'C')
+                        ENDIF
+                        DEVPOS(PROW()+2,0);DEVOUT('Quantidade de Produtos: '+STRZERO(mtot_prod,8))
+                        DEVPOS(PROW()+1,0);DEVOUT('Valor Total em R$.....: '+TRANSFORM(mtot_geral,'99,999,999.99'))
+                ENDIF
+        ELSEIF mtipo_rel = 'S'
+                ccomm :="SELECT cod_prod,descri,sum(qtd),sum(qtd*preco) FROM mastmov WHERE dat_pag IS NOT NULL AND data >= "+sr_cdbvalue(mdata1)+" AND data <= "+sr_cdbvalue(mdata2)
+                IF ! EMPTY(mcod_fun)
+                        ccomm := ccomm + " AND grupo = "+sr_cdbvalue(STRZERO(mcod_fun,3))
+                ENDIF
+                ccomm := ccomm + "  GROUP BY cod_prod,cod_prod,descri,descri"
+                IF mordem = 'A'
+                        ccomm := ccomm + " ORDER BY descri"
+                        mtipo := 'Por Ordem de Alfabetica'
+                ELSEIF mordem = 'C'
+                        ccomm := ccomm + " ORDER BY cod_prod"
+                        mtipo := 'Por Ordem de Codigo'
+                ENDIF
+                //SELECT cod_prod,sum(qtd),sum(qtd*preco) FROM mastmov WHERE dat_pag IS NOT NULL GROUP BY COD_PROD,COD_PROD
+                IF mordem # 'G'
+                        cons_merc := {}
+                        //atencao(ccomm)
+                        sr_getconnection():exec(ccomm,,.t.,@cons_merc)
+                        IF LEN(cons_merc) = 0
+                                atencao('Nao existe nenhum produto em nosso Arquivo !!!')
+                                LOOP
+                        ENDIF
+                        IF mprod_mais = 'S'
+                                ASORT(cons_merc,,,{|x,y| x[3] > y[3]})
+                        ENDIF
+                        IF ! imp_arq('MOV_PROD.REL','R')
+                                LOOP
+                        ENDIF
+                        mpag := 1
+                        cabecalho(mpag,mtit,mtipo,mprg)
+                        imprt(mtipo_imp,'C')
+                        DEVPOS(PROW()+1,00);DEVOUT(' Cod.')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('Descricao                     ')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('  Quantd.')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('Preco Med')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('    Total')
+                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                        i:= mtot_geral:=0
+                        FOR i = 1 TO LEN(cons_merc)
+                                mensagem('Produtos: '+cons_merc[i,1]+' - '+cons_merc[i,2])
+                                DEVPOS(PROW()+1,00);DEVOUT(cons_merc[i,1])
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(cons_merc[i,2])
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,3],'99,999.99'))
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,4]/cons_merc[i,3],'99,999.99'))
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,4],'99,999.99'))
+                                mtot_geral := mtot_geral + cons_merc[i,4]
+                                mtot_prod  := mtot_prod + cons_merc[i,3]
+                                IF PROW() > 59
+                                        EJECT
+                                        mpag ++
+                                        cabecalho(mpag,mtit,mtipo,mprg)
+                                        imprt(mtipo_imp,'C')
+                                        DEVPOS(PROW()+1,00);DEVOUT(' Cod.')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('Descricao                     ')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('  Quantd.')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('Preco Med')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('    Total')
+                                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                ENDIF
+                        NEXT
+                        IF PROW() > 57
+                                EJECT
+                                mpag ++
+                                cabecalho(mpag,mtit,mtipo,mprg)
+                        ENDIF
+                        DEVPOS(PROW()+2,0);DEVOUT('Quantidade de Produtos: '+STRZERO(mtot_prod,8))
+                        DEVPOS(PROW()+1,0);DEVOUT('Valor Total em R$.....: '+TRANSFORM(mtot_geral,'99,999,999.99'))
+                ELSE
+                        cons_grup := {}
+                        sr_getconnection():exec("SELECT * FROM mastgrupo ORDER BY grupo",,.t.,@cons_grup)
+                        IF LEN(cons_grup) = 0
+                                atencao('Nao existe nenhum produto em nosso Arquivo !!!')
+                                LOOP
+                        ENDIF
+                        IF ! imp_arq('TABPRECO.REL','R')
+                                LOOP
+                        ENDIF
+                        mpag := 1
+                        cabecalho(mpag,mtit,mtipo,mprg)
+                        imprt(mtipo_imp,'C')
+                        h:=0
+                        FOR h = 1 TO LEN(cons_grup)
+                                mgru_prod := mgru_geral:=0
+                                ccomm :="SELECT mastmov.cod_prod,mastmov.descri,sum(mastmov.qtd),sum(mastmov.qtd*mastmov.preco) FROM mastmov,mastprod WHERE mastmov.dat_pag IS NOT NULL AND mastmov.data >= "+sr_cdbvalue(mdata1)+" AND mastmov.data <= "+sr_cdbvalue(mdata2)+' AND mastprod.grupo = '+sr_cdbvalue(cons_grup[h,1])+' AND mastprod.codigo = mastmov.cod_prod'
+                                IF ! EMPTY(mcod_fun)
+                                        ccomm := ccomm + " AND mastmov.grupo = "+sr_cdbvalue(STRZERO(mcod_fun,3))
+                                ENDIF
+                                ccomm := ccomm + "  GROUP BY mastmov.cod_prod,mastmov.cod_prod,mastmov.descri,mastmov.descri"
+                                IF mordem = 'A'
+                                        ccomm := ccomm + " ORDER BY mastmov.descri"
+                                        mtipo := 'Por Ordem de Alfabetica'
+                                ELSEIF mordem = 'C'
+                                        ccomm := ccomm + " ORDER BY mastmov.cod_prod"
+                                        mtipo := 'Por Ordem de Codigo'
+                                ENDIF
+                                cons_merc := {}
+                                sr_getconnection():exec(ccomm,,.t.,@cons_merc)
+                                IF LEN(cons_merc) = 0
+                                        LOOP
+                                ENDIF
+                                DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                DEVPOS(PROW()+1,00);DEVOUT(PADC('GRUPO: '+cons_grup[h,1]+' - '+cons_grup[h,2],80))
+                                DEVPOS(PROW()+1,00);DEVOUT(' Cod.')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('Descricao                     ')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('  Quantd.')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('Preco Med')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('    Total')
+                                DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                IF mprod_mais = 'S'
+                                        ASORT(cons_merc,,,{|x,y| x[3] > y[3]})
+                                ENDIF
+                                i:=0
+                                FOR i = 1 TO LEN(cons_merc)
+                                        mensagem('Produtos: '+cons_merc[i,1]+' - '+cons_merc[i,2])
+                                        DEVPOS(PROW()+1,00);DEVOUT(cons_merc[i,1])
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT(cons_merc[i,2])
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,3],'99,999.99'))
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,4]/cons_merc[i,3],'99,999.99'))
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,4],'99,999.99'))
+                                        mtot_geral := mtot_geral + cons_merc[i,4]
+                                        mtot_prod  := mtot_prod + cons_merc[i,3]
+                                        mgru_geral := mgru_geral + cons_merc[i,4]
+                                        mgru_prod  := mgru_prod + cons_merc[i,3]
+                                        IF PROW() > 58
+                                                EJECT
+                                                mpag ++
+                                                cabecalho(mpag,mtit,mtipo,mprg)
+                                                imprt(mtipo_imp,'C')
+                                                DEVPOS(PROW()+1,00);DEVOUT(PADC('GRUPO: '+cons_grup[h,1]+' - '+cons_grup[h,2],80))
+                                                DEVPOS(PROW()+1,00);DEVOUT(' Cod.')
+                                                DEVPOS(PROW(),PCOL()+1);DEVOUT('Descricao                     ')
+                                                DEVPOS(PROW(),PCOL()+1);DEVOUT('  Quantd.')
+                                                DEVPOS(PROW(),PCOL()+1);DEVOUT('Preco Med')
+                                                DEVPOS(PROW(),PCOL()+1);DEVOUT('    Total')
+                                                DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                        ENDIF
+                                NEXT
+                                DEVPOS(PROW()+2,0);DEVOUT('Quantidade: '+STRZERO(mgru_prod,4)+' - '+'Valor Total R$: '+TRANSFORM(mgru_geral,'999,999.99'))
+                        NEXT
+                        IF PROW() > 57
+                                EJECT
+                                mpag ++
+                                cabecalho(mpag,mtit,mtipo,mprg)
+                                imprt(mtipo_imp,'C')
+                        ENDIF
+                        DEVPOS(PROW()+2,0);DEVOUT('Quantidade de Produtos: '+STRZERO(mtot_prod,8))
+                        DEVPOS(PROW()+1,0);DEVOUT('Valor Total em R$.....: '+TRANSFORM(mtot_geral,'99,999,999.99'))
+                ENDIF
+        ELSE
+                ccomm :="SELECT num_local,sum(qtd),sum(qtd*preco) FROM mastmov WHERE dat_pag IS NOT NULL AND data >= "+sr_cdbvalue(mdata1)+" AND data <= "+sr_cdbvalue(mdata2)
+                IF ! EMPTY(mcod_fun)
+                        ccomm := ccomm + " AND grupo = "+sr_cdbvalue(STRZERO(mcod_fun,3))
+                ENDIF
+                ccomm := ccomm + "  GROUP BY num_local,num_local"
+                ccomm := ccomm + " ORDER BY num_local"
+                mtipo := 'Por Ordem de Mesas'
+                //SELECT cod_prod,sum(qtd),sum(qtd*preco) FROM mastmov WHERE dat_pag IS NOT NULL GROUP BY COD_PROD,COD_PROD
+                IF mordem # 'G'
+                        cons_merc := {}
+                        sr_getconnection():exec(ccomm,,.t.,@cons_merc)
+                        IF LEN(cons_merc) = 0
+                                atencao('Nao existe nenhum produto em nosso Arquivo !!!')
+                                LOOP
+                        ENDIF
+                        IF mprod_mais = 'S'
+                                ASORT(cons_merc,,,{|x,y| x[2] > y[2]})
+                        ENDIF
+                        IF ! imp_arq('MOV_PROD.REL','R')
+                                LOOP
+                        ENDIF
+                        mpag := 1
+                        cabecalho(mpag,mtit,mtipo,mprg)
+                        imprt(mtipo_imp,'C')
+                        DEVPOS(PROW()+1,00);DEVOUT(' Mesa')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('  Quantd.')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('Preco Med')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('    Total')
+                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                        i:= mtot_geral:=0
+                        FOR i = 1 TO LEN(cons_merc)
+                                mensagem('Mesa: '+cons_merc[i,1])
+                                DEVPOS(PROW()+1,00);DEVOUT(cons_merc[i,1])
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,2],'99,999.99'))
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,3]/cons_merc[i,2],'99,999.99'))
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,3],'99,999.99'))
+                                mtot_geral := mtot_geral + cons_merc[i,3]
+                                mtot_prod  := mtot_prod + cons_merc[i,2]
+                                IF PROW() > 59
+                                        EJECT
+                                        mpag ++
+                                        cabecalho(mpag,mtit,mtipo,mprg)
+                                        imprt(mtipo_imp,'C')
+                                        DEVPOS(PROW()+1,00);DEVOUT(' Mesa')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('  Quantd.')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('Preco Med')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('    Total')
+                                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                ENDIF
+                        NEXT
+                        IF PROW() > 57
+                                EJECT
+                                mpag ++
+                                cabecalho(mpag,mtit,mtipo,mprg)
+                        ENDIF
+                        DEVPOS(PROW()+2,0);DEVOUT('Quantidade de Produtos: '+STRZERO(mtot_prod,8))
+                        DEVPOS(PROW()+1,0);DEVOUT('Valor Total em R$.....: '+TRANSFORM(mtot_geral,'99,999,999.99'))
+                ELSE
+                        cons_grup := {}
+                        sr_getconnection():exec("SELECT * FROM mastgrupo ORDER BY grupo",,.t.,@cons_grup)
+                        IF LEN(cons_grup) = 0
+                                atencao('Nao existe nenhum produto em nosso Arquivo !!!')
+                                LOOP
+                        ENDIF
+                        IF ! imp_arq('TABPRECO.REL','R')
+                                LOOP
+                        ENDIF
+                        mpag := 1
+                        cabecalho(mpag,mtit,mtipo,mprg)
+                        imprt(mtipo_imp,'C')
+                        h:=0
+                        FOR h = 1 TO LEN(cons_grup)
+                                mgru_prod := mgru_geral:=0
+                                ccomm :="SELECT num_local,sum(mastmov.qtd),sum(mastmov.qtd*mastmov.preco) FROM mastmov,mastprod WHERE mastmov.dat_pag IS NOT NULL AND mastmov.data >= "+sr_cdbvalue(mdata1)+" AND mastmov.data <= "+sr_cdbvalue(mdata2)+' AND mastprod.grupo = '+sr_cdbvalue(cons_grup[h,1])+' AND mastprod.codigo = mastmov.cod_prod'
+                                IF ! EMPTY(mcod_fun)
+                                        ccomm := ccomm + " AND mastmov.grupo = "+sr_cdbvalue(STRZERO(mcod_fun,3))
+                                ENDIF
+                                ccomm := ccomm + "  GROUP BY num_local,num_local"
+                                ccomm := ccomm + " ORDER BY num_local"
+                                mtipo := 'Por Ordem de Mesas'
+                                cons_merc := {}
+                                sr_getconnection():exec(ccomm,,.t.,@cons_merc)
+                                IF LEN(cons_merc) = 0
+                                        LOOP
+                                ENDIF
+                                DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                DEVPOS(PROW()+1,00);DEVOUT(PADC('GRUPO: '+cons_grup[h,1]+' - '+cons_grup[h,2],80))
+                                DEVPOS(PROW()+1,00);DEVOUT(' Mesa')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('  Quantd.')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('Preco Med')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('    Total')
+                                DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                IF mprod_mais = 'S'
+                                        ASORT(cons_merc,,,{|x,y| x[2] > y[2]})
+                                ENDIF
+                                i:=0
+                                FOR i = 1 TO LEN(cons_merc)
+                                        mensagem('Mesa: '+cons_merc[i,1])
+                                        DEVPOS(PROW()+1,00);DEVOUT(cons_merc[i,1])
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,2],'99,999.99'))
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,3]/cons_merc[i,2],'99,999.99'))
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,3],'99,999.99'))
+                                        mtot_geral := mtot_geral + cons_merc[i,3]
+                                        mtot_prod  := mtot_prod + cons_merc[i,2]
+                                        mgru_geral := mgru_geral + cons_merc[i,3]
+                                        mgru_prod  := mgru_prod + cons_merc[i,2]
+                                        IF PROW() > 58
+                                                EJECT
+                                                mpag ++
+                                                cabecalho(mpag,mtit,mtipo,mprg)
+                                                imprt(mtipo_imp,'C')
+                                                DEVPOS(PROW()+1,00);DEVOUT(PADC('GRUPO: '+cons_grup[h,1]+' - '+cons_grup[h,2],80))
+                                                DEVPOS(PROW()+1,00);DEVOUT(' Mesa')
+                                                DEVPOS(PROW(),PCOL()+1);DEVOUT('  Quantd.')
+                                                DEVPOS(PROW(),PCOL()+1);DEVOUT('Preco Med')
+                                                DEVPOS(PROW(),PCOL()+1);DEVOUT('    Total')
+                                                DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                        ENDIF
+                                NEXT
+                                DEVPOS(PROW()+2,0);DEVOUT('Quantidade: '+STRZERO(mgru_prod,4)+' - '+'Valor Total R$: '+TRANSFORM(mgru_geral,'999,999.99'))
+                        NEXT
+                        IF PROW() > 57
+                                EJECT
+                                mpag ++
+                                cabecalho(mpag,mtit,mtipo,mprg)
+                                imprt(mtipo_imp,'C')
+                        ENDIF
+                        DEVPOS(PROW()+2,0);DEVOUT('Quantidade de Produtos: '+STRZERO(mtot_prod,8))
+                        DEVPOS(PROW()+1,0);DEVOUT('Valor Total em R$.....: '+TRANSFORM(mtot_geral,'99,999,999.99'))
+                ENDIF
+        ENDIF
+        EJECT
+        SETPRC(00,00)
+        SET DEVI TO SCREEN;SET PRINT TO;SET PRINT OFF
+        conf_impressao('MOV_PROD.REL')
+ENDDO
+wvw_lclosewindow()
+RETURN NIL
+*********************** f i m ***********************************

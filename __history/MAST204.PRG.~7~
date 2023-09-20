@@ -1,0 +1,270 @@
+MEMVAR getlist
+*************************
+* FECHAMENTO PARCIAL
+*************************
+FUNCTION mast204()
+******************
+MEMVAR mdata_sis,nivel_acess
+LOCAL MPRG:='MAST204',lci,cci,lba,cba,cons_merc:={},mtipo_lanca := 'M'
+PRIVATE mnum_mesa:=0
+IF mtipo_lanca = 'M'
+        IF ! ver_nivel(mprg+'MESA','FECHAMENTO PARCIAL DE MESAS','15',nivel_acess,,'AMBIE')
+                RETURN NIL
+        ENDIF
+        op_tela(10,10,13,90,' FECHAMENTO PARCIAL DE MESAS  ['+mprg+']')
+ELSEIF mtipo_lanca = 'Q'
+        IF ! ver_nivel(mprg+'QTO','FECHAMENTO PARCIAL DE QUARTOS','15',nivel_acess,,'AMBIE')
+                RETURN NIL
+        ENDIF
+        op_tela(10,10,13,90,' FECHAMENTO PARCIAL DE QUARTOS  ['+mprg+']')
+ELSEIF mtipo_lanca = 'C'
+        IF ! ver_nivel(mprg+'CHL','FECHAMENTO PARCIAL DE CHALES','15',nivel_acess,,'AMBIE')
+                RETURN NIL
+        ENDIF
+        op_tela(10,10,13,90,' FECHAMENTO PARCIAL DE CHALES  ['+mprg+']')
+ENDIF
+lci:=cci:=00
+CLEAR GETS
+WHILE .T.
+        setcor(1)
+        limpa(lci,cci,lba,cba)
+        exibi_prg(mprg)
+        mtipo_lanca := 'M'
+        mcod_merc := mnum_mesa := mqtd := mcod_garcon := 0
+        mmerc := SPACE(30)
+        mensagem('Preencha os Campos - <ESC> p/Retornar')
+        DEVPOS(lci+1,cci+1);DEVOUT('Numero MESA:')
+        @ lci+1,cci+15 GET mnum_mesa PICT '9999' VALID IF(EMPTY(mnum_mesa),.F.,.T.) .AND. lim_get() WHEN men_get(,,'Digite o Numero da MESA - [ESC] p/Retonar')
+        READ
+        IF LASTKEY() = 27
+                wvw_lclosewindow()
+                RETURN .T.
+        ENDIF
+        cons_merc := {}
+        sr_getconnection():exec("SELECT * FROM mastmesas WHERE tipo = "+sr_cdbvalue(mtipo_lanca)+" AND numero = "+sr_cdbvalue(STRZERO(mnum_mesa,4)),,.t.,@cons_merc)
+        IF LEN(cons_merc) = 0
+                atencao('MESA nao existe em nossos Arquivo !!!')
+                LOOP
+        ENDIF
+        cons_merc := {}
+        sr_getconnection():exec("SELECT * FROM mastmov WHERE num_local = "+sr_cdbvalue(mtipo_lanca+STRZERO(mnum_mesa,4))+' AND dat_pag IS NULL',,.t.,@cons_merc)
+        IF LEN(cons_merc) = 0
+                atencao('Esta MESA nao estar ABERTA nao podendo ser solicitada !!!')
+                LOOP
+        ENDIF
+        IF LASTKEY() = 27 .OR. 'N' = op_simnao('S','Confirma a FECHAMENTO PARCIAL DA MESA: '+mtipo_lanca+STRZERO(mnum_mesa,4))
+                LOOP
+        ENDIF
+        Fecha_parc(mtipo_lanca,mnum_mesa,VAL(cons_merc[1,1]))
+        EXIT
+ENDDO
+wvw_lclosewindow()
+RETURN NIL
+********************************** F I M ******************************************
+FUNCTION conf_impressao(marquivo,memail,mtip)
+*********************************************
+LOCAL mnome_aux:=''
+MEMVAR mnome_arq, mimp_tipo
+
+MYRUN('MD '+CURDRIVE()+':\'+ALLTRIM(m_indiv[1,5]))
+IF mimp_tipo = 5 .OR. mtip # NIL
+        enviar_email(marquivo,memail,mtip)
+ELSEIF mimp_tipo = 1
+        IF mtipo_imp = 'J'
+                //MYRUN('DOSPRINTER '+IF(m_cfg[79]='2','/SEL2','/SEL')+' /DEL '+ALLTRIM(m_indiv[1,5])+'HRB.REL')
+                MYRUN('DOSPRINTER /SEL /DEL '+ALLTRIM(m_indiv[1,5])+'HRB.REL')
+        ELSEIF mtipo_imp = 'M'
+                MYRUN('DOSPRINTER /RAW /DEL '+ALLTRIM(m_indiv[1,5])+'HRB.REL')
+        ENDIF
+ELSEIF mimp_tipo = 2
+        MYRUN('DOSPRINTER /SEL2 /DEL '+ALLTRIM(m_indiv[1,5])+'HRB.REL')
+ENDIF
+RETURN
+***************************  F I M  **********************************
+* TIPO DE IMPRESSAO  ARQUIVOS OU IMPRESSORA
+*******************************************
+FUNCTION imp_arq(imp_arq,mporta,op,linha,comp,mens,msenha_lib,mexcel)
+*********************************************************************
+LOCAL mtp_impre:=0
+mimp_tipo :=0
+mporta_imp:=mtipo_imp :=' '
+mnome_arq := imp_arq
+op_tela(03,10,14,98,' Configuracao de IMPRESSAO - Arquivo: '+ALLTRIM(mnome_arq),,1)
+WvW_ClearGetVarList()
+IF op = NIL
+        op := 'S'
+ENDIF
+IF mporta = NIL
+        mporta := 'R'
+ENDIF
+mnome_arq := ALLTRIM(m_indiv[1,5])+imp_arq+SPACE(50-LEN(ALLTRIM(m_indiv[1,5])+imp_arq))
+mtp_impre:=0
+WHILE .T.
+        imp_arq := mnome_arq
+        mimp_tipo := 1
+        IF mporta = 'R'
+                mporta_imp := m_indiv[1,17]
+                mtipo_imp  := m_indiv[1,18]
+        ELSEIF mporta = 'T'
+                mporta_imp := m_indiv[1,7]
+                mtipo_imp  := m_indiv[1,10]
+        ELSEIF mporta = 'D'
+                mporta_imp := m_indiv[1,20]
+                mtipo_imp  := m_indiv[1,18]
+        ELSEIF mporta = 'B'
+                mporta_imp := m_indiv[1,24]
+                mtipo_imp  := m_indiv[1,10]
+        ELSEIF mporta = 'N'
+                mporta_imp := m_indiv[1,23]
+                mtipo_imp  := 'M'
+        ELSEIF mporta = 'K'
+                mporta_imp := m_indiv[1,19]
+                mtipo_imp  := m_indiv[1,10]
+        ELSE
+                mporta_imp := 'LPT1'
+                mtipo_imp  := 'M'
+        ENDIF
+	IF mtipo_imp = 'M'
+		mtp_impre:=1
+	ELSE
+		mtp_impre:=2
+	ENDIF
+        limpa(00,00,30,80)
+        setcor(1)
+        @ 4,0 TO 4,70
+        DEVPOS(6,1);DEVOUT('Tipo da Impressora [J]ato [M]atriz...:')
+        DEVPOS(8,1);DEVOUT('Nome do Arquivo de impressao.........:')
+        //DEVPOS(9,1);DEVOUT('Porta Impressora.....................:')
+        //DEVPOS(10,1);DEVOUT('Diminuir Espacos entre Linhas [s/N]..:')
+        botao1(5,40,7,53)
+        botao1(5,56,7,69)
+        setcor(3)
+        DEVPOS(6,41);DEVOUT(' MATRICIAL  ')
+        DEVPOS(6,57);DEVOUT(' JATO TINTA ')
+        setcor(1)
+
+        botao1(1,02,3,15)
+        botao1(1,20,3,33)
+        botao1(1,37,3,50)
+        botao1(1,55,3,68)
+        botao1(1,73,3,86)
+        @ 2,03 PROMPT ' IMPRESSORA '
+        @ 2,21 PROMPT '  CONSULTA  '        //+marq
+        @ 2,38 PROMPT '  ARQUIVO   '        //+marq
+        IF mexcel <> NIL
+                @ 2,56 PROMPT '   EXCEL    '        //+marq
+        ELSE
+                @ 2,56 PROMPT ' Nao Disp.  '        //+marq
+        ENDIF
+        @ 2,74 PROMPT         'ENVIAR EMAIL'        //+marq
+        SET INTEN ON
+        MENU TO mimp_tipo
+        IF LASTKEY() = 27
+                EXIT
+        ENDIF
+        IF ! mimp_tipo = 3 .AND. ! mimp_tipo = 5 .AND. ! mimp_tipo = 2
+                @ 6,41 PROMPT ' MATRICIAL  '
+                @ 6,57 PROMPT ' JATO TINTA '
+                SET INTEN ON
+                MENU TO mtp_impre
+                IF LASTKEY() = 27
+                        LOOP
+                ENDIF
+                IF mtp_impre = 1
+                        mtipo_imp := 'M'
+                ELSE
+                        mtipo_imp := 'J'
+                ENDIF
+        ENDIF
+        IF mimp_tipo = 2
+                mtipo_imp := 'M'
+        ENDIF
+        IF mimp_tipo = 4
+                IF mexcel = NIL
+                        atencao('Esta opcao nao estar disponivel para este Relatorio')
+                ENDIF
+        ENDIF
+        IF (mtipo_imp = 'J' .AND. mimp_tipo = 1)
+                //mimp_tipo := 3
+                //mtipo_imp := 'D'
+                imp_arq := ALLTRIM(m_indiv[1,5])+'HRB.REL'
+        ELSEIF (mimp_tipo = 2 .AND.  m_set[1,41] = 'P')
+                imp_arq := ALLTRIM(m_indiv[1,5])+'HRB.REL'
+        ELSE
+                IF mimp_tipo = 1 .AND. ! EMPTY(mens)
+                        IF msenha_lib = 'IMP_2VIAPED'
+                                IF ! ver_nivel('IMP_ARQ2VIA','" IMPRESSAO " DA 2a.VIA DE PEDIDO','12345',nivel_acess,,'AMBIE')
+                                        LOOP
+                                ENDIF
+                        ELSE
+                                IF ! aut_sen('Senha de autorizacao '+mens,msenha_lib)
+                                        LOOP
+                                ENDIF
+                        ENDIF
+                ELSEIF mimp_tipo = 2
+                        mtipo_imp := 'M'
+                ELSEIF mimp_tipo = 3 .OR. mimp_tipo = 5
+                        IF ! ver_nivel('IMP_ARQ','IMPRESSAO PARA ARQUIVO','17',nivel_acess,,'AMBIE')
+                                LOOP
+                        ENDIF
+                        mporta := 'PRN '
+                        @ 08,40 GET imp_arq PICT '@S30!' VALID IF(EMPTY(imp_arq),.F.,.T.)
+                        READ
+                        IF LASTKEY() = 27
+                                LOOP
+                        ENDIF
+                ELSEIF mimp_tipo = 4
+                        IF ! ver_nivel('IMP_ARQ','IMPRESSAO PARA ARQUIVO','17',nivel_acess,,'AMBIE')
+                                LOOP
+                        ENDIF
+                        mporta := 'PRN '
+                        imp_arq := SUBSTR(imp_arq,1,LEN(ALLTRIM(imp_arq))-4)+'.XLS'+SPACE(10)
+                        @ 08,40 GET imp_arq PICT '@S30!' VALID IF(EMPTY(imp_arq),.F.,.T.)
+                        READ
+                        IF LASTKEY() = 27
+                                LOOP
+                        ENDIF
+                        marq := ALLTRIM(imp_arq)
+                ENDIF
+        ENDIF
+        //@ 9,40 GET mporta_imp PICT '@!' WHEN mimp_tipo = 1 VALID mporta_imp $ 'LPT1,LPT2,LPT3,LPT4,LPT5,COM1,COM2,COM3,COM4,PRN ' .AND. IF(EMPTY(mporta_imp),.F.,.T.)
+        //@ 10,40 GET comp PICT '@!' WHEN comp <> NIL VALID comp $ 'S,N'
+        //READ
+        IF LASTKEY() = 27
+                LOOP
+        ENDIF
+        IF mimp_tipo > 2
+                setcor(3)
+                DEVPOS(08,40);DEVOUT(imp_arq)
+                setcor(1)
+        ENDIF
+        op := op_simnao('S','Confirma Impressao/Consulta [S/n]:')
+        IF op = 'S'
+                wvw_lclosewindow()
+                mensagem('Espere o final da impressao !!!')
+                IF mimp_tipo = 4
+                        RETURN .T.
+                ENDIF
+                SET DEVI TO PRINT
+                SET PRINT ON
+                /*
+                IF m_cfg[18] = '7' .AND. (mimp_tipo = 1 .OR. mimp_tipo = 2 .OR. mimp_tipo = 5)
+                        imp_arq := ALLTRIM(m_indiv[1,5])+'HRB.REL'
+                        SET PRINT TO (imp_arq)
+                ELSEIF mimp_tipo = 1
+                        SET PRINT TO (mporta_imp)
+                        IF comp <> NIL .AND. comp = 'S'
+                                imprt(mtipo_imp,'P8')
+                        ENDIF
+                ELSE
+                */
+                        imp_arq := ALLTRIM(m_indiv[1,5])+'HRB.REL'
+                        SET PRINT TO (imp_arq)
+                //ENDIF
+                RETURN .T.
+        ELSE
+                LOOP
+        ENDIF
+ENDDO
+wvw_lclosewindow()
+RETURN .F.

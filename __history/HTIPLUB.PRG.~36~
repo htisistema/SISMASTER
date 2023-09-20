@@ -1,0 +1,1387 @@
+#include "wvwtools.ch"
+#INCLUDE "wingdi.ch"
+#INCLUDE "winuser.ch"
+//REQUEST SQLRDD             // SQLRDD should be linked in
+//REQUEST SR_FIREBIRD        // Needed if you plan to use native connection to Firebird
+REQUEST DBFCDX
+REQUEST DBFFPT
+//#define mvar ' '
+*/
+MEMVAR mdata_sis,cod_operado,nivel_acess,mversao,sistema,;
+       memp_resa,cor,mend_firm,mcid_firm,mfone_firm,mcgc_firm,getlist,mt_cor
+* OPCAO TELA
+**********************
+FUNCTION op_tela(op_l,op_c,op_lb,op_cb,op_mensagem,mli,mcent,mclose)
+************************************
+LOCAL msel,mord
+wvw_maximize()
+//wvw_nopenwindow(,op_l,op_c,op_lb,op_cb,33554432)
+wvw_nopenwindow(,op_l,op_c,op_lb,op_cb)
+Wvw_SetTitle( ,op_mensagem)
+IF mclose <> NIL
+        wvw_noclose()
+ENDIF
+IF mcent = NIL .AND. (op_lb >= 30 .OR. op_cb = 90)
+        WVW_CenterWindow(,.T.,.T.)
+ENDIF
+IF mcent # NIL
+        WVW_CenterWindow(,.T.,.T.)
+ENDIF
+IF mli = NIL
+        WVW_SBCreate()
+        WVW_SBAddPart(,,800,0,.F.)
+ENDIF
+//WVW_ShowWindow( , 6 )
+RETURN NIL
+************************* F I M ****************************************
+FUNCTION mensagem(men)
+**********************
+WVW_SBSetText(,1,men)
+RETURN NIL
+******************************* F I M ****************************************
+FUNCTION atencao(men,tempo,tipo,alerta,linha)
+**********************
+LOCAL linhas,i,lin,matencao,li,ci,la,ca,mpos
+men := RTRIM(men)
+//WVW_MessageBox( ,men,' ATENCAO ',MB_ICONEXCLAMATION + MB_ICONQUESTION + MB_SYSTEMMODAL  )
+WVW_MessageBox( ,men,' ATENCAO ',MB_ICONWARNING)
+//WVW_MessageBox( ,men,' ATENCAO ',MB_ICONEXCLAMATION + MB_SYSTEMMODAL  )
+//WVW_MessageBox( ,men,' ATENCAO ',MB_OK)
+RETURN .T.
+******************************* F I M ******************************************
+* FUNCAO PARA ABRIR ARQUIVOS
+********************************
+FUNCTION AbriArq(arq,al,tp,sit,vlocal,vext,vcamin,vmens)
+**********************
+LOCAL mcam:='',mcamcfg,mlocal:='',mestacao:='',mver:='',m_cfg1:={}
+
+//mestacao := ver_ini()
+SET AUTOPEN ON
+IF SELECT(al) > 0 .AND. tp = NIL
+        RETURN .T.
+ENDIF
+
+WHILE .T.
+        IF m_line = 'ON' .AND. sit = NIL
+                IF tp = 'E'
+                        IF SELECT(al) > 0
+                                (al)->(DBCLOSEAREA())
+                        ENDIF
+                        USE (arq) ALIAS (al) EXCLUSIVE NEW VIA 'SQLRDD'
+                        IF ! NETERR()
+                                RETURN .T.
+                        ELSE
+                                atencao('Este ARQUIVO esta sendo usado por outro usuario, Aguarde...Tentando Acesso ao Arquivo: '+UPPER(arq)+' EXCLUSIVO')
+                        ENDIF
+                ELSE
+                        IF SELECT(al) > 0
+                                RETURN .T.
+                        ENDIF
+                        USE (arq) ALIAS (al) SHARED NEW VIA 'SQLRDD'
+                        IF ! NETERR()
+                                RETURN .T.
+                        ELSE
+                                atencao('Este ARQUIVO esta sendo usado EXCLUSIVO por outro usuario, Aguarde...Tentando Acesso ao Arquivo: '+UPPER(arq)+' COMPARTILHADO')
+                        ENDIF
+                ENDIF
+                IF LASTKEY() = 27
+                        atencao('Nao foi possivel acessar este Arquivo: '+mcam+UPPER(arq))
+                        RETURN .F.
+                ENDIF
+        ELSE
+                IF tp = 'E'
+                        IF SELECT(al) > 0
+                                (al)->(DBCLOSEAREA())
+                        ENDIF
+                        USE (arq) ALIAS (al) EXCLUSIVE NEW VIA 'DBFCDX'
+                        IF ! NETERR()
+                                RETURN .T.
+                        ELSE
+                                atencao('Este ARQUIVO esta sendo usado por outro usuario, Aguarde...Tentando Acesso ao Arquivo: '+UPPER(arq)+' EXCLUSIVO')
+                        ENDIF
+                ELSE
+                        IF SELECT(al) > 0
+                                RETURN .T.
+                        ENDIF
+                        USE (arq) ALIAS (al) SHARED NEW VIA 'DBFCDX'
+                        IF ! NETERR()
+                                RETURN .T.
+                        ELSE
+                                atencao('Este ARQUIVO esta sendo usado EXCLUSIVO por outro usuario, Aguarde...Tentando Acesso ao Arquivo: '+UPPER(arq)+' COMPARTILHADO')
+                        ENDIF
+                ENDIF
+                IF LASTKEY() = 27
+                        atencao('Nao foi possivel acessar este Arquivo: '+mcam+UPPER(arq))
+                        RETURN .F.
+                ENDIF
+        ENDIF
+ENDDO
+RETURN .F.
+*************************** F I M *********************************
+* FINALIZA OS SISTEMAS
+***************************
+FUNCTION fim(msist,mtti)
+*************
+LOCAL opcao,lci := 05,cci := 25,lba := 17,cba := 53,tela
+tela := SAVESCREEN(00,00,24,79)
+opcao := 0
+WHILE .T.
+        IF (msist = NIL .OR. SUBSTR(msist,1,8) <> '"SISCOM"') .AND. mtti = NIL
+                SET CURSOR ON
+        	sr_getconnection():exec("UPDATE insopera SET sult_fim = " + sr_cdbvalue(DATE())  +;
+                                        ",shora_fim = " + sr_cdbvalue(TIME())+;
+                                        ",sh_i_c = '     '"+;
+                                        " WHERE scod_op = " + sr_cdbvalue(cod_operado),,.f.)
+	       	sr_getconnection():exec("COMMIT",,.f.)
+                SETCOLOR(cor)
+                limpa(00,00,24,79)
+                CLEAR MEMORY
+                apaga_hti() //apaga o arquivo de controle "HTI.001"
+                QUIT
+        ENDIF
+        IF mtti = NIL
+                setcor(3)
+                botao(lci,cci,lba,cba,,' ESCOLHA A OPCAO ')
+                botao(lci+2,cci+1,lci+4,cba-1)
+                botao(lci+5,cci+1,lci+7,cba-1)
+                botao(lci+8,cci+1,lci+10,cba-1)
+                setcor(9)
+                @ lci+3,cci+2 PROMPT '   Finalizar o sistema   ' MESSAGE '** Sai do sistema **'
+                @ lci+6,cci+2 PROMPT ' Nao finalizar o sistema ' MESSAGE '** Retorna ao sistema **'
+                SET INTEN ON
+                MENU TO opcao
+                IF LASTKEY() = 27
+                        RESTSCREEN(00,00,24,79,tela)
+                        setcor(1)
+                        RETURN NIL
+                ENDIF
+        ELSE
+                opcao := 1
+        ENDIF
+
+        DO CASE
+                CASE opcao = 1
+                        SET CURSOR ON
+                        IF mtti = NIL
+
+		        	sr_getconnection():exec("UPDATE insopera SET sult_fim = " + sr_cdbvalue(DATE())  +;
+                		                        ",shora_fim = " + sr_cdbvalue(TIME())+;
+                                		        ",sh_i_c = '     '"+;
+		                                        " WHERE scod_op = " + sr_cdbvalue(cod_operado),,.f.)
+	       			sr_getconnection():exec("COMMIT",,.f.)
+                        ENDIF
+                        CLEAR MEMORY
+                        INKEY(1)
+                        apaga_hti() //apaga o arquivo de controle "HTI.001"
+                        wvw_lclosewindow()
+                        QUIT
+                CASE opcao = 2
+                        RESTSCREEN(00,00,24,79,tela)
+                        setcor(1)
+                        RETURN NIL
+                CASE opcao = 3
+                        RESTSCREEN(00,00,24,79,tela)
+                        setcor(1)
+                        //alt_senha()
+                        RETURN NIL
+       ENDCASE
+ENDDO
+RETURN NIL
+***************************** F I M *********************************************
+***************************  F I M  **********************************
+/*
+                mtipo_imp  := 'M'
+                SET DEVI TO PRINT
+                SET PRINT ON
+                SET PRINT TO (ALLTRIM(m_cfg[8])+'HTI.REL')
+                RETURN .T.
+*/
+* TIPO DE IMPRESSAO  ARQUIVOS OU IMPRESSORA
+*******************************************
+FUNCTION imp_arq(imp_arq,mporta,op,linha,comp,mens,msenha_lib,mexcel)
+*********************************************************************
+PUBLIC mtp_impre:=0
+mimp_tipo :=0
+mporta_imp:=' '
+mtipo_imp :='M'
+mnome_arq := imp_arq
+setcor(1)
+op_tela(03,10,14,98,' Configuracao de IMPRESSAO - Arquivo: '+ALLTRIM(mnome_arq),,1)
+WvW_ClearGetVarList()
+IF op = NIL
+        op := 'S'
+ENDIF
+IF mporta = NIL
+        mporta := 'R'
+ENDIF
+mnome_arq := m_cfg[8]+imp_arq+SPACE(50)
+mtp_impre:=0
+WHILE .T.
+        imp_arq := mnome_arq
+        mimp_tipo := 1
+        /*
+        IF mporta = 'R'
+                mtipo_imp  := IF(LEN(m_indiv)>0,'M','J')
+        ELSEIF mporta = 'T'
+                mtipo_imp  := IF(LEN(m_indiv)>0,m_indiv[1,10],'J')
+        ELSEIF mporta = 'D'
+                mtipo_imp  := IF(LEN(m_indiv)>0,'M','J')
+        ELSEIF mporta = 'B'
+                mtipo_imp  := IF(LEN(m_indiv)>0,m_indiv[1,10],'J')
+        ELSEIF mporta = 'N'
+                mtipo_imp  := 'M'
+        ELSEIF mporta = 'K'
+                mtipo_imp  := IF(LEN(m_indiv)>0,m_indiv[1,10],'J')
+        ELSE
+                mtipo_imp  := 'M'
+        ENDIF
+        */
+
+        IF mtipo_imp = 'M'
+		mtp_impre:=1
+	ELSE
+		mtp_impre:=2
+	ENDIF
+        limpa(00,00,30,80)
+        setcor(1)
+        @ 4,0 TO 4,70
+        DEVPOS(6,1);DEVOUT('Tipo da Impressora [J]ato [M]atriz...:')
+        DEVPOS(8,1);DEVOUT('Nome do Arquivo de impressao.........:')
+        //DEVPOS(9,1);DEVOUT('Porta Impressora.....................:')
+        //DEVPOS(10,1);DEVOUT('Diminuir Espacos entre Linhas [s/N]..:')
+        botao1(5,40,7,53)
+        botao1(5,56,7,69)
+        setcor(3)
+        DEVPOS(6,41);DEVOUT(' MATRICIAL  ')
+        DEVPOS(6,57);DEVOUT(' JATO TINTA ')
+        setcor(1)
+
+        botao1(1,02,3,15)
+        botao1(1,20,3,33)
+        botao1(1,37,3,50)
+        botao1(1,55,3,68)
+        botao1(1,73,3,86)
+        @ 2,03 PROMPT ' IMPRESSORA '
+        @ 2,21 PROMPT '  CONSULTA  '        //+marq
+        @ 2,38 PROMPT '  ARQUIVO   '        //+marq
+        IF mexcel <> NIL
+                @ 2,56 PROMPT '   EXCEL    '        //+marq
+        ELSE
+                @ 2,56 PROMPT ' Nao Disp.  '        //+marq
+        ENDIF
+        @ 2,74 PROMPT         'ENVIAR EMAIL'        //+marq
+        SET INTEN ON
+        MENU TO mimp_tipo
+        IF LASTKEY() = 27
+                EXIT
+        ENDIF
+        IF ! mimp_tipo = 3 .AND. ! mimp_tipo = 5 .AND. ! mimp_tipo = 2
+
+                @ 6,41 PROMPT ' MATRICIAL  '
+                @ 6,57 PROMPT ' JATO TINTA '
+                SET INTEN ON
+                MENU TO mtp_impre
+                IF LASTKEY() = 27
+                        LOOP
+                ENDIF
+                */
+                mtipo_imp := 'M'
+
+                IF mtp_impre = 1
+                        mtipo_imp := 'M'
+                ELSE
+                        mtipo_imp := 'J'
+                ENDIF
+                */
+        ELSEIF mimp_tipo = 2
+                mtipo_imp := 'M'
+        ELSEIF mimp_tipo = 4
+                IF mexcel = NIL
+                        atencao('Esta opcao nao estar disponivel para este Relatorio')
+                ENDIF
+        ENDIF
+        imp_arq := ALLTRIM(m_cfg[8])+'HTI.REL'
+        IF mimp_tipo = 1 .AND. ! EMPTY(mens)
+                IF msenha_lib = 'IMP_2VIAPED'
+                        IF ! ver_nivel('IMP_ARQ2VIA','" IMPRESSAO " DA 2a.VIA DE PEDIDO','12345',nivel_acess,,'AMBIE')
+                                LOOP
+                        ENDIF
+                ELSE
+                        IF ! aut_sen('Senha de autorizacao '+mens,msenha_lib)
+                                LOOP
+                        ENDIF
+                ENDIF
+        ELSEIF mimp_tipo = 3 .OR. mimp_tipo = 5
+                IF ! ver_nivel('IMP_ARQ','IMPRESSAO PARA ARQUIVO','17',nivel_acess,,'AMBIE')
+                        LOOP
+                ENDIF
+                mporta := 'PRN '
+                @ 08,40 GET imp_arq PICT '@S30!' VALID IF(EMPTY(imp_arq),.F.,.T.)
+                READ
+                IF LASTKEY() = 27
+                        LOOP
+                ENDIF
+        ENDIF
+        IF LASTKEY() = 27
+                LOOP
+        ENDIF
+        IF mimp_tipo > 2
+                setcor(3)
+                DEVPOS(08,40);DEVOUT(imp_arq)
+                setcor(1)
+        ENDIF
+        //op := op_simnao('S','Confirma Impressao/Consulta [S/n]:')
+        op := 'S'
+        IF op = 'S'
+                wvw_lclosewindow()
+                mensagem('Espere o final da impressao !!!')
+                IF mimp_tipo = 4
+                        RETURN .T.
+                ENDIF
+                SET DEVI TO PRINT
+                SET PRINT ON
+                imp_arq := ALLTRIM(m_cfg[8])+'HTI.REL'
+                SET PRINT TO (imp_arq)
+                RETURN .T.
+        ELSE
+                LOOP
+        ENDIF
+ENDDO
+wvw_lclosewindow()
+RETURN .F.
+*********************** F I M *************************************************************************
+* FUNCAO PARA QUALIDADE DE IMPRESSAO
+************************************
+FUNCTION imprt(imp,tipo,linha,col)
+**********************************
+*e chr(27)+"w1" aumenta a altura da fonte, e "w0" volta ao normal
+IF col = NIL
+        col := 0
+ENDIF
+IF linha = NIL
+        linha := 0
+ENDIF
+IF imp = 'M' .AND. tipo = 'C'	//CONDENSADO
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(15))
+        //DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+CHR(15))
+        RETURN .T.
+ELSEIF imp = 'M' .AND. tipo = 'N'	//NORMAL DRAFT
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(18))
+        RETURN .T.
+ELSEIF imp = 'M' .AND. tipo = 'N+'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+"E")
+        RETURN .T.
+ELSEIF imp = 'M' .AND. tipo = 'N-'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+"F")
+        RETURN .T.
+ELSEIF imp = 'M' .AND. tipo = 'R'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+"k0")
+        RETURN .T.
+ELSEIF imp = 'M' .AND. tipo = 'S'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+"k1")
+        RETURN .T.
+ELSEIF imp = 'M' .AND. tipo = 'T+'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+"x1")
+        RETURN .T.
+ELSEIF imp = 'M' .AND. tipo = 'T-'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+"x0")
+        RETURN .T.
+ELSEIF imp = 'M' .AND. tipo = 'S+'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+CHR(45)+"1")
+        RETURN .T.
+ELSEIF imp = 'M' .AND. tipo = 'S-'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+CHR(45)+"0")
+        RETURN .T.
+ELSEIF imp = 'M' .AND. tipo = 'E'
+       DEVPOS(PROW()+linha,col);DEVOUT(CHR(14))
+       RETURN .T.
+ELSEIF imp = 'M' .AND. tipo = 'M'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(15)+CHR(14))
+        RETURN .T.
+ELSEIF imp = 'M' .AND. tipo = 'P8'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+'0')
+        RETURN .T.
+ELSEIF imp = 'M' .AND. tipo = 'A'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+'W'+'1')
+        RETURN .T.
+ELSEIF imp = 'M' .AND. tipo = 'P6'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+'2')
+        RETURN .T.
+ELSEIF imp = 'M' .AND. tipo = 'W1'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+'W'+'1')
+        RETURN .T.
+ELSEIF imp = 'M' .AND. tipo = 'W0'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+'W'+'0')
+        RETURN .T.
+ELSEIF imp = 'J' .AND. tipo = 'C'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+'(s16.67H')
+*        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+'(s15H')
+        RETURN NIL
+ELSEIF imp = 'J' .AND. tipo = 'N'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+'(s10H')
+        RETURN NIL
+ELSEIF imp = 'J' .AND. tipo = 'M'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+'(s10H')
+        RETURN NIL
+ELSEIF imp = 'J' .AND. tipo = 'E'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+'(s5H')
+        RETURN NIL
+ELSEIF imp = 'J' .AND. tipo = 'P8'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+'(s1P')
+        RETURN NIL
+ELSEIF imp = 'J' .AND. tipo = 'P6'
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(27)+'(s0P')
+        RETURN NIL
+ELSEIF imp = 'D' .AND. tipo = 'C'
+        DEVPOS(PROW()+linha,col);DEVOUT('M')
+        RETURN .T.
+ELSEIF imp = 'D' .AND. tipo = 'N'
+        DEVPOS(PROW()+linha,col);DEVOUT('P')
+        RETURN .T.
+ELSEIF imp = 'D' .AND. tipo = 'E'
+        DEVPOS(PROW()+linha,col);DEVOUT('P')
+        RETURN .T.
+ELSE
+        DEVPOS(PROW()+linha,col);DEVOUT(CHR(18))
+        RETURN .T.
+ENDIF
+
+RETURN NIL
+******************************** F I M ********************************
+FUNCTION conf_impressao(marquivo,mp_imp,mtip)
+*********************************************
+LOCAL mnome_aux:=''
+MEMVAR mnome_arq, mimp_tipo
+MYRUN('MD '+CURDRIVE()+':\'+ALLTRIM(m_cfg[8]))
+IF mimp_tipo = 5 .OR. mtip # NIL
+        //enviar_email(marquivo,memail,mtip)
+ELSEIF mimp_tipo = 1
+        atencao(mp_imp+mtipo_imp )
+
+        IF mtipo_imp = 'J'
+                //atencao("DOSPRINTER /SEL'"+ALLTRIM(m_cfg[5])+"' /DEL "+ALLTRIM(m_cfg[5])+"HTI.REL")
+                IF mp_imp = 1
+                        mensagem('Impressacao na Impressora: '+ALLTRIM(m_cfg[5]))
+                        MYRUN("DOSPRINTER /SEL'"+ALLTRIM(m_cfg[5])+"' /DEL "+ALLTRIM(m_cfg[8])+"HTI.REL")
+                ELSEIF mp_imp = 2
+                        mensagem('Impressacao na Impressora: '+ALLTRIM(m_cfg[6]))
+                        MYRUN("DOSPRINTER /SEL'"+ALLTRIM(m_cfg[6])+"' /DEL "+ALLTRIM(m_cfg[8])+"HTI.REL")
+                ELSEIF mp_imp = 3
+                        mensagem('Impressacao na Impressora: '+ALLTRIM(m_cfg[7]))
+                        MYRUN("DOSPRINTER /SEL'"+ALLTRIM(m_cfg[7])+"' /DEL "+ALLTRIM(m_cfg[8])+"HTI.REL")
+                ELSEIF ! EMPTY(ALLTRIM(m_cfg[9]))
+                        mensagem('Impressacao na Impressora: '+ALLTRIM(m_cfg[9]))
+                        MYRUN("DOSPRINTER /SEL'"+ALLTRIM(m_cfg[9])+"' /DEL "+ALLTRIM(m_cfg[8])+"HTI.REL")
+                ELSE
+                        MYRUN('DOSPRINTER SEL2 /DEL '+ALLTRIM(m_cfg[8])+'HTI.REL')
+                ENDIF
+        ELSEIF mtipo_imp = 'M'
+                IF mp_imp = 1
+                        mensagem('Impressacao na Impressora: '+ALLTRIM(m_cfg[5]))
+                        MYRUN("DOSPRINTER /SEL'"+ALLTRIM(m_cfg[5])+"' /DEL "+ALLTRIM(m_cfg[8])+"HTI.REL")
+                ELSEIF mp_imp = 2
+                        mensagem('Impressacao na Impressora: '+ALLTRIM(m_cfg[6]))
+                        MYRUN("DOSPRINTER /SEL'"+ALLTRIM(m_cfg[6])+"' /DEL "+ALLTRIM(m_cfg[8])+"HTI.REL")
+                ELSEIF mp_imp = 3
+                        mensagem('Impressacao na Impressora: '+ALLTRIM(m_cfg[7]))
+                        MYRUN("DOSPRINTER /SEL'"+ALLTRIM(m_cfg[7])+"' /DEL "+ALLTRIM(m_cfg[8])+"HTI.REL")
+                ELSEIF ! EMPTY(ALLTRIM(m_cfg[9]))
+                        mensagem('Impressacao na Impressora: '+ALLTRIM(m_cfg[9]))
+                        MYRUN("DOSPRINTER /SEL'"+ALLTRIM(m_cfg[9])+"' /DEL "+ALLTRIM(m_cfg[8])+"HTI.REL")
+                ELSE
+                        MYRUN('DOSPRINTER /RAW /DEL '+ALLTRIM(m_cfg[8])+'HTI.REL')
+                        //MYRUN('DOSPRINTER SEL2 /DEL '+ALLTRIM(m_cfg[8])+'HTI.REL')
+                ENDIF
+                //MYRUN('DOSPRINTER /RAW /DEL '+ALLTRIM(m_cfg[8])+'HTI.REL')
+        ENDIF
+ELSE    //IF mimp_tipo = 2
+        //atencao('2')
+        MYRUN('DOSPRINTER /SEL2 /DEL '+ALLTRIM(m_cfg[8])+'HTI.REL')
+ENDIF
+RETURN
+******************************* F I M ********************************
+* LIMPA UMA AREA
+**************************
+FUNCTION limpa(li,ci,lb,cb)
+***************************
+@ li,ci CLEAR TO lb,cb
+RETURN NIL
+***************** F I M **************************
+* APAGA O ARQUIVOI DE CONTROLE "HTI.001"
+****************************************
+FUNCTION apaga_hti()
+********************
+mensagem('Ajustando o ambiente do sistema HTI.001')
+WHILE .T.
+        MYRUN('DEL HTI.001')
+        IF ! SR_PhFile('HTI.001')
+                EXIT
+        ENDIF
+ENDDO
+RETURN NIL
+************************ F I M ***********************************************
+//#INCLUDE 'winuser.ch'
+#INCLUDE 'INKEY.CH'
+***************
+* FUNCAO DE CORES
+*******************
+FUNCTION setcor(nTipCor,mtipo)
+************************
+LOCAL m_color := {}
+//SETCOLOR('W/G,B/W,,,W/B')
+//RETURN NIL
+//mt_cor:='V'
+//mt_cor:= 'A'
+
+//GetSysColor( COLOR_WINDOWTEXT )
+//RGB(   0,  51, 153 )
+//RGB(   0, 255, 255 )
+//GetSysColor( COLOR_BTNFACE )
+//RGB( 100, 135, 220 )
+//RGB( 227,  92,  47 )
+//m_color := WVW_GetPalette()
+
+IF nTipCor = 1 .AND. mtipo = NIL
+        //SETCOLOR('B*/W,B+/W,,,N/W')
+        SETCOLOR('B*/W*,W/B+,,,R/W*')
+        //SETCOLOR('B*/W*,N*/GR*,,,B*/GR+')
+ELSEIF nTipCor = 2 .AND. mtipo = NIL
+        //SETCOLOR('W*/B*,W/B,,,N/W*')                     && cor para os SAY
+        SETCOLOR('W/R,W/N,,,N/W')                     && cor para os SAY
+ELSEIF nTipCor = 3 .AND. mtipo = NIL
+        //WVW_GetRGBColor( m_color[8],m_color[10],,,m_color[10] )
+        SETCOLOR('R/W*,W/B*,x')                     && cor para os SAY
+        //SETCOLOR('B*/GR*,W/N,x')                     && cor para os SAY
+ELSEIF nTipCor = 4 .AND. mtipo = NIL
+        SETCOLOR('W/B+,B/w*,,,GR+/B')
+ELSEIF nTipCor = 5 .AND. mtipo = NIL
+        SETCOLOR('R*/W*,W/R,,,GR+/B')
+ELSEIF nTipCor = 10 .AND. mtipo = NIL
+        SETCOLOR('b*/w*,w/b,,,b/w')
+ELSEIF nTipCor = 30 .AND. mtipo = NIL
+        SETCOLOR('b/w,b/w,x')                     && cor para os SAY
+ELSEIF nTipCor = 31 .AND. mtipo = NIL
+        SETCOLOR('r+/w*,w/b+,x')                     && cor para os SAY
+ELSE
+        SETCOLOR('n/W*,B/w*,,,gr+/n')
+ENDIF
+RETURN .T.
+***************************** F I M ****************************************
+FUNCTION botao(l,c,ll,cc,t,titulo,lado,cor_tit,mtamanho)
+********************************************************
+WVW_SetPaintRefresh(0)
+IF mtamanho = NIL
+        mtamanho := 0
+ENDIF
+IF t <> NIL
+        cc := c + 5 + LEN(t) + mtamanho
+ENDIF
+SET CURSOR OFF
+IF titulo <> NIL
+        @ l-1,c clear to ll,cc
+        //wvw_drawboxraised(,l,c,ll,cc,1)
+        wvw_drawboxraised(,l-1,c,ll,cc)
+        @ l,c to l,cc
+        setcor(2)
+        IF lado = NIL
+                IF cor_tit # NIL
+                        WVW_DrawLabel(,l-1,c,'   '+titulo,,,240,, 'times new roman',15,8,,,,,)
+                ELSE
+                        WVW_DrawLabel(,l-1,c,'   '+titulo,,,,, 'times new roman',15,8,,,,,)
+                ENDIF
+        ELSE
+                IF cor_tit # NIL
+                        WVW_DrawLabel(,l-1,c+2,'   '+titulo,,,240,, 'times new roman',16,8,,,,,)
+                ELSE
+                        WVW_DrawLabel(,l-1,c+2,'   '+titulo,,,,, 'times new roman',16,8,,,,,)
+                ENDIF
+        ENDIF
+        setcor(1)
+ELSE
+
+        @ l,c clear to ll,cc
+        WVW_SetPen( PS_COSMETIC, 2, m_color[16] )
+        //WVW_DrawOutline( ,l,c,ll,cc, AD_CLOCKWISE  , ,257 )
+        WVW_DrawBoxRecessed(,l,c,ll,cc)
+        //WVW_DrawBoxGroup(,l,c,ll,cc)
+        //WVW_DrawEllipse( ,l,c,ll,cc)
+        //WVW_DrawColorRect( ,l,c,ll,cc ,255)
+
+        //WVW_DrawRoundRect(,l,c,ll,cc, , 15, 15)
+        //@ l,c clear to ll,cc
+ENDIF
+IF t <> NIL
+        DEVPOS(l+1,c+1);DEVOUT(t)
+ENDIF
+SET CURSOR ON
+setcor(1)
+RETURN NIL
+************************** F I M ******************************
+FUNCTION botao1(l,c,ll,cc,t,titulo,lado,cor_tit,mtamanho)
+****************
+WVW_SetPaintRefresh(0)
+IF mtamanho = NIL
+        mtamanho := 0
+ENDIF
+IF t <> NIL
+        cc := c + 5 + LEN(t) + 0
+ENDIF
+wvw_drawboxraised(,l,c,ll,cc)
+IF t <> NIL
+        setcolor('w/b')
+        @ l,c clear to ll,cc
+        DEVPOS(l+1,c+2);DEVOUT(t)
+ENDIF
+setcor(1)
+RETURN NIL
+************************** F I M ******************************
+* VER NIVEL DE ACESSO
+**********************
+FUNCTION ver_nivel(mmodulo,mdescri,mnivel,mconf_nivel,mamb,mopera)
+******************************************************************
+LOCAL msele,morde,mtela_nivel
+
+msele := 0
+IF SELE() > 0
+        msele := SELE()
+        morde := INDEXORD()
+ENDIF
+exibi_prg(mmodulo)
+IF ! AbriArq('sacconf','conf');RETURN NIL;ENDIF
+***************************
+SELE('conf');ORDSETFOCUS(2)
+GO TOP
+***************************
+mmodulo := mmodulo+SPACE(20-LEN(mmodulo))
+
+WHILE .T.
+        IF conf->(DBSEEK(mmodulo))
+                BLOQREG()
+                conf->descri := mdescri
+                DBCOMMIT()
+                DBUNLOCK()
+*               IF RAT(mconf_nivel,conf->nivel) = 0 .AND. sen->scod_op <> '999'
+*               IF RAT(mconf_nivel,conf->nivel) = 0 .AND. cod_operado <> '999'
+                IF mopera = '999' .OR. cod_operado = '999'
+                        IF ! EMPTY(msele);SELE(msele);ENDIF
+                        IF ! EMPTY(morde);ORDSETFOCUS(morde);ENDIF
+                        RETURN .T.
+                ENDIF
+                IF RAT(IF(EMPTY(SUBSTR(mconf_nivel,1,1)),'*',SUBSTR(mconf_nivel,1,1)),conf->nivel) = 0 .AND. RAT(IF(EMPTY(SUBSTR(mconf_nivel,2,1)),'*',SUBSTR(mconf_nivel,2,1)),conf->nivel) = 0
+                        IF mamb = NIL
+                                atencao('ACESSO NAO AUTORIZADO PARA ESTE AMBIENTE - NIVEL: '+mconf_nivel,2)
+                                IF ! aut_sen('Senha de Liberacao do Ambiente:','LIB_AMB')
+                                        IF ! EMPTY(msele);SELE(msele);ENDIF
+                                        IF ! EMPTY(morde);ORDSETFOCUS(morde);ENDIF
+                                        RETURN .F.
+                                ELSE
+                                        IF ! EMPTY(msele);SELE(msele);ENDIF
+                                        IF ! EMPTY(morde);ORDSETFOCUS(morde);ENDIF
+                                        RETURN .T.
+                                ENDIF
+                        ELSE
+                                IF ! EMPTY(msele);SELE(msele);ENDIF
+                                IF ! EMPTY(morde);ORDSETFOCUS(morde);ENDIF
+                                RETURN .F.
+                        ENDIF
+                ELSE
+                        IF ! EMPTY(msele);SELE(msele);ENDIF
+                        IF ! EMPTY(morde);ORDSETFOCUS(morde);ENDIF
+                        RETURN .T.
+                ENDIF
+        ELSE
+                IF ! ADIREG()
+                        atencao('Nao foi possivel adicionar o registro neste modulo')
+                        IF ! EMPTY(msele);SELE(msele);ENDIF
+                        IF ! EMPTY(morde);ORDSETFOCUS(morde);ENDIF
+                        RETURN NIL
+                ELSE
+                        conf->modulo := mmodulo
+                        conf->descri := mdescri
+                        conf->nivel  := mnivel
+                        DBUNLOCK()
+                        DBCOMMIT()
+                ENDIF
+        ENDIF
+ENDDO
+IF ! EMPTY(msele);SELE(msele);ENDIF
+IF ! EMPTY(morde);ORDSETFOCUS(morde);ENDIF
+RETURN .T.
+*********************************** f i m **************************************
+* FUNCAO P/VERIFICAR AUTORIZACAO
+********************************
+FUNCTION aut_sen(men,mdl,mlin,mnum_cli,mnum_prod)
+****************
+LOCAL linhas,i,lin,matencao,li,ci,la,ca,mpos,;
+      msel_sen,mord_sen,mcont,tela,mok:=' ',linha,msenha,mn_ped:=SPACE(6),;
+      mc_cli:=SPACE(5),msel,mord,mcodaux:=SPACE(14),;
+      maut_oper:=SPACE(3),msol_aut:=' ',mpoint:=0
+
+MEMVAR mautoriza,mnum_ped
+
+PRIVATE mcod_aut:=SPACE(6),mcod_oper:=0
+
+IF ver_modulo(mdl)
+        RESTSCREEN(00,00,24,79,tela)
+        RETURN .T.
+ENDIF
+msel_sen := SELE()
+mord_sen := INDEXORD()
+linha := 18
+IF ! AbriArq('saclog','log');RETURN NIL;ENDIF
+IF ! AbriArq('sacconf','conf');RETURN NIL;ENDIF
+IF ! AbriArq('insopera','sen');RETURN NIL;ENDIF
+tela := SAVESCREEN(00,00,24,79)
+*****************
+SELE('sen');ORDSETFOCUS(2)
+*****************
+mcont := 0
+men := RTRIM(men)
+IF LEN(men) > 60
+        mpos := 60
+        ci := 10
+ELSEIF LEN(men) < LEN(' MODULO DE LIBERACAO P/SENHA ')
+        mpos := LEN(' MODULO DE LIBERACAO P/SENHA ')    //+20
+        ci := (80-LEN(' MODULO DE LIBERACAO P/SENHA ')) / 2
+ELSE
+        mpos := LEN(men)
+        ci := (80-LEN(men)) / 2
+ENDIF
+linhas := MLCOUNT(men,mpos)
+li := 12
+IF linha <> NIL
+        IF linha + linhas + 4 > 24
+                li := 24 - (linhas + 4)
+        ELSE
+                li := linha
+        ENDIF
+ENDIF
+IF mlin <> NIL .AND. mlin < li
+        li := mlin
+ENDIF
+la := li+linhas+4
+ca := ci+1+mpos+1
+IF ca - ci < 50
+        ci := 10
+        ca := 70
+ENDIF
+matencao := SAVESCREEN(00,00,24,79)
+botao(li,ci,la,ca,,' MODULO DE LIBERACAO P/SENHA ')
+FOR i = 1 TO  linhas
+        LIN := MEMOLINE(men,mpos,i,,)
+        DEVPOS(li+i,ci+1);DEVOUT(PADC(RTRIM(LIN),mpos))
+NEXT
+WHILE mcont < 3
+        CLEAR GETS
+        mok := ' '
+        mcod_aut := SPACE(6)
+        msol_aut := 'N'
+        setcor(1)
+        DEVPOS(li+i,ci+1);  DEVOUT('Codigo Operador:')
+        DEVPOS(li+i+1,ci+1);DEVOUT('Senha Liberacao:')
+        DEVPOS(li+i+2,ci+1);DEVOUT('Solicitar [s/N]:')
+        @ li+i,ci+18 GET mcod_oper PICT '999' VALID IF(EMPTY(mcod_oper),.F.,ven(mcod_oper,li+i,ci+22))
+        READ
+        IF LASTKEY() = 27
+                EXIT
+        ENDIF
+
+        msenha = ''
+        pegasenha(@msenha,li+i+1,ci+18,setcor(6,'*'))
+        IF msenha = 'NAO'
+                EXIT
+        ENDIF
+        IF ! EMPTY(msenha)
+                maut_oper := sen->scod_op
+        ENDIF
+
+        @ li+i+2,ci+18 GET msol_aut PICT '@!' VALID IF(msol_aut = 'S',soli_aut(STRZERO(mcod_oper,3),mnum_cli,mnum_prod),.T.) WHEN EMPTY(msenha)
+        READ
+        IF LASTKEY() = 27
+                EXIT
+        ENDIF
+        DEVPOS(li+i+2,ci+18);DEVOUT(mcod_aut)
+        IF mcod_aut = 'NEGATIVO'
+                atencao('Autorizao NEGADA')
+                EXIT
+        ENDIF
+        IF (! EMPTY(mnum_cli) .OR. ! EMPTY(mnum_prod)) .AND. ! EMPTY(sen->scod_aut) .AND. EMPTY(msenha)
+                mcodaux := mcod_aut+IF(! EMPTY(mnum_cli),mnum_cli,mnum_prod)+STRZERO(mcod_oper,3)
+                IF mcodaux = SUBSTR(sen->scod_aut,1,14)
+                        msenha := ALLTRIM(DCRIPTO(sen->ssenha))
+                        msel := SELE()
+                        mord := INDEXORD()
+                        **************************
+                        SELE('sen');ORDSETFOCUS(2)
+                        **************************
+                        BLOQREG()
+                        mcodaux := sen->scod_aut
+                        sen->scod_aut := SPACE(17)
+                        DBCOMMIT()
+                        DBUNLOCK()
+                        GO TOP
+                        maut_oper := SUBSTR(mcodaux,15,3)
+                        ven(VAL(maut_oper))
+                        msenha := ALLTRIM(DCRIPTO(sen->ssenha))
+                ELSEIF EMPTY(mcod_aut)
+                        msenha = ''
+                        pegasenha(@msenha,li+i+2,ci+18,setcor(6,'*'))
+                        IF msenha = 'NAO'
+                                EXIT
+                        ENDIF
+                        IF EMPTY(msenha)
+                                LOOP
+                        ENDIF
+                        maut_oper := sen->scod_op
+                ELSE
+                        atencao('Codigo de Autorizacao nao confere !!!')
+                        mcont ++
+                        LOOP
+                ENDIF
+        ENDIF
+        IF ALLTRIM(msenha) == ALLTRIM(DCRIPTO(sen->ssenha))
+                IF mdl = 'LIB_SALDO'
+                        IF(ver_nivel(mdl,'LIBERACAO DE QUANTD.SOLICITADA MAIOR QUE O SALDO DO PRODUTO','15',sen->snivel,1,STRZERO(VAL(maut_oper),3)),mok := '*',' ')
+                ELSEIF mdl = 'OPER_PED'
+                        IF(ver_nivel(mdl,'LIBERACAO DE OPERADOR COM PEDIDOS PEDENTES','1',sen->snivel,1,STRZERO(VAL(maut_oper),3)),mok := '*',' ')
+                ELSEIF mdl = 'ALT_DADOS'
+                        IF(ver_nivel(mdl,'LIBERACAO P/ALTERACAO NA ENTRADA DE MERCADORIA','1',sen->snivel,1,STRZERO(VAL(maut_oper),3)),mok := '*',' ')
+                ELSEIF mdl = 'LIB_DESC'
+                        IF(ver_nivel(mdl,'LIBERACAO DE DESCONTO A MAIOR NO PRECO DE VENDA PRODUTO','15',sen->snivel,1,STRZERO(VAL(maut_oper),3)),mok := '*',' ')
+                ELSEIF mdl = 'LIB_AJUST'
+                        IF(ver_nivel(mdl,'LIBERACAO DE AJUSTE DE SALDO DOS PRODUTOS','1',sen->snivel,1,STRZERO(VAL(maut_oper),3)),mok := '*',' ')
+                ELSEIF mdl = 'LIBSLDNF'
+                        IF(ver_nivel(mdl,'LIBERACAO DE SALDO A MENOR NA NOTA FISCAL','15',sen->snivel,1,STRZERO(VAL(maut_oper),3)),mok := '*',' ')
+                ELSEIF mdl = 'LIB_AMB'
+                        IF(ver_nivel(mdl,'LIBERACAO DE AMBIENTE NAO AUTORIZADO','1',sen->snivel,1,STRZERO(VAL(maut_oper),3)),mok := '*',' ')
+                ELSEIF mdl = 'DESC_CX'
+                        IF ver_nivel(mdl,'LIBERACAO DE DESCONTO NO RECEBIMENTO DO PEDIDO (CAIXA)','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                                mn_ped := STRZERO(mnum_ped,6)
+                        ENDIF
+                ELSEIF mdl = 'LIB_ALTSLDPED'
+                        IF ver_nivel(mdl,'LIBERACAO DA QUANTIDADE NA ALTERACAO DO PEDIDO IMPRESSO','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                                mn_ped := STRZERO(mnum_ped,6)
+                        ENDIF
+                ELSEIF mdl = 'LIB_PED_LIB'
+                        IF ver_nivel(mdl,'LIBERACAO DE PEDIDO JA LIBERADOR PELO FINANCEIRO','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                                mn_ped := STRZERO(mnum_ped,6)
+                        ENDIF
+                ELSEIF mdl = 'PRZ_REC'
+                        IF ver_nivel(mdl,'LIBERACAO DE PRAZO MAIOR QUE ESTIPULADO NO PEDIDO','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                                mn_ped := STRZERO(mnum_ped,6)
+                                mc_cli := cli->cod_cli
+                        ENDIF
+                ELSEIF mdl = 'LIB_DEV'
+                        IF ver_nivel(mdl,'LIBERACAO DE CLIENTE DEVEDOR, CHQ.S/FUNDO OU LIMITE ESTOURADO','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                                mc_cli := cli->cod_cli
+                        ENDIF
+                ELSEIF mdl = 'LIB_TAX'
+                        IF ver_nivel(mdl,'LIBERACAO DA TAXA DE ACRESCIMO NO PEDIDO','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                                mc_cli := cli->cod_cli
+                        ENDIF
+                ELSEIF mdl = 'LIB_PRZ'
+                        IF ver_nivel(mdl,'LIBERACAO DE PRAZO A MAIOR QUE O PERMITIDO','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                                mc_cli := cli->cod_cli
+                        ENDIF
+                ELSEIF mdl = 'CHQ_DEV'
+                        IF ver_nivel(mdl,'LIBERACAO DE CLIENTE COM *** CHEQUE SEM FUNDOS ***','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                                mc_cli := cli->cod_cli
+                        ENDIF
+                ELSEIF mdl = 'LIMIT_EST'
+                        IF ver_nivel(mdl,'LIBERACAO DE CLIENTE COM *** LIMITE ESTOURADO ***','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                                mc_cli := cli->cod_cli
+                        ENDIF
+                ELSEIF mdl = 'LIB_RECE'
+                        IF ver_nivel(mdl,'LIBERACAO DE SALDO A RECEBER POR CONTA','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                        ENDIF
+                ELSEIF mdl = 'LIB_ORCA'
+                        IF ver_nivel(mdl,'LIBERACAO DE ORCAMENTO PRECO CUSTO','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                        ENDIF
+                ELSEIF mdl = 'LIB_INSC'
+                        IF ver_nivel(mdl,'LIBERACAO DE INSCRICAO ESTADUAL','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                        ENDIF
+                ELSEIF mdl = 'LIBCLIVEN'
+                        IF ver_nivel(mdl,'LIBERACAO DE VENDEDOR DIFERENTE DO VENDEDOR RESP.PELO CLIENTE','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                        ENDIF
+                ELSEIF mdl = 'EST_PEDEXP'
+                        IF ver_nivel(mdl,'ESTORNO DE PEDIDO EXPEDIDO','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                        ENDIF
+                ELSEIF mdl = 'LIB_PED'
+                        IF ver_nivel(mdl,'LIBERAR OU CANCELAR PEDIDOS','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                                mn_ped := STRZERO(mnum_ped,6)
+                        ENDIF
+                ELSEIF mdl = 'LIB_PED_VLR'
+                        IF ver_nivel(mdl,'LIBERAR VALOR MAIOR DO QUE O PEDIDO','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                                mn_ped := STRZERO(mnum_ped,6)
+                        ENDIF
+                ELSEIF mdl = 'LIB_2VIAPED'
+                        IF ver_nivel(mdl,'LIBERAR 2a.VIA PEDIDO JA EMITIDO NOTA FISCAL','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                        ENDIF
+                ELSEIF mdl = 'SAC101EXC'
+                        IF ver_nivel(mdl,'EXCLUSAO DE SUB-GRUPO','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                        ENDIF
+                ELSEIF mdl = 'SAC10EXC'
+                        IF ver_nivel(mdl,'EXCLUSAO DE GRUPO','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                        ENDIF
+                ELSEIF mdl = 'BALSLSAIDA'
+                        IF ver_nivel(mdl,'BALANCO ** CORRECAO DE SALDO (SAIDA) **','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                        ENDIF
+                ELSEIF mdl = 'FORMPAGPED'
+                        IF ver_nivel(mdl,'LIBERACAO DA FORMA DE PAG. NA ALTERCAO DO PEDIDO (AV -> AP)','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                                mn_ped := STRZERO(mnum_ped,6)
+                        ENDIF
+                ELSEIF mdl = 'LIB_FORMA_PG'
+                        IF ver_nivel(mdl,'LIBERA FORMA DE PAGAMENTO NO RECEBIMENTO DE AVISTA P/APRAZO','1',sen->snivel,1,STRZERO(VAL(maut_oper),3))
+                                mok := '*'
+                                mc_cli := cli->cod_cli
+                                mn_ped := STRZERO(mnum_ped,6)
+                        ENDIF
+                ELSEIF (RAT(IF(EMPTY(SUBSTR(sen->snivel,1,1)),'*',SUBSTR(sen->snivel,1,1)),conf->nivel) > 0 .OR. RAT(IF(EMPTY(SUBSTR(sen->snivel,2,1)),'*',SUBSTR(sen->snivel,2,1)),conf->nivel) > 0) .OR. STRZERO(VAL(maut_oper),3) = 999
+                        mok := '*'
+                ENDIF
+                IF mok = '*'
+                        mautoriza := SPACE(3)
+                        mautoriza := sen->scod_op
+                        *****************
+                        SELE('log');ORDSETFOCUS(1)
+                        *****************
+                        ADIREG()
+                        log->data_sis := DATE()
+                        log->data     := mdata_sis
+                        log->hora     := TIME()
+                        log->tipo     := 'AUTORIZACAO'
+                        log->documento:= mn_ped
+                        log->cod_cli  := mc_cli
+                        log->aut_oper := maut_oper
+                        log->cod_oper := cod_operado
+                        log->modulo   := conf->modulo
+                        log->descri   := conf->descri
+                        log->cod_aut  := mcodaux
+                        DBCOMMIT()
+                        DBUNLOCK()
+                        *********************
+                        SELE(msel_sen);IF(mord_sen>0,ORDSETFOCUS(mord_sen),)
+                        *********************
+                        RESTSCREEN(00,00,24,79,tela)
+                        RETURN .T.
+                ENDIF
+                atencao('Cod. Operador:'+maut_oper+' - Operador nao Autorizada !!!')
+                mcont ++
+                LOOP
+        ELSE
+                atencao('Senha nao Autorizada 2 !!!')
+                mcont ++
+                LOOP
+        ENDIF
+ENDDO
+RESTSCREEN(00,00,24,79,tela)
+*********************
+SELE(msel_sen);IF(mord_sen>0,ORDSETFOCUS(mord_sen),)
+*SELE(msel_sen);ORDSETFOCUS(mord_sen)
+*********************
+RETURN .F.
+***************************** F I M ****************************************
+**********************
+* EXECUTAR PROGRAMAS EXTERNOS
+**********************
+*********************************
+FUNC MYRUN( cComando )
+*********************************
+local oShell, RET
+oShell := CreateObject( "WScript.Shell" )
+RET := oShell:Run( "%comspec% /c " + cComando, 0, .T. )
+oShell := NIL
+return iif( RET = 0, .T., .F. )
+*********************************
+***********************
+FUNCTION MyRun2( cRun )
+***********************
+Local hIn, hOut, nRet //, hProc
+Local hProc := HB_OpenProcess(cRun , @hIn, @hOut, @hOut )
+
+IF hProc < 0
+   	FClose( hProc )
+   	FClose( hIn )
+   	FClose( hOut )
+   	Return(.F.)
+	//atencao("Error: " + valtoprg(FError()))
+ENDIF
+nRet := HB_ProcessValue( hProc,.f. )
+IF nRet > 0
+   	FClose( hProc )
+   	FClose( hIn )
+   	FClose( hOut )
+   	Return(.F.)
+endif
+FClose( hProc )
+FClose( hIn )
+FClose( hOut )
+Return(.T.)
+************************** f i m ******************************
+* EXIBIR O PRG
+*****************************
+FUNCTION exibi_prg(vprg)
+**********************
+WVW_SBSetText(mnum_principal,1,vprg)
+RETURN NIL
+********************************* F I M **************************
+* FUNCAO PARA BLOQUEAR REGISTRO EM REDE
+******************************************
+FUNCTION bloqreg
+***********************
+LOCAL vtela
+
+IF RLOCK()
+        RETURN (.T.)
+ENDIF
+vtela := SAVESCREEN(24,00,24,79)
+mensagem('Aguarde um momento...Registro acessado p/outro usuario !!!')
+
+WHILE LASTKEY() <> 27
+        IF RLOCK()
+                RESTSCREEN(24,00,24,79,vtela)
+                RETURN (.T.)
+        ENDIF
+        INKEY(1)
+ENDDO
+RESTSCREEN(24,00,24,79,vtela)
+RETURN (.F.)
+****************************** F I M ***************************
+* FUNCAO TENTA ADICIONA REGISTRO NO ARQUIVO EM REDE
+*****************************************************
+FUNCTION adireg
+**********************
+LOCAL vtela
+
+APPEND BLANK
+IF ! NETERR()
+        RETURN .T.
+ENDIF
+WHILE LASTKEY() <> 27
+        mensagem('Aguarde...Acessando o Arquivo: '+ALIAS(SELE()))
+        APPEND BLANK
+        IF ! NETERR()
+                RETURN .T.
+        ENDIF
+ENDDO
+RETURN .F.
+*************************** F I M *********************************
+* VER NIVEL DE MODULO
+***************************
+FUNCTION ver_modulo(mmodulo)
+****************************
+LOCAL msele,morde,mtela_nivel,mcons_nivel:={}
+
+mmodulo := mmodulo+SPACE(20-LEN(mmodulo))
+mcons_nivel := {}
+sr_getconnection():exec("SELECT * FROM sacconf WHERE modulo = "+sr_cdbvalue(mmodulo),,.t.,@mcons_nivel)
+IF LEN(mcons_nivel) > 0 .AND. SUBSTR(mcons_nivel[1,3],1,1) = '0'
+        RETURN .T.
+ELSE
+        RETURN .F.
+ENDIF
+RETURN NIL
+*********************************** f i m **************************************
+************************** F I M ******************************
+* TESTE DE EXISTENCIA DE VENDEDOR
+**********************************
+FUNCTION ven(mcod_ven,li,ci,p)
+******************************
+LOCAL msele,morde
+MEMVAR mnome_vend,mcom_ap,mcom_ven
+
+IF EMPTY(mcod_ven); RETURN .T.;END
+
+mnome_vend = SPACE(30)
+
+cons_ven:={}
+sr_getconnection():exec("SELECT * FROM insopera WHERE scod_op = "+sr_cdbvalue(STRZERO(mcod_ven,3)),,.t.,@cons_ven)
+IF LEN(cons_ven) = 0
+        IF p = NIL
+                atencao('Vendedor nao Cadastrado !!!')
+        ENDIF
+        mcod_ven = 0
+        RETURN .F.
+ELSE
+        mnome_vend = cons_ven[1,2]
+        mcom_ven := cons_ven[1,6]
+        mcom_ap := cons_ven[1,7]
+        IF li = 0 .AND. ci = NIL
+                RETURN cons_ven[1,2]
+        ENDIF
+        IF li = NIL
+                RETURN .T.
+        ELSE
+                setcor(3)
+                DEVPOS(li,ci);DEVOUT(mnome_vend)
+                setcor(1)
+                RETURN .T.
+        ENDIF
+ENDIF
+RETURN NIL
+************************************ F I M ************************************
+* FUNCAO PARA DES-CRIPTOGRAFA
+*****************************
+FUNCTION dcripto(mexp)
+**********************
+LOCAL mletra:={},maux:={},msenha,i
+ASIZE(mletra,0)
+ASIZE(maux,0)
+msenha := ''
+i:=0
+FOR i = 1 TO LEN(mexp)
+        IF SUBSTR(mexp,i,1) = ' ' .OR. SUBSTR(mexp,i,1) = NIL
+                LOOP
+        ENDIF
+        AADD(mletra,SUBSTR(mexp,i,1))
+NEXT
+i:=0
+IF EMPTY(mletra)
+        RETURN NIL
+ENDIF
+FOR i = 1 TO LEN(mletra)
+        IF mletra[i] = CHR(189)
+                AADD(maux,'A')
+        ELSEIF mletra[i] = CHR(184)
+                AADD(maux,'B')
+        ELSEIF mletra[i] = CHR(154)
+                AADD(maux,'C')
+        ELSEIF mletra[i] = CHR(181)
+                AADD(maux,'D')
+        ELSEIF mletra[i] = CHR(228)
+                AADD(maux,'E')
+        ELSEIF mletra[i] = CHR(230)
+                AADD(maux,'F')
+        ELSEIF mletra[i] = CHR(232)
+                AADD(maux,'G')
+        ELSEIF mletra[i] = CHR(218)
+                AADD(maux,'H')
+        ELSEIF mletra[i] = CHR(204)
+                AADD(maux,'I')
+        ELSEIF mletra[i] = CHR(236)
+                AADD(maux,'J')
+        ELSEIF mletra[i] = CHR(231)
+                AADD(maux,'K')
+        ELSEIF mletra[i] = CHR(245)
+                AADD(maux,'L')
+        ELSEIF mletra[i] = CHR(225)
+                AADD(maux,'M')
+        ELSEIF mletra[i] = CHR(237)
+                AADD(maux,'N')
+        ELSEIF mletra[i] = CHR(224)
+                AADD(maux,'O')
+        ELSEIF mletra[i] = CHR(208)
+                AADD(maux,'P')
+        ELSEIF mletra[i] = CHR(166)
+                AADD(maux,'Q')
+        ELSEIF mletra[i] = CHR(168)
+                AADD(maux,'R')
+        ELSEIF mletra[i] = CHR(172)
+                AADD(maux,'S')
+        ELSEIF mletra[i] = CHR(157)
+                AADD(maux,'T')
+        ELSEIF mletra[i] = CHR(140)
+                AADD(maux,'U')
+        ELSEIF mletra[i] = CHR(174)
+                AADD(maux,'W')
+        ELSEIF mletra[i] = CHR(20)
+                AADD(maux,'V')
+        ELSEIF mletra[i] = CHR(223)
+                AADD(maux,'X')
+        ELSEIF mletra[i] = CHR(239)
+                AADD(maux,'Y')
+        ELSEIF mletra[i] = CHR(235)
+                AADD(maux,'Z')
+        ELSEIF mletra[i] = CHR(251)
+                AADD(maux,'0')
+        ELSEIF mletra[i] = CHR(253)
+                AADD(maux,'1')
+        ELSEIF mletra[i] = CHR(252)
+                AADD(maux,'2')
+        ELSEIF mletra[i] = CHR(248)
+                AADD(maux,'3')
+        ELSEIF mletra[i] = CHR(216)
+                AADD(maux,'4')
+        ELSEIF mletra[i] = CHR(200)
+                AADD(maux,'5')
+        ELSEIF mletra[i] = CHR(136)
+                AADD(maux,'6')
+        ELSEIF mletra[i] = CHR(127)
+                AADD(maux,'7')
+        ELSEIF mletra[i] = CHR(21)
+                AADD(maux,'8')
+        ELSEIF mletra[i] = CHR(23)
+                AADD(maux,'9')
+        ELSEIF mletra[i] = '0'
+                AADD(maux,' ')
+        ELSEIF mletra[i] = '1'
+                AADD(maux,'*')
+        ELSEIF mletra[i] = '2'
+                AADD(maux,'-')
+        ELSEIF mletra[i] = '3'
+                AADD(maux,'/')
+        ELSEIF mletra[i] = '4'
+                AADD(maux,'.')
+        ELSEIF mletra[i] = '5'
+                AADD(maux,',')
+        ELSEIF mletra[i] = 'A'
+                AADD(maux,'"')
+        ELSEIF mletra[i] = '6'
+                AADD(maux,"'")
+        ELSEIF mletra[i] = '7'
+                AADD(maux,'(')
+        ELSEIF mletra[i] = '8'
+                AADD(maux,')')
+        ELSEIF mletra[i] = '9'
+                AADD(maux,'=')
+        ELSEIF mletra[i] = 'B'
+                AADD(maux,'%')
+        ELSEIF mletra[i] = 'C'
+                AADD(maux,'*')
+        ELSEIF mletra[i] = 'D'
+                AADD(maux,'+')
+        ELSEIF mletra[i] = 'E'
+                AADD(maux,'@')
+        ELSEIF mletra[i] = 'F'
+                AADD(maux,']')
+        ELSEIF mletra[i] = 'G'
+                AADD(maux,'[')
+        ELSEIF mletra[i] = 'I'
+                AADD(maux,'{')
+        ELSEIF mletra[i] = 'J'
+                AADD(maux,'}')
+        ELSEIF mletra[i] = 'K'
+                AADD(maux,'&')
+        ELSEIF mletra[i] = 'L'
+                AADD(maux,'#')
+        ELSEIF mletra[i] = 'M'
+                AADD(maux,'!')
+        ELSEIF mletra[i] = 'N'
+                AADD(maux,':')
+        ELSEIF mletra[i] = 'O'
+                AADD(maux,';')
+        ELSEIF mletra[i] = 'P'
+                AADD(maux,'?')
+        ELSEIF mletra[i] = 'Q'
+                AADD(maux,'|')
+        ELSEIF mletra[i] = 'R'
+                AADD(maux,'\')
+        ELSEIF mletra[i] = 'S'
+                AADD(maux,'ç')
+        ELSEIF mletra[i] = 'Ç'
+                AADD(maux,'Ç')
+        ELSEIF mletra[i] = 'U'
+                AADD(maux,'Ã')
+        ELSEIF mletra[i] = 'V'
+                AADD(maux,'ã')
+        ELSEIF mletra[i] = 'X'
+                AADD(maux,'Õ')
+        ELSEIF mletra[i] = 'Y'
+                AADD(maux,'õ')
+        ELSEIF mletra[i] = 'Z'
+                AADD(maux,'Á')
+        ELSEIF mletra[i] = 'A'
+                AADD(maux,'á')
+        ELSEIF mletra[i] = 'b'
+                AADD(maux,'º')
+        ELSEIF mletra[i] = 'c'
+                AADD(maux,'ª')
+        ELSEIF mletra[i] = 'd'
+                AADD(maux,NIL)
+        ELSE
+                AADD(maux,'_')
+        ENDIF
+NEXT
+IF LEN(mexp) = 0
+        msenha := ''
+ELSEIF LEN(mexp) = 1
+        msenha := maux[1]
+ELSE
+        i:=0
+        msenha := maux[2] + maux[1]
+        FOR i = 3 TO LEN(maux)
+                msenha := msenha + maux[i]
+        NEXT
+ENDIF
+RETURN msenha
+********************************* f i m ********************************
+* SOLICITAR AUTORIZACAO
+************************
+FUNCTION soli_aut(sope,scli,sprod)
+**********************************
+LOCAL mcont:=1,mponto_sen:=0
+mponto_sen := RECNO()
+BLOQREG()
+sen->sstatus := 'S'
+IF scli <> NIL
+        sen->scliente := scli
+ENDIF
+IF sprod <> NIL
+        sen->sproduto := sprod
+ENDIF
+sen->sope     := sope
+DBUNLOCK()
+DBCOMMIT()
+WHILE LASTKEY() <> 27
+        GO mponto_sen
+        IF sen->sstatus = 'S'
+                mensagem('Aguarde solicitanto AUTORIZACAO '+REPLI('.',mcont))
+        ELSEIF sen->sstatus = 'A'
+                mensagem('Aguarde um momento em ANALISE '+REPLI('.',mcont))
+        ELSEIF sen->sstatus = 'L'
+                mcod_aut := SUBSTR(sen->scod_aut,1,6)
+                EXIT
+        ELSEIF sen->sstatus = 'N'
+                mcod_aut := 'NEGATIVO'
+                EXIT
+        ENDIF
+        mcont ++
+        IF mcont = 5
+                mcont := 1
+        ENDIF
+        INKEY(.5)
+        IF LASTKEY() = 27
+                mcod_aut := 'NEGATIVO'
+                EXIT
+        ENDIF
+ENDDO
+BLOQREG()
+sen->sstatus := ' '
+sen->scliente := sen->sproduto := SPACE(5)
+sen->sope     := SPACE(3)
+DBUNLOCK()
+DBCOMMIT()
+RETURN .T.
+************************************ F I M ***************************************************
+FUNCTION tira_pt(mpalavra)
+******************************
+mpalavra := STRTRAN(mpalavra,'.','')
+mpalavra := STRTRAN(mpalavra,'-','')
+mpalavra := STRTRAN(mpalavra,'/','')
+mpalavra := STRTRAN(mpalavra,",","")
+mpalavra := STRTRAN(mpalavra,"\N","")
+mpalavra := STRTRAN(mpalavra,"\n"," ")
+mpalavra := STRTRAN(mpalavra,"\r"," ")
+RETURN mpalavra
+************************************ F I M ***************************************************

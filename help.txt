@@ -1,0 +1,289 @@
+select cod_cli,razao,limite from saccli  where limite < '1000' order by limite order by limite
+
+update saccli set limite = 1000 where limite = '1'
+
+update saccli SET VLR_ANT = 0 WHERE VLR_ANT IS null
+
+delete from saccli where razao like 'A%'
+
+ALTER table saccli drop EMPRESA     +++ DELETA A COLUNA , NÃO VOLTA MAIS ++++
+
+ALTER table saccli ADD EMPRESA varchar(3)
+ALTER table saccli ADD EMPRESA DECIMAL(12,2)
+
+select sacped_s.pcod_cli,saccli.razao from saccli,sacped_s
+
+select sum(sacped_s.pvlr_fat*sacped_s.pquantd) from sacped_s where pnum_ped = '071600' //somar
+
+use ("select * from tabela order by xxxx") new via sqlrdd alias test
+
+via comando sr_changestruct
+olhe o sample chnstruct.prg
+
+********* COPIA UMA TABELA *******************
+sr_setactiveconnection( 1)
+copy to xxxx connection 2 via sqlrdd
+copy to batela.dbf via "DBFCDX"
+
+***********************************************
+UTILIZAR O COMANDO GFIX.EXE
+****************************
+- Verifica o BD
+gfix -v -full -user SYSDBA -password masterkey database.gdb
+
+- Recupera o BD:
+gfix -mend -full -ignore -user SYSDBA -password masterkey database.gdb
+
+
+set FIREBIRD_BIN=c:\Programas\Firebird\Firebird_1_5\bin\
+set LAFOBIT_PASTA_DADOS=c:\lafobit\dados\
+set FICHEIRO_GDK=c:\lafobit\dados\dados%DATE%.gdk
+set FICHEIRO_ORG=c:\lafobit\dados\dados.gdb
+
+copy /y %FICHEIRO_ORG% %LAFOBIT_PASTA_DADOS%\COPIA%DATE%.GDB
+
+%FIREBIRD_BIN%gfix -mend -user SYSDBA -password masterkey %FICHEIRO_ORG%
+
+%FIREBIRD_BIN%\gbak -b -v -ig -user SYSDBA -password masterkey
+%FICHEIRO_ORG% %FICHEIRO_GDK%
+
+REM PARA RECUPERAR A BD EXECUTAR ISTO
+%FIREBIRD_BIN%\gbak -c -R -user SYSDBA -password masterkey
+%FICHEIRO_GDK% %FICHEIRO_ORG%
+
+
+pause
+************************************
+ COMMANDO GBAK
+******************
+C:\TEMP> set isc_user=sysdba // define o usuário
+C:\TEMP> set isc_password=masterkey // define a senha
+C:\TEMP> gbak -B -user SYSDBA -password masterkey SeuBanco.gdb SeuBanco.gbk // gera o backup
+
+Para restaurar é só fazer:
+
+C:\TEMP> gbak -R -user SYSDBA -password masterkey SeuBanco.gbk SeuBanco.gbd
+
+*************************** F I M *************************************
+// ROTINA PARA LOG DO USUARIO
+
+FUNCTION dbCommitLog( LOG_TIPO, PROCNAME )
+LOCAL ret_line := "chr(13)+chr(10)", errfile := "backup.log"
+IF  LOG_TIPO = 'A'
+    M->MINHA_INFO  := 'ABERTURA'
+ELSEIF LOG_TIPO = 'I'
+    M->MINHA_INFO  := 'INCLUSAO'
+ELSEIF LOG_TIPO = 'E'
+    M->MINHA_INFO  := 'EXCLUSAO'
+ELSEIF LOG_TIPO = 'M'
+    M->MINHA_INFO  := 'MANUTENCAO'
+ENDIF
+M->MODULO := PROCNAME
+IF !FILE(errfile)
+  errhandle = FCREATE(errfile)
+  FWRITE(errhandle,"Segue lista de processos detectados."+&ret_line.+&ret_line.)
+  FWRITE(errhandle,"Data  Hora  Operador      Processo"+&ret_line.)
+  FWRITE(errhandle,replicate("-",80)+&ret_line.+&ret_line.)
+ELSE
+  errhandle = FOPEN(errfile,1)
+  length  = FSEEK(errhandle,0,2)
+  FSEEK(errhandle,length)
+ENDIF
+FWRITE(errhandle,DTOC(DATE())+" "+TIME()+" "+M->OPERADOR+" "+M->MODULO+" "+M->MINHA_INFO+&ret_line.)
+FCLOSE(errhandle)
+RETURN(.T.)
+
+procedure PafMF_LX_Impressao;
+
+s;
+
+Tentou RETURN IBR_OK( IBR_COMANDO( 'ECF.PafMF_LMFC_Impressao', {CRZini,CRZFim}, ........))?
+
+PafMF_LMFC_Impressao(const DataInicial, DataFinal: TDateTime);
+PafMF_LMFC_Espelho(const CRZInicial, CRZFinal: Integer; const PathArquivo: String);
+PafMF_LMFC_Espelho(const DataInicial, DataFinal: TDateTime; const PathArquivo: String);
+PafMF_LMFC_Cotepe1704(const CRZInicial, CRZFinal: Integer; const PathArquivo: String);
+PafMF_LMFC_Cotepe1704(const DataInicial, DataFinal: TDateTime; const PathArquivo: String);
+
+PafMF_LMFS_Impressao(const CRZInicial, CRZFinal: Integer);
+PafMF_LMFS_Impressao(const DataInicial, DataFinal: TDateTime);
+PafMF_LMFS_Espelho(const CRZInicial, CRZFinal: Integer; const PathArquivo: String);
+PafMF_LMFS_Espelho(const DataInicial, DataFinal: TDateTime; const PathArquivo: String);
+
+PafMF_MFD_Espelho(const COOInicial, COOFinal: Integer; const PathArquivo: String);
+PafMF_MFD_Espelho(const DataInicial, DataFinal: TDateTime; const PathArquivo: String);
+PafMF_MFD_Cotepe1704(const COOInicial, COOFinal: Integer; const PathArquivo: String);
+PafMF_MFD_Cotepe1704(const DataInicial, DataFinal: TDateTime; const PathArquivo: String);
+
+
+// Venda de item no ECF-ACBRMONITOR
+
+VendeItem( Cmd.Params(0), Cmd.Params(1),           { Cod, Descricao }
+                      Trim(Cmd.Params(2)),                          { Aliquota }
+                      StringToFloat( Cmd.Params(3)),                     { Qtd }
+                      StringToFloat( Cmd.Params(4)),                  { P.Unit }
+                      StringToFloatDef( Cmd.Params(5), 0),          { Val.Desconto/Acres }
+                      Cmd.Params(6),                                      { Un }
+                      PadL(Cmd.Params(7),1,'%' ou '$'),               { Tipo Desconto }
+                      PadL(Cmd.Params(8),1,'D' ou 'A') );             { Desc / Acresc }
+
+******************************* F I M ****************************88
+lssendmail ENVIAR EMAIL
+************************
+:\Program Files (x86)\LazSolutions\LSSendMail>lssendmail.exe --help
+Available parameters:
+  --about,           Show information about the project.
+  -h, --help,        Show this text.
+  --checkopenssl,    Show if have SSL support.
+  -debugmode,        Debug mode shows information of MIME without send e-mail, e.g: -debugmode=debug.txt
+  -attempt,          Define all attemps to try send mail, e.g: -attempt="3". Default is 3.
+  -from,             Set <From> (may be your name).
+  -to,               Set <To> destinations, e.g: -to="mail1@host.com;mail2@host.com".
+  -cc,               Set <CC> destinations, e.g: -cc="mail1@host.com;mail2@host.com".
+  -bcc               Set <BCC> destinations, e.g: -bcc="mail1@host.com;mail2@host.com".
+  -subject,          Set <Subject> string.
+  -message,          Set <Message> string. You can also encode strings in URL format, e.g: Silvio%20Cl%C3%A9cio = Silvio Cl+®cio.
+  -messagefile,      Set <Message> string from file, e.g: -messagefile="message.txt"
+  -attached,         Set <Attached>. To send more than one attached, separate by semicolons, e.g: -attached="attached1.txt;attached2.txt".
+  -messagetype,      Set message type, e.g: -messagetype=txt for TXT message, or -messagetype=html for HTML message.
+  -priority,         Set the priority option, use the following options: unknown, low, normal, high. Unknown is default.
+  -confirmreading,   Set confirmation to reading for your e-mail. Use y to True, or n to False.
+  -user,             Set SMTP user.
+  -password,         Set SMTP password.
+  -host,             Set SMTP host.
+  -port,             Set SMTP port.
+  -ssl,              Set SMTP SSL. Use y to True, or n to False.
+  -tls,              Set SMTP TLS. Use y to True, or n to False.
+  --version,         Show project version.
+**********************************************************************************
+        SR_BEGINTRANSACTION()
+        TRY
+
+
+
+        sr_committransaction()
+        CATCH e
+        SR_ENDTRANSACTION()
+        END
+**********************************************************************************
+
+VALTYPE(m_set[1,i]) = 'N'
+
+***********************************************************************************
+ACBRMONITOR
+************
+</linha_simples>    - ------------------...
+</linha_dupla>      - ==================...
+<e></e>             - Expandido
+<n></n>             - Negrito
+<s></s>             - Sublinhado
+<c></c>             - Condensado
+<i></i>             - Itálico
+<ad></ad>           - Alinhado a direita
+<ce></ce>           - centralizado
+
+
+<ean8></ean8>       - ean 8
+<ean13></ean13>     - ean 13
+<std></std>         - standart
+<inter></inter>     - interleave
+<code11></code11>   - code 11
+<code39></code39>   - code 39
+<code93></code93>   - code 93
+<code128></code128> - code 128
+<upca></upca>       - upca
+<codabar></codabar> - codabar
+<msi></msi>         - msi
+
+
+pafmf_arquivomf(path) e pafmf_arquivomfd(path)  -> binarios
+
+
+function criatabela()
+  local osql,csql
+  oSql := SR_GetConnection()
+  cSql :="CREATE TABLE CARTA (sr_recno bigint(15) NOT NULL unique auto_increment, CODE char(3), NAME char(50), sr_deleted char(1) default ' ' NOT NULL );"
+  oSql:Exec( csql )
+
+
+return nil
+
+
+Error SR_FIREBIRD/0 SQLExecDirect Error
+Unable to complete network request to host
+
+
+
+telnet -a 192.168.1.11 3050
+
+
+
+1.Instalação.
+
+Instale o Firebird 2.1
+Pare o serviço do Firebird 2.1 no painel de controle e instale o Firebird 2.5;
+1.1: Durante o processo de instalação do Firebird 2.5, o instalador detectará que já existe uma versão do banco de dados instalada na máquina, e exibirá uma mensagem perguntando se você realmente deseja instalar outra versão – clique em NÃO. Os arquivos serão copiados para o sistema operacional, porém o Firebird não será configurado/instalado, esta etapa deverá ser feita manualmente.
+
+1.2: Pelo método padrão, não é possível ter o Firebird 2.1 e 2.5 rodando como serviço em uma mesma máquina, pois o serviço criado pelo instalador de ambas as versões tem o mesmo nome.
+
+1.3: A pasta padrão de instalação do Firebird é “C:\Arquivos de Programas\Firebird\Firebird_2_5”. Recomendamos que esta pasta seja alterada para “C:\Arquivos de Programas\Firebird_2_5”
+
+2. Após a conclusão da instalação do Firebird 2.1 ou 2.5, vá para o prompt do MS-DOS (ex: iniciar, executar, cmd <enter>);
+
+2.1 Estando no prompt do MS-DOS, digite: cd\Arquivos de Programas\Firebird_2_5 <enter>
+
+2.2 Digite edit firebird.conf <enter>. Será aberta a tela do editor de texto com o conteúdo do arquivo de configurações do Firebird. Localize a linha
+#RemoteServicePort=3050 e remova o #. Depois, altere o número da porta para 3051, ou qualquer outro número de porta que não esteja em uso no computador. Salve o documento e saia do editor.
+
+Obs.1: Você pode editar o arquivo firebird.conf com o notepad++ ou outro editor de sua preferência.
+
+Obs.2: Coloque a porta que você definiu no arquivo de configuração do Firebird nas exceções do Firewall do Windows, pois o mesmo poderá bloqueá-la por motivos de segurança.
+
+2.3 Digite: cd bin <enter>
+2.4 Estando no diretório bin do Firebird, devemos instalar o serviço e depois colocá-lo em execução:
+
+Digite: instsvc i –s –a –g <enter>
+Digite: instsvc sta <enter>
+O primeiro comando cria o serviço do Firebird no Windows. O segundo, inicia o serviço.
+
+Se tudo correu normalmente após a execução deste último comando, será exibida uma mensagem informando que o serviço foi iniciado com sucesso.
+
+Feito isso, as duas versões do Firebird encontram-se instaladas e em execução.
+
+
+
+
+
+
+Run Dir \Clientes.Prg /S /B > Result.Tmp
+
+
+"GMAIL" $ Upper(cSMTP)
+   curl_easy_setopt( curl, HB_CURLOPT_URL, "smtps://smtp.gmail.com:465" )
+//https://www.google.com/settings/security/lesssecureapps (para ativar aplicativo menos seguro)
+ELSEIF "YAHOO" $ Upper(cSMTP)
+   curl_easy_setopt( curl, HB_CURLOPT_URL, "smtps://smtp.mail.yahoo.com:465" )
+ELSEIF "OUTLOOK" $ Upper(cSMTP)
+   curl_easy_setopt( curl, HB_CURLOPT_URL, "smtp://smtp-mail.outlook.com:587" ) //25
+ELSEIF "UOL" $ Upper(cSMTP)
+   curl_easy_setopt( curl, HB_CURLOPT_URL, "smtps://smtps.uol.com.br:465" ) //587
+ENDIF
+
+
+COMO ROTEAR UM COMPUTADOR
+*************************
+NETSH WLAN SET HOSTEDNETWORK MODE=ALLOW SSID=NOMEDAREDE KEY=SENHADAREDE KEYUSAGE=PERSINSTENT <ENTER>
+NETSH WLAN START HOSTEDNETWORK <ENTER>
+
+
+INSTALACAO DO ACBRMONITOR E ACBRNFEMONITO EM SILENCIO
+*****************************************************
+/SILENT
+/VERYSILENT
+
+//012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+
+DIFERENCA ENTRE NFe E NFCe
+*****************************
+Através do modelo do documento fiscal, NF-e = 55, NFC-e = 65.

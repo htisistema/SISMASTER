@@ -1,0 +1,65 @@
+MEMVAR getlist
+*************************
+* INCLUSAO  PRODUTO
+*************************
+FUNCTION mast203(mtipo_lanca)
+*****************************
+MEMVAR mmen_icms,mdata_sis,nivel_acess
+LOCAL lci,cci,lba,cba,cons_merc:={},m_mesa:={},i:=0,point,m_pos
+PRIVATE MPRG:='MAST203',mtraco := REPLI('=',54)
+IF ! ver_nivel(mprg,'ENTREGA DE PRODUTOS','15',nivel_acess,,'AMBIE')
+        RETURN NIL
+ENDIF
+op_tela(10,10,46,90,' ENTREGA DE PRODUTOS  ['+mprg+']')
+lci:=cci:=00
+lba:=35
+cba:=99
+CLEAR GETS
+WHILE .T.
+        setcor(1)
+        limpa(lci,cci,lba,cba)
+        exibi_prg(mprg)
+        WHILE .T.
+                limpa(lci+3,cci+1,lba-3,cba-1)
+                cons_merc := {}
+                sr_getconnection():exec("SELECT * FROM mastmov WHERE dat_pag IS NULL AND entregue IS NULL OR entregue = ' '",,.t.,@cons_merc)
+                IF LEN(cons_merc) = 0
+                        atencao('Nao existe nenhum Produto para ser ENTREGE...')
+                        EXIT
+                ELSE
+                        i := mcont_doc := 0
+                        m_mesa := {}
+                        m_pos  := {}
+                        FOR i = 1 TO LEN(cons_merc)
+                                AADD(m_mesa,' '+cons_merc[i,2]+' '+cons_merc[i,5]+' '+cons_merc[i,6]+'  '+TRANSFORM(cons_merc[i,7],'999,999.99'))
+                                AADD(m_pos,{cons_merc[i,15],cons_merc[i,7],cons_merc[i,8]})
+                                mcont_doc ++
+                                mtotal_doc := mtotal_doc + (cons_merc[i,7] * cons_merc[i,8])
+                        NEXT
+
+                        mensagem('<ESC> Retorna  -  <ENTER> p/Confirmar')
+                        setcor(3)
+                        DEVPOS(lci+1,cci+01);DEVOUT(' Local')
+                        DEVPOS(lci+1,cci+08);DEVOUT('Produto')
+                        DEVPOS(lci+1,cci+48);DEVOUT('Quantidade')
+                        @ lci+2,cci TO lci+2,cba
+                        @ lba-2,cci TO lba-2,cba
+                        DEVPOS(lba-1,cci+1);DEVOUT('Quantidade:')
+                        setcor(1)
+                        DEVPOS(lba-1,cci+13);DEVOUT(STRZERO(mcont_doc,4))
+                        point := ACHOICE(lci+3,cci+1,lba-3,cba-1,m_mesa,,,point)
+                        timeout(10)
+                        DO CASE
+                                CASE LASTKEY()=27
+                                        EXIT
+                                CASE LASTKEY() = 13
+                        ENDCASE
+                ENDIF
+                IF LASTKEY() = 27
+                        EXIT
+                ENDIF
+        ENDDO
+ENDDO
+wvw_lclosewindow()
+RETURN NIL
+*********************** f i m ***********************************

@@ -1,0 +1,130 @@
+<!--
+################################################
+# xDevStudio Project - xdev@kssoftware.com.br  #
+# Created @ 30/05/2023 12:25:08                #
+#                                              #
+### Standard xDev Config - Layout v1.5 #########
+-->
+<project>
+   <option compiler="650949">
+   <option outputname="sismaster">
+   <option targettype="EXE">
+   <option outputpath="">
+   <option root="($)">
+   <option runpath="">
+   <option runparams="">
+   <option pathch="C:\xharbour997\include;C:\SQLRDD997\include;ch;C:\Borland\BCC55\Include;C:\HTI\sismaster\CH">
+   <option pathlib="C:\xharbour977\lib;C:\SQLRDD997\lib\BC5;lib;C:\HTI\SISMASTER">
+   <option pathobj="c:\HTI\sismaster">
+   <option pathtooutput="c:\HTI\sismaster">
+   <option defines="">
+   <option documentroot="">
+   <option makeincfile="Não">
+   <option taskprepare="">
+   <option taskfinalize="">
+
+   <compilerparam name="Harbour.xCompiler">
+      <option presetsname="11644,9362">
+      <option fguilib="Gtwvw">
+      <option rdd2="Sim">
+   </compilerparam>
+
+   <compilerparam name="XHarbour.xCompiler">
+      <option presetsname="650949">
+   </compilerparam>
+
+   <unit filename="C:\SQLRDD997\include\firebird.ch" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\msg.ch" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\mysql.ch" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\mysql.h" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\oracle.ch" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\pgs.ch" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\sqlextern.ch" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\sqlodbc.ch" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\sqlora.ch" compile="Sim">
+   <unit filename="C:\SQLRDD997\include\sqlrdd.ch" compile="Sim">
+   <unit filename="SISMASTER.PRG" main="true" compile="Sim">
+   <unit filename="ch\directry.ch" compile="Sim">
+   <unit filename="ch\wingdi.ch" compile="Sim">
+   <unit filename="ch\winuser.ch" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\tip.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\dbfcdx.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\dbffpt.lib" compile="Sim">
+   <unit filename="C:\xHarbour997\lib\WVWTOOLS.LIB" compile="Sim">
+   <unit filename="C:\SQLRDD997\lib\BC5\fbclient_bc.lib" compile="Sim">
+   <unit filename="C:\SQLRDD997\lib\BC5\fbclient_ms.lib" compile="Sim">
+   <unit filename="C:\SQLRDD997\lib\BC5\libmysql.lib" compile="Sim">
+   <unit filename="C:\SQLRDD997\lib\BC5\libpq.lib" compile="Sim">
+   <unit filename="C:\SQLRDD997\lib\BC5\oci.lib" compile="Sim">
+   <unit filename="C:\SQLRDD997\lib\BC5\odbccp32.lib" compile="Sim">
+   <unit filename="C:\SQLRDD997\lib\BC5\sql.lib" compile="Sim">
+   <unit filename="MASTERDBF.PRG" compile="Sim">
+   <unit filename="MASTERCFG.PRG" compile="Sim">
+   <unit filename="mastercfg.ini" compile="Não">
+   <unit filename="errorsys.prg" compile="Sim">
+   <unit filename="MAST00.PRG" compile="Sim">
+   <unit filename="mastercdx.prg" compile="Sim">
+   <unit filename="MAST130.PRG" compile="Sim">
+   <unit filename="SACCID.PRG" compile="Sim">
+   <unit filename="MAST110.PRG" compile="Sim">
+   <unit filename="MAST120.PRG" compile="Sim">
+   <unit filename="MAST200.PRG" compile="Sim">
+   <unit filename="MAST201.PRG" compile="Sim">
+   <unit filename="mast30.prg" compile="Sim">
+   <unit filename="MAST301.PRG" compile="Sim">
+   <unit filename="MAST36.PRG" compile="Sim">
+   <unit filename="MAST37.PRG" compile="Sim">
+   <unit filename="MAST38.PRG" compile="Sim">
+   <unit filename="SACREC.PRG" compile="Sim">
+   <unit filename="CON22.PRG" compile="Sim">
+   <unit filename="CON211.PRG" compile="Sim">
+   <unit filename="SACRCCOM.PRG" compile="Sim">
+   <unit filename="SAC140.PRG" compile="Sim">
+   <unit filename="SAC141.PRG" compile="Sim">
+   <unit filename="SAC142.PRG" compile="Sim">
+   <unit filename="MAST33.PRG" compile="Sim">
+   <unit filename="MAST202.PRG" compile="Sim">
+   <unit filename="MAST203.PRG" compile="Sim">
+   <unit filename="MASTFUN.PRG" compile="Sim">
+   <unit filename="C:\xHarbour997\include\hbapi.h" compile="Sim">
+   <unit filename="C:\xHarbour997\include\WVWTOOLS.CH" compile="Sim">
+   <unit filename="C:\xharbour\lib\ct.lib" compile="Sim">
+   <unit filename="MAST341.PRG" compile="Sim">
+   <unit filename="MAST204.PRG" compile="Sim">
+   <unit filename="masterutil.prg" compile="Sim">
+   <unit filename="master_dbf.prg" compile="Sim">
+   <unit filename="mastgrupo.prg" compile="Sim">
+   <unit filename="mast50.prg" compile="Sim">
+   <unit filename="MAST51.PRG" compile="Sim">
+   <unit filename="MAST2001.PRG" compile="Sim">
+   <unit filename="MAST610.PRG" compile="Sim">
+   <unit filename="MAST40.PRG" compile="Sim">
+   <unit filename="MAST52.PRG" compile="Sim">
+   <unit filename="MAST53.PRG" compile="Sim">
+   <unit filename="MAST2002.PRG" compile="Sim">
+   <unit filename="MAST19.PRG" compile="Sim">
+   <unit filename="SACNFCE.prg" compile="Sim">
+   <unit filename="SACTEF.PRG" compile="Sim">
+   <unit filename="impacbr.prg" compile="Sim">
+   <unit filename="sac_ncm.prg" compile="Sim">
+   <unit filename="SAC211.PRG" compile="Sim">
+   <unit filename="sacnf_e.prg" compile="Sim">
+   <unit filename="SAC1OP.PRG" compile="Sim">
+   <unit filename="SAUTORIZA.PRG" compile="Sim">
+   <unit filename="mastbal.prg" compile="Sim">
+   <unit filename="sac31_1.prg" compile="Sim">
+   <unit filename="SAC5DES.PRG" compile="Sim">
+   <unit filename="SAC5NOT1.PRG" compile="Sim">
+   <unit filename="SAC5NOT2.PRG" compile="Sim">
+   <unit filename="SAC5NOT3.PRG" compile="Sim">
+   <unit filename="sac5not4.prg" compile="Sim">
+   <unit filename="SAC5NOT6.PRG" compile="Sim">
+   <unit filename="SAC5NOT7.PRG" compile="Sim">
+   <unit filename="SAC5NOT8.PRG" compile="Sim">
+   <unit filename="HTIPLUB.PRG" compile="Sim">
+   <unit filename="MASTEXCE.PRG" compile="Sim">
+   <unit filename="MAST54.PRG" compile="Sim">
+   <unit filename="MAST700.PRG" compile="Sim">
+   <unit filename="MAST710.PRG" compile="Sim">
+   <unit filename="MAST750.PRG" compile="Sim">
+</project>

@@ -1,0 +1,192 @@
+MEMVAR getlist
+*************************
+* TABELA DE PRECO
+*************************
+FUNCTION mast50()
+**********************
+MEMVAR mdata_sis,nivel_acess,memp_resa
+LOCAL lci,cci,lba,cba,cons_merc:={},i:=0,mgrupo:=0,mordem:='',cons_grup:={}
+PRIVATE MPRG:='MAST50',mexcluir:='',mtit:='',mtipo:='',mpag:=0,;
+        mtipo_imp,mimp_tipo:=2,marq:=SPACE(35),mtraco := REPLI('=',80),mcomp:='',msaldo:=' '
+
+IF ! ver_nivel(mprg,'RELATORIO TABELA DE PRECO','15',nivel_acess,,'AMBIE')
+        RETURN NIL
+ENDIF
+op_tela(15,10,18,80,' Relatorio Tabela de Preco ['+mprg+']')
+lci:=cci:=00
+lba:=35
+cba:=70
+CLEAR GETS
+WHILE .T.
+        setcor(1)
+        limpa(lci,cci,lba,cba)
+        exibi_prg(mprg)
+        mgrupo := 0
+        mordem := 'A'
+        mcomp  := 'S'
+        mensagem('Preencha os Campos - <ESC> p/Retornar')
+        DEVPOS(lci+0,cci+1);DEVOUT('Grupo..........................:')
+        DEVPOS(lci+1,cci+1);DEVOUT('Ordenar [A]lfa [C]odigo [G]rupo:')
+        DEVPOS(lci+2,cci+1);DEVOUT('Deseja Imprimir os Componentes.:')
+        DEVPOS(lci+3,cci+1);DEVOUT('[C]com [S]em [T]odoss SALDO....:')
+        @ lci+0,cci+35 GET mgrupo PICT '999'
+        READ
+        IF LASTKEY() = 27
+                wvw_lclosewindow()
+                RETURN .T.
+        ENDIF
+        ccomm :="SELECT * FROM mastprod "
+        IF ! EMPTY(mgrupo)
+                cons_merc := {}
+                sr_getconnection():exec("SELECT * FROM mastgrupo WHERE codigo = "+sr_cdbvalue(STRZERO(mgrupo,3)),,.t.,@cons_merc)
+                IF LEN(cons_merc) = 0
+                        atencao('GRUPO nao em nosso Arquivo !!!')
+                        LOOP
+                ENDIF
+                setcor(3)
+                DEVPOS(lci+1,cci+39);DEVOUT(cons_merc[1,2])
+                setcor(1)
+                mtipo := 'GRUPO: '+STRZERO(mgrupo,3)
+                ccomm := ccomm + "WHERE grupo = "+sr_cdbvalue(STRZERO(mgrupo,3))
+
+        ENDIF
+        @ lci+1,cci+35 GET mordem PICT '@!' VALID mordem $ 'A,C,G'
+        @ lci+2,cci+35 GET mcomp PICT '@!' VALID mcomp $ 'S,N'
+        @ lci+3,cci+35 GET msaldo PICT '@!' VALID msaldo $ 'C,S,T'
+        READ
+        IF LASTKEY() = 27
+                LOOP
+        ENDIF
+        IF mordem = 'A'
+                ccomm := ccomm + " ORDER BY descri"
+                mtipo := 'Por Ordem de Alfabetica'
+        ELSEIF mordem = 'C'
+                ccomm := ccomm + " ORDER BY codigo"
+                mtipo := 'Por Ordem de Codigo'
+        ELSE
+                mtipo := 'Por Ordem de GRUPO'
+        ENDIF
+        IF mordem # 'G'
+                cons_merc := {}
+                sr_getconnection():exec(ccomm,,.t.,@cons_merc)
+                IF LEN(cons_merc) = 0
+                        atencao('Nao existe nenhum produto em nosso Arquivo !!!')
+                        LOOP
+                ENDIF
+                IF ! imp_arq('TABPRECO.REL','R')
+                        LOOP
+                ENDIF
+                mpag := 1
+                mtit := 'TABELA DE PRECO'
+                cabecalho(mpag,mtit,mtipo,mprg)
+                imprt(mtipo_imp,'N')
+                DEVPOS(PROW()+1,00);DEVOUT(' Cod.')
+                DEVPOS(PROW(),PCOL()+1);DEVOUT('Descricao                     ')
+                DEVPOS(PROW(),PCOL()+1);DEVOUT('    Saldo')
+                DEVPOS(PROW(),PCOL()+1);DEVOUT('    Preco')
+                DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                i:=0
+                FOR i = 1 TO LEN(cons_merc)
+                        DEVPOS(PROW()+1,00);DEVOUT(cons_merc[i,1])
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT(cons_merc[i,2])
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,8],'99,999.99'))
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,6],'99,999.99'))
+                        IF mcomp = 'S' .AND. ! EMPTY(cons_merc[i,32])
+                                DEVPOS(PROW()+1,7);DEVOUT(cons_merc[i,32])
+                        ENDIF
+                        IF mcomp = 'S' .AND. ! EMPTY(cons_merc[i,33])
+                                DEVPOS(PROW()+1,7);DEVOUT(cons_merc[i,33])
+                        ENDIF
+                        IF PROW() > 59
+                                EJECT
+                                mpag ++
+                                cabecalho(mpag,mtit,mtipo,mprg)
+                                DEVPOS(PROW()+1,00);DEVOUT(' Cod.')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('Descricao                     ')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('    Saldo')
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT('    Preco')
+                                DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                        ENDIF
+                NEXT
+                IF PROW() > 57
+                        EJECT
+                        mpag ++
+                        cabecalho(mpag,mtit,mtipo,mprg)
+                ENDIF
+                DEVPOS(PROW()+2,0);DEVOUT('Quantidade de Itens:'+STRZERO(LEN(cons_merc),4))
+        ELSE
+                mtipo := 'Por Ordem de Grupo'
+                cons_grup := {}
+                sr_getconnection():exec("SELECT * FROM mastgrupo ORDER BY grupo",,.t.,@cons_grup)
+                IF LEN(cons_grup) = 0
+                        atencao('Nao existe nenhum produto em nosso Arquivo !!!')
+                        LOOP
+                ENDIF
+                IF ! imp_arq('TABPRECO.REL','R')
+                        LOOP
+                ENDIF
+                mpag := 1
+                mtit := 'TABELA DE PRECO'
+                cabecalho(mpag,mtit,mtipo,mprg)
+                imprt(mtipo_imp,'N')
+                y:=0
+                FOR y = 1 TO LEN(cons_grup)
+                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                        DEVPOS(PROW()+1,00);DEVOUT(PADC('GRUPO: '+cons_grup[y,1]+' - '+cons_grup[y,2],80))
+                        DEVPOS(PROW()+1,00);DEVOUT(' Cod.')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('Descricao                     ')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('    Saldo')
+                        DEVPOS(PROW(),PCOL()+1);DEVOUT('    Preco')
+                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                        cons_merc := {}
+                        sr_getconnection():exec("SELECT * FROM mastprod WHERE grupo = "+sr_cdbvalue(cons_grup[y,1])+" ORDER BY descri",,.t.,@cons_merc)
+                        IF LEN(cons_merc) = 0
+                                LOOP
+                        ENDIF
+                        i:=0
+                        FOR i = 1 TO LEN(cons_merc)
+                                DEVPOS(PROW()+1,00);DEVOUT(cons_merc[i,1])
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(cons_merc[i,2])
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,8],'99,999.99'))
+                                DEVPOS(PROW(),PCOL()+1);DEVOUT(TRANSFORM(cons_merc[i,6],'99,999.99'))
+                                IF mcomp = 'S' .AND. ! EMPTY(cons_merc[i,32])
+                                        DEVPOS(PROW()+1,7);DEVOUT(cons_merc[i,32])
+                                ENDIF
+                                IF mcomp = 'S' .AND. ! EMPTY(cons_merc[i,33])
+                                        DEVPOS(PROW()+1,7);DEVOUT(cons_merc[i,33])
+                                ENDIF
+                                IF PROW() > 59
+                                        EJECT
+                                        mpag ++
+                                        cabecalho(mpag,mtit,mtipo,mprg)
+                                        DEVPOS(PROW()+1,00);DEVOUT(PADC('GRUPO: '+cons_grup[y,1]+' - '+cons_grup[y,2],80))
+                                        DEVPOS(PROW()+1,00);DEVOUT(' Cod.')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('Descricao                     ')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('    Saldo')
+                                        DEVPOS(PROW(),PCOL()+1);DEVOUT('    Preco')
+                                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                ENDIF
+                        NEXT
+                NEXT
+                IF PROW() > 57
+                        EJECT
+                        mpag ++
+                        cabecalho(mpag,mtit,mtipo,mprg)
+                ENDIF
+                DEVPOS(PROW()+2,0);DEVOUT('Quantidade de Itens:'+STRZERO(LEN(cons_merc),4))
+        ENDIF
+        EJECT
+        SETPRC(00,00)
+        SET DEVI TO SCREEN;SET PRINT TO;SET PRINT OFF
+        conf_impressao(ALLTRIM(m_cfg[12])+'HRB.REL')
+        /*
+        IF mtipo_imp = 'D'
+                MYRUN('DOSPRINTER /SEL2 /DEL '+ALLTRIM(m_cfg[12])+'HRB.REL')
+        ELSE
+                MYRUN('DOSPRINTER /RAW /DEL '+ALLTRIM(m_cfg[12])+'HRB.REL')
+        ENDIF
+        */
+ENDDO
+wvw_lclosewindow()
+RETURN NIL
+*********************** f i m ***********************************

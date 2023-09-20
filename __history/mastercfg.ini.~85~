@@ -1,0 +1,17 @@
+001 C Caminho do Banco Dados=localhost:c:\HELIO\sismaster\SISMASTER.gdb
+002 C Tipo de Terminal      =S
+003 C md5                   =7d539b303a4e568e4877cda1e4feadf9
+004 N Quantidade Terminais  =002
+005 C Porta Cozinha (Prod.) =EPSON TM-T20 Receipt
+006 C Porta Bar     (Prod.) =Samsung SCX-3400 Series
+007 C Porta Outros  (Prod.) =
+008 C Caminho arq Impressao =
+009 C Porta Geral Impressao =
+010 N Qtd.Linhas p/Corte    =015
+011 C Caminho Foto Produto  =
+012 C Caminho Geral         =C:\helio\sismaster\
+013 C Versao do sistema     =v21.10.02
+014 C Tipo de Tela          =
+015 C IP DO ACBR ("ip":3434)=LOCALHOST:3434
+016 C CAMINHO DA NFE        =C:\HELIO\SISMASTER\NFE\
+017 C CAMINHO DO ACBRMONITOR=C:\ACBRMONITORPLUS\

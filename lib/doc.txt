@@ -1,0 +1,12 @@
+Funcionamento:
+
+  Relogio(x,y,c)
+  - ativa o relógio na tela, na linha X, coluna Y, com a cor C,
+    por exemplo: Relogio(01,60,"W/R")
+
+  Relogio()
+  - a mesma função, chamada sem parâmetros, desativa
+    o relógio
+
+  A LIB é bem pequena (menos de 10Kb) e quase não ocupa
+  os recursos do sistema, tão pouco a memória disponível.

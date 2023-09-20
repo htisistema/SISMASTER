@@ -1,0 +1,32 @@
+[Configuracao]
+TrataDisplay=1
+ExibeForm=0
+ESC=127
+Libera_Sistema=1
+#==================== FUNCAO ===================#
+
+[\\Funcao]
+F1=1234567890123<13>
+F2=Texto
+F3=A
+
+#===================== BASE ====================#
+
+[Base]
+Tipo=USB
+Porta=7
+BaudRate=57600
+EnderecoRF=85
+Canal=50
+TimeOut=3
+Retries=3
+Dispatch=2
+Sync=3
+Discover=15
+
+#=============== LISTA TERMINAIS ===============#
+
+
+NTerminais=2
+0=RS01;RF01
+1=RS02;RF02

@@ -1,0 +1,73 @@
+********************************
+* T.P's PEDENTES
+********************************
+FUNCTION MAST341(mab_pg,mtp_orc,tipo_ali)
+****************************************
+LOCAL mprg:='MAST341',;
+      tela1,lci,cci,lba,cba,point,opcao,mnum_pedido,mtempo,m_codigo:={},;
+      m_posicao:={},mdias,mtot_ped,mcod_vend,mdata_ped,mposicao,;
+      mhora,mtipo_venda,mcod_op,mcod_cli,mcod_emp,mcodemp,mlib_por,mexp_por,mpg,;
+      mnum_os,mtot_ger,mquantd_ped,cons_arq:={},i:=0,mfecha:=' ',mped_orc:=' ',cComm,mtot_pv,mdesc_r,mdesc_p
+
+MEMVAR mnum_ped,mnum_pedp,ali,mnum_orc
+IF ! ver_nivel(mprg,'CONSULTA MESAS EM ABERTO','15',nivel_acess,,'AMBIE')
+        RETURN NIL
+ENDIF
+lci := cci := 0
+lba := 22
+cba := 120
+op_tela(00,00,24,120,' CONSULTA MESAS EM ABERTO')
+mped_orc := 2
+mnum_pedido := SPACE(6)
+CLEAR GETS
+WHILE .T.
+        exibi_prg(mprg)
+        mcodemp := '   '
+        mtot_ped := 0
+        setcor(3)
+        @ lci+2,cci TO lci+2,cba
+        @ lba,cci TO lba,cba
+        DEVPOS(lci+1,cci+1);DEVOUT(' No.Mesa ')
+        DEVPOS(lci+1,cci+10);DEVOUT('Garcon')
+        DEVPOS(lci+1,cci+17);DEVOUT('Valor ')
+        mensagem('Aguarde um momento coletando informacoes para a consulta OK !!!')
+        cons_arq := {}
+        sr_getconnection():exec("SELECT num_local,cod_garco,sum(qtd*preco) FROM mastmov WHERE dat_pag IS NULL GROUP BY num_local,num_local,cod_garco,cod_garco",,.t.,@cons_arq)
+        m_codigo := {}
+        m_posicao:= {}
+        mquantd_ped := mtot_ger := mtot_pv := 0
+        i := 0
+        FOR i = 1 TO LEN(cons_arq)
+                prog_imp(i,cons_arq[i,1])
+                              //      1               2              3                 4               5                   6                                7              8              9            10           11          12            13           14
+                AADD(m_codigo,' '+cons_arq[i,1]+'  '+cons_arq[i,2]+'  '+TRANSFORM(cons_arq[i,3],'9,999,999.99'))
+                AADD(m_posicao,cons_arq[i,1])
+                mtot_ger := mtot_ger + cons_arq[i,3]
+        NEXT
+        IF LEN(m_codigo) = 0
+                atencao('Nao existe Nenhuma Mesa ABERTA !!!')
+                wvw_lclosewindow()
+                RETURN NIL
+        ENDIF
+        WHILE .T.
+                point := 0
+                DEVPOS(lba+1,00);DEVOUT('Quantidade de Pedidos em Aberto:'+TRANSFORM(LEN(cons_arq),'999,999')+' R$:'+TRANSFORM(mtot_ger,'99,999,999.99'))
+                mensagem("<ESC> Retorna - <ENTER>p/Confirma")
+                point := ACHOICE(lci+3,cci+1,lba-1,cba-1,m_codigo)
+                IF LASTKEY()=27
+                        wvw_lclosewindow()
+                        ali := tipo_ali
+                        RETURN NIL
+                ENDIF
+                IF LASTKEY() = 13
+                        setcor(1)
+                        wvw_lclosewindow()
+                        RETURN m_posicao[point]
+                ENDIF
+        ENDDO
+ENDDO
+setcor(1)
+ali := tipo_ali
+wvw_lclosewindow()
+RETURN NIL
+************************* F I M ******************************************

@@ -1,0 +1,639 @@
+#include "wvwtools.ch"
+#include "inkey.ch"              // constantes de codigos das teclas
+#include "Fileio.ch"             // funcoes de leitura/gravacao de arquivo
+#include "set.ch"                // constantes da funcao SETKEY()
+#include "wingdi.ch"
+#include "winuser.ch"
+#include "common.ch"
+#include "setcurs.ch"
+#include "getexit.ch"
+* LANCAMENTO DE PRODUTOS
+************************
+FUNCTION mast2001(mtipo_lanca)
+******************************
+MEMVAR getlist,mmen_icms,mdata_sis,nivel_acess
+PRIVATE mqtd:=0,cons_merc:={},aret:={},i:=0,nPBid:={},mped_merc:={},mtraco := REPLI('=',48),;
+        mintervalo := '',mtipo_lug:='',abre_fecha := {},;
+        MPRG:='MAST200',mmerc:=SPACE(50),mcod_garcon:=0,mnum_doc := 1,mobs:=SPACE(20),mcod_merc:=SPACE(5),;
+        mtipo_imp:='M',mimp_tipo:=0,marq:=SPACE(35),m_sair := 0
+mtipo_lanca := 'M'
+IF mtipo_lanca = 'M'
+        /*
+        IF ! ver_nivel(mprg+'MESA','LANCAMENTO DE MESAS','15',nivel_acess,,'AMBIE')
+                RETURN NIL
+        ENDIF
+        */
+        op_tela(1,0,50,120,' LANCAMENTO DE MESAS  ['+mprg+']')
+        mtipo_lug:='M'
+        DEVPOS(49,1);DEVOUT('Numero MESA...:')
+ELSEIF mtipo_lanca = 'Q'
+        /*
+        IF ! ver_nivel(mprg+'QTO','LANCAMENTO DE QUARTOS','15',nivel_acess,,'AMBIE')
+                RETURN NIL
+        ENDIF
+        */
+        op_tela(1,0,50,120,' LANCAMENTO DE QUARTOS  ['+mprg+']')
+        DEVPOS(49,1);DEVOUT('Numero QUARTO.:')
+ELSEIF mtipo_lanca = 'C'
+        /*
+        IF ! ver_nivel(mprg+'CHL','LANCAMENTO DE CHALES','15',nivel_acess,,'AMBIE')
+                RETURN NIL
+        ENDIF
+        */
+        op_tela(1,0,50,120,' LANCAMENTO DE CHALES  ['+mprg+']')
+        DEVPOS(49,1);DEVOUT('Numero CHALE..:')
+ENDIF
+CLEAR GETS
+nPBid:={}
+i:=0
+FOR i = 1 TO 121
+        AADD(nPBid,0)
+NEXT
+m_sair := 0
+//WVW_PBSetFont( nWinNum, 'Arial Black',80,40, nWeight, nQuality, lItalic, lUnderline,lStrikeout )
+WVW_PBSetFont( , 'Arial',15,10)
+
+WHILE .T.
+        mnum_mesa :=0
+        abre_fecha1 := {}
+        abre_fecha := {}
+        sr_getconnection():exec("SELECT num_local FROM mastmov WHERE dat_pag IS NULL GROUP BY num_local,num_local",,.t.,@abre_fecha1)
+        IF LEN(abre_fecha1) > 0
+                FOR i = 1 TO LEN(abre_fecha1)
+                        AADD(abre_fecha,abre_fecha1[i,1])
+                NEXT
+        ENDIF
+
+        cons_lugar := {}
+        sr_getconnection():exec("SELECT * FROM mastmesas WHERE tipo = "+sr_cdbvalue(mtipo_lanca)+' ORDER BY numero',,.t.,@cons_lugar)
+        IF LEN(cons_lugar) = 0
+                atencao('Nao existe nenhum lugar Cadastrados...')
+                wvw_lclosewindow()
+                RETURN NIL
+        ENDIF
+        nPBid[1] := wvw_pbCreate(NIL,1 ,1,3 ,9, '001-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0001') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,1) })
+        nPBid[2] := wvw_pbCreate(NIL,5 ,1,7 ,9, '002-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0002') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,2) })
+        nPBid[3] := wvw_pbCreate(NIL,9 ,1,11,9, '003-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0003') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,3) })
+        nPBid[4] := wvw_pbCreate(NIL,13,1,15,9, '004-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0004') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,4) })
+        nPBid[5] := wvw_pbCreate(NIL,17,1,19,9, '005-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0005') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,5) })
+        nPBid[6] := wvw_pbCreate(NIL,21,1,23,9, '006-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0006') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,6) })
+        nPBid[7] := wvw_pbCreate(NIL,25,1,27,9, '007-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0007') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,7) })
+        nPBid[8] := wvw_pbCreate(NIL,29,1,31,9, '008-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0008') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,8) })
+        nPBid[9] := wvw_pbCreate(NIL,33,1,35,9, '009-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0009') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,9) })
+        nPBid[10]:= wvw_pbCreate(NIL,37,1,39,9, '010-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0010') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,10)})
+
+        nPBid[11] := wvw_pbCreate(NIL,1 ,11,3 ,19, '011-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0011') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,11)})
+        nPBid[12] := wvw_pbCreate(NIL,5 ,11,7 ,19, '012-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0012') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,12)})
+        nPBid[13] := wvw_pbCreate(NIL,9 ,11,11,19, '013-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0013') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,13)})
+        nPBid[14] := wvw_pbCreate(NIL,13,11,15,19, '014-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0014') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,14)})
+        nPBid[15] := wvw_pbCreate(NIL,17,11,19,19, '015-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0015') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,15)})
+        nPBid[16] := wvw_pbCreate(NIL,21,11,23,19, '016-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0016') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,16)})
+        nPBid[17] := wvw_pbCreate(NIL,25,11,27,19, '017-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0017') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,17)})
+        nPBid[18] := wvw_pbCreate(NIL,29,11,31,19, '018-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0018') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,18)})
+        nPBid[19] := wvw_pbCreate(NIL,33,11,35,19, '019-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0019') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,19)})
+        nPBid[20] := wvw_pbCreate(NIL,37,11,39,19, '020-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0020') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,20)})
+
+        nPBid[21] := wvw_pbCreate(NIL,1 ,21,3 ,29, '021-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0021') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,21)})
+        nPBid[22] := wvw_pbCreate(NIL,5 ,21,7 ,29, '022-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0022') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,22)})
+        nPBid[23] := wvw_pbCreate(NIL,9 ,21,11,29, '023-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0023') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,23)})
+        nPBid[24] := wvw_pbCreate(NIL,13,21,15,29, '024-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0024') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,24)})
+        nPBid[25] := wvw_pbCreate(NIL,17,21,19,29, '025-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0025') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,25)})
+        nPBid[26] := wvw_pbCreate(NIL,21,21,23,29, '026-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0026') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,26)})
+        nPBid[27] := wvw_pbCreate(NIL,25,21,27,29, '027-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0027') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,27)})
+        nPBid[28] := wvw_pbCreate(NIL,29,21,31,29, '028-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0028') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,28)})
+        nPBid[29] := wvw_pbCreate(NIL,33,21,35,29, '029-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0029') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,29)})
+        nPBid[30] := wvw_pbCreate(NIL,37,21,39,29, '030-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0030') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,30)})
+
+        nPBid[31] := wvw_pbCreate(NIL,1 ,31,3 ,39, '031-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0031') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,31)})
+        nPBid[32] := wvw_pbCreate(NIL,5 ,31,7 ,39, '032-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0032') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,32)})
+        nPBid[33] := wvw_pbCreate(NIL,9 ,31,11,39, '033-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0033') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,33)})
+        nPBid[34] := wvw_pbCreate(NIL,13,31,15,39, '034-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0034') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,34)})
+        nPBid[35] := wvw_pbCreate(NIL,17,31,19,39, '035-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0035') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,35)})
+        nPBid[36] := wvw_pbCreate(NIL,21,31,23,39, '036-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0036') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,36)})
+        nPBid[37] := wvw_pbCreate(NIL,25,31,27,39, '037-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0037') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,37)})
+        nPBid[38] := wvw_pbCreate(NIL,29,31,31,39, '038-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0038') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,38)})
+        nPBid[39] := wvw_pbCreate(NIL,33,31,35,39, '039-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0039') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,39)})
+        nPBid[40] := wvw_pbCreate(NIL,37,31,39,39, '040-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0040') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,40)})
+
+        nPBid[41] := wvw_pbCreate(NIL,1 ,41,3 ,49, '041-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0041') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,41)})
+        nPBid[42] := wvw_pbCreate(NIL,5 ,41,7 ,49, '042-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0042') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,42)})
+        nPBid[43] := wvw_pbCreate(NIL,9 ,41,11,49, '043-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0043') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,43)})
+        nPBid[44] := wvw_pbCreate(NIL,13,41,15,49, '044-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0044') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,44)})
+        nPBid[45] := wvw_pbCreate(NIL,17,41,19,49, '045-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0045') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,45)})
+        nPBid[46] := wvw_pbCreate(NIL,21,41,23,49, '046-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0046') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,46)})
+        nPBid[47] := wvw_pbCreate(NIL,25,41,27,49, '047-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0047') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,47)})
+        nPBid[48] := wvw_pbCreate(NIL,29,41,31,49, '048-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0048') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,48)})
+        nPBid[49] := wvw_pbCreate(NIL,33,41,35,49, '049-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0049') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,49)})
+        nPBid[50] := wvw_pbCreate(NIL,37,41,39,49, '050-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0050') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,50)})
+
+        nPBid[51] := wvw_pbCreate(NIL,1 ,51,3 ,59, '051-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0051') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,51)})
+        nPBid[52] := wvw_pbCreate(NIL,5 ,51,7 ,59, '052-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0052') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,52)})
+        nPBid[53] := wvw_pbCreate(NIL,9 ,51,11,59, '053-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0053') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,53)})
+        nPBid[54] := wvw_pbCreate(NIL,13,51,15,59, '054-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0054') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,54)})
+        nPBid[55] := wvw_pbCreate(NIL,17,51,19,59, '055-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0055') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,55)})
+        nPBid[56] := wvw_pbCreate(NIL,21,51,23,59, '056-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0056') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,56)})
+        nPBid[57] := wvw_pbCreate(NIL,25,51,27,59, '057-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0057') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,57)})
+        nPBid[58] := wvw_pbCreate(NIL,29,51,31,59, '058-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0058') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,58)})
+        nPBid[59] := wvw_pbCreate(NIL,33,51,35,59, '059-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0059') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,59)})
+        nPBid[60] := wvw_pbCreate(NIL,37,51,39,59, '060-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0060') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,60)})
+
+        nPBid[61] := wvw_pbCreate(NIL,1 ,61,3 ,69, '061-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0061') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,61)})
+        nPBid[62] := wvw_pbCreate(NIL,5 ,61,7 ,69, '062-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0062') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,62)})
+        nPBid[63] := wvw_pbCreate(NIL,9 ,61,11,69, '063-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0063') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,63)})
+        nPBid[64] := wvw_pbCreate(NIL,13,61,15,69, '064-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0064') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,64)})
+        nPBid[65] := wvw_pbCreate(NIL,17,61,19,69, '065-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0065') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,65)})
+        nPBid[66] := wvw_pbCreate(NIL,21,61,23,69, '066-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0066') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,66)})
+        nPBid[67] := wvw_pbCreate(NIL,25,61,27,69, '067-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0067') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,67)})
+        nPBid[68] := wvw_pbCreate(NIL,29,61,31,69, '068-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0068') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,68)})
+        nPBid[69] := wvw_pbCreate(NIL,33,61,35,69, '069-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0069') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,69)})
+        nPBid[70] := wvw_pbCreate(NIL,37,61,39,69, '070-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0070') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,70)})
+
+        nPBid[71] := wvw_pbCreate(NIL,1 ,71,3 ,79, '071-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0071') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,71)})
+        nPBid[72] := wvw_pbCreate(NIL,5 ,71,7 ,79, '072-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0072') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,72)})
+        nPBid[73] := wvw_pbCreate(NIL,9 ,71,11,79, '073-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0073') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,73)})
+        nPBid[74] := wvw_pbCreate(NIL,13,71,15,79, '074-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0074') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,74)})
+        nPBid[75] := wvw_pbCreate(NIL,17,71,19,79, '075-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0075') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,75)})
+        nPBid[76] := wvw_pbCreate(NIL,21,71,23,79, '076-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0076') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,76)})
+        nPBid[77] := wvw_pbCreate(NIL,25,71,27,79, '077-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0077') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,77)})
+        nPBid[78] := wvw_pbCreate(NIL,29,71,31,79, '078-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0078') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,78)})
+        nPBid[79] := wvw_pbCreate(NIL,33,71,35,79, '079-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0079') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,79)})
+        nPBid[80] := wvw_pbCreate(NIL,37,71,39,79, '080-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0080') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,80)})
+
+        nPBid[81] := wvw_pbCreate(NIL,1 ,81,3 ,89, '081-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0081') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,81)})
+        nPBid[82] := wvw_pbCreate(NIL,5 ,81,7 ,89, '082-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0082') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,82)})
+        nPBid[83] := wvw_pbCreate(NIL,9 ,81,11,89, '083-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0083') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,83)})
+        nPBid[84] := wvw_pbCreate(NIL,13,81,15,89, '084-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0084') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,84)})
+        nPBid[85] := wvw_pbCreate(NIL,17,81,19,89, '085-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0085') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,85)})
+        nPBid[86] := wvw_pbCreate(NIL,21,81,23,89, '086-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0086') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,86)})
+        nPBid[87] := wvw_pbCreate(NIL,25,81,27,89, '087-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0087') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,87)})
+        nPBid[88] := wvw_pbCreate(NIL,29,81,31,89, '088-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0088') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,88)})
+        nPBid[89] := wvw_pbCreate(NIL,33,81,35,89, '089-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0089') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,89)})
+        nPBid[90] := wvw_pbCreate(NIL,37,81,39,89, '090-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0090') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,90)})
+
+        nPBid[91] := wvw_pbCreate(NIL,1 ,91,3 ,99, '091-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0091') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,91) })
+        nPBid[92] := wvw_pbCreate(NIL,5 ,91,7 ,99, '092-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0092') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,92) })
+        nPBid[93] := wvw_pbCreate(NIL,9 ,91,11,99, '093-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0093') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,93) })
+        nPBid[94] := wvw_pbCreate(NIL,13,91,15,99, '094-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0094') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,94) })
+        nPBid[95] := wvw_pbCreate(NIL,17,91,19,99, '095-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0095') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,95) })
+        nPBid[96] := wvw_pbCreate(NIL,21,91,23,99, '096-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0096') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,96) })
+        nPBid[97] := wvw_pbCreate(NIL,25,91,27,99, '097-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0097') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,97) })
+        nPBid[98] := wvw_pbCreate(NIL,29,91,31,99, '098-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0098') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,98) })
+        nPBid[99] := wvw_pbCreate(NIL,33,91,35,99, '099-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0099') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,99) })
+        nPBid[100]:= wvw_pbCreate(NIL,37,91,39,99, '100-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0100') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,100)})
+
+        nPBid[101]:= wvw_pbCreate(NIL,1 ,101,3 ,109, '101-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0101') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,101)})
+        nPBid[102]:= wvw_pbCreate(NIL,5 ,101,7 ,109, '102-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0102') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,102)})
+        nPBid[103]:= wvw_pbCreate(NIL,9 ,101,11,109, '103-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0103') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,103)})
+        nPBid[104]:= wvw_pbCreate(NIL,13,101,15,109, '104-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0104') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,104)})
+        nPBid[105]:= wvw_pbCreate(NIL,17,101,19,109, '105-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0105') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,105)})
+        nPBid[106]:= wvw_pbCreate(NIL,21,101,23,109, '106-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0106') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,106)})
+        nPBid[107]:= wvw_pbCreate(NIL,25,101,27,109, '107-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0107') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,107)})
+        nPBid[108]:= wvw_pbCreate(NIL,29,101,31,109, '108-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0108') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,108)})
+        nPBid[109]:= wvw_pbCreate(NIL,33,101,35,109, '109-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0109') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,109)})
+        nPBid[110]:= wvw_pbCreate(NIL,37,101,39,109, '110-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0110') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,110)})
+
+        nPBid[111]:= wvw_pbCreate(NIL,1 ,111,3 ,119, '111-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0111') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,111)})
+        nPBid[112]:= wvw_pbCreate(NIL,5 ,111,7 ,119, '112-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0112') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,112)})
+        nPBid[113]:= wvw_pbCreate(NIL,9 ,111,11,119, '113-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0113') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,113)})
+        nPBid[114]:= wvw_pbCreate(NIL,13,111,15,119, '114-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0114') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,114)})
+        nPBid[115]:= wvw_pbCreate(NIL,17,111,19,119, '115-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0115') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,115)})
+        nPBid[116]:= wvw_pbCreate(NIL,21,111,23,119, '116-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0116') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,116)})
+        nPBid[117]:= wvw_pbCreate(NIL,25,111,27,119, '117-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0117') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,117)})
+        nPBid[118]:= wvw_pbCreate(NIL,29,111,31,119, '118-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0118') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,118)})
+        nPBid[119]:= wvw_pbCreate(NIL,33,111,35,119, '119-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0119') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,119)})
+        nPBid[120]:= wvw_pbCreate(NIL,37,111,39,119, '120-'+mtipo_lug+' '+IF(ASCAN(abre_fecha,mtipo_lug+'0120') > 0,'*',''),NIL,{||lanc_grup2001(mtipo_lanca,120)})
+
+        //nPBid[121]:= wvw_pbCreate(NIL,41,1,43,9, 'S A I R',NIL,{||lanc_prod(mtipo_lanca,1000),lanc_grup2001(mtipo_lanca,1000))})
+        //nPBid[121]:= wvw_pbCreate(NIL,41,1,43,9, 'S A I R',NIL,{||lanc_prod(mtipo_lanca,1000)})
+        i := 0
+        FOR i = 1 TO 120
+                IF i <= LEN(cons_lugar)
+                        LOOP
+                ENDIF
+                WVW_PBEnable( NIL, nPBid[i], .F. )
+        NEXT
+
+        limpa(41,1,43,16)
+        botao1(41,1,43,16)
+        @ 42,1  PROMPT '     Sair       '
+        MENU TO opcao
+        IF opcao = 1 .OR. LASTKEY() = 27
+                IF op_simnao('N','Deseja SAIR do sistemas ?') = 'N'
+                        LOOP
+                ENDIF
+                i:=0
+                FOR i= 1 TO 121
+                        WVW_PBDestroy(,nPBid[i])
+                NEXT
+                wvw_lclosewindow()
+                RETURN .T.
+        ENDIF
+
+        /*
+        IF LASTKEY() = 27 .OR. m_sair = 1 .OR. mnum_mesa = 9999
+                i:=0
+                FOR i= 1 TO 121
+                        WVW_PBDestroy(,nPBid[i])
+                NEXT
+                wvw_lclosewindow()
+                RETURN .T.
+        ENDIF
+        @ 49,17 GET mnum_mesa PICT '9999' VALID IF(EMPTY(mnum_mesa),.F.,.T.) WHEN m_sair # 1
+        READ
+        IF LASTKEY() = 27 .OR. m_sair = 1 .OR. mnum_mesa = 9999
+                i:=0
+                FOR i= 1 TO 121
+                        WVW_PBDestroy(,nPBid[i] )
+                NEXT
+                wvw_lclosewindow()
+                RETURN .T.
+        ENDIF
+        IF EMPTY(mnum_mesa)
+                LOOP
+        ENDIF
+        cons_merc := {}
+        sr_getconnection():exec("SELECT * FROM mastmesas WHERE tipo = "+sr_cdbvalue(mtipo_lug)+" AND numero = "+sr_cdbvalue(STRZERO(mnum_mesa,4)),,.t.,@cons_merc)
+        IF LEN(cons_merc) = 0
+                atencao('MESA/QUARTO No.: '+mtipo_lug+STRZERO(mnum_mesa,4)+' nao existe em nossos Arquivo !!!')
+                LOOP
+        ENDIF
+        lanc_grup2001(mtipo_lanca,mnum_mesa)
+        */
+ENDDO
+RETURN NIL
+***************************** f i m **********************************
+FUNCTION lanc_grup2001(mtip_lugar,mnum_lugar)
+*********************************************
+LOCAL opcao,mbt_prod:={},cons_prod := {},i:=0,y:=0,x:=0,mqtd_aux:=0,mqtd_cont := ' ',cons_grupo := {},op_grupo:=0,mopcao:=''
+
+PRIVATE nPB_grup:={},mnum_grupo:=0,mnum_mesa:=0
+
+mnum_mesa:=mnum_lugar
+
+IF mnum_lugar = 1000
+        m_sair := 1
+        mnum_mesa := 9999
+        //mensagem('TECLE <ENTER> P/ CONTINUAR....')
+        RETURN .T.
+ENDIF
+*/
+op_grupo:=0
+CLEAR GETS
+op_tela(0,10,55,52,'GRUPO   -   ['+mtip_lugar+'-'+STRZERO(mnum_mesa,3)+']',,1)
+cons_grupo := {}
+sr_getconnection():exec("SELECT * FROM mastgrupo ORDER BY grupo",,.t.,@cons_grupo)
+WHILE .T.
+        mnum_grupo:=0
+        IF LEN(cons_grupo) > 1
+                nPB_grup:={}
+                i:=0
+                FOR i = 1 TO LEN(cons_grupo)+1
+                        AADD(nPB_grup,0)
+                NEXT
+
+                IF LEN(cons_grupo) >= 1
+                        nPB_grup[1] := wvw_pbCreate(NIL,1 ,1,2 ,39, cons_grupo[1,2]+' - '+cons_grupo[1,1],NIL,{||lanc_prod2001(mtip_lugar,1,cons_grupo[1,1]) })
+                ENDIF
+                IF LEN(cons_grupo) >= 2
+                        nPB_grup[2] := wvw_pbCreate(NIL,4 ,1,5 ,39, cons_grupo[2,2]+' - '+cons_grupo[2,1],NIL,{||lanc_prod2001(mtip_lugar,1,cons_grupo[2,1]) })
+                ENDIF
+                IF LEN(cons_grupo) >= 3
+                        nPB_grup[3] := wvw_pbCreate(NIL,7 ,1,8 ,39, cons_grupo[3,2]+' - '+cons_grupo[3,1],NIL,{||lanc_prod2001(mtip_lugar,1,cons_grupo[3,1]) })
+                ENDIF
+                IF LEN(cons_grupo) >= 4
+                        nPB_grup[4] := wvw_pbCreate(NIL,10,1,11,39, cons_grupo[4,2]+' - '+cons_grupo[4,1],NIL,{||lanc_prod2001(mtip_lugar,1,cons_grupo[4,1]) })
+                ENDIF
+                IF LEN(cons_grupo) >= 5
+                        nPB_grup[5] := wvw_pbCreate(NIL,13,1,14,39, cons_grupo[5,2]+' - '+cons_grupo[5,1],NIL,{||lanc_prod2001(mtip_lugar,1,cons_grupo[5,1]) })
+                ENDIF
+                IF LEN(cons_grupo) >= 6
+                        nPB_grup[6] := wvw_pbCreate(NIL,16,1,17,39, cons_grupo[6,2]+' - '+cons_grupo[6,1],NIL,{||lanc_prod2001(mtip_lugar,1,cons_grupo[6,1]) })
+                ENDIF
+                IF LEN(cons_grupo) >= 7
+                        nPB_grup[7] := wvw_pbCreate(NIL,19,1,20,39, cons_grupo[7,2]+' - '+cons_grupo[7,1],NIL,{||lanc_prod2001(mtip_lugar,1,cons_grupo[7,1]) })
+                ENDIF
+                IF LEN(cons_grupo) >= 8
+                        nPB_grup[8] := wvw_pbCreate(NIL,22,1,23,39, cons_grupo[8,2]+' - '+cons_grupo[8,1],NIL,{||lanc_prod2001(mtip_lugar,1,cons_grupo[8,1]) })
+                ENDIF
+                IF LEN(cons_grupo) >= 9
+                        nPB_grup[9] := wvw_pbCreate(NIL,25,1,26,39, cons_grupo[9,2]+' - '+cons_grupo[9,1],NIL,{||lanc_prod2001(mtip_lugar,1,cons_grupo[9,1]) })
+                ENDIF
+                IF LEN(cons_grupo) >= 10
+                        nPB_grup[10] := wvw_pbCreate(NIL,28,1,29,39, cons_grupo[10,2]+' - '+cons_grupo[10,1],NIL,{||lanc_prod2001(mtip_lugar,1,cons_grupo[10,1]) })
+                ENDIF
+
+
+                IF LEN(cons_grupo) >= 11
+                        nPB_grup[11] := wvw_pbCreate(NIL,31,1,32,39, cons_grupo[11,2]+' - '+cons_grupo[11,1],NIL,{||lanc_prod2001(mtip_lugar,1,cons_grupo[11,1]) })
+                ENDIF
+                IF LEN(cons_grupo) >= 12
+                        nPB_grup[12] := wvw_pbCreate(NIL,34,1,35,39, cons_grupo[12,2]+' - '+cons_grupo[12,1],NIL,{||lanc_prod2001(mtip_lugar,1,cons_grupo[12,1]) })
+                ENDIF
+                IF LEN(cons_grupo) >= 13
+                        nPB_grup[13] := wvw_pbCreate(NIL,37,1,38,39, cons_grupo[13,2]+' - '+cons_grupo[13,1],NIL,{||lanc_prod2001(mtip_lugar,1,cons_grupo[13,1]) })
+                ENDIF
+                IF LEN(cons_grupo) >= 14
+                        nPB_grup[14] := wvw_pbCreate(NIL,40,1,41,39, cons_grupo[14,2]+' - '+cons_grupo[14,1],NIL,{||lanc_prod2001(mtip_lugar,1,cons_grupo[14,1]) })
+                ENDIF
+                IF LEN(cons_grupo) >= 15
+                        nPB_grup[15] := wvw_pbCreate(NIL,43,1,44,39, cons_grupo[15,2]+' - '+cons_grupo[15,1],NIL,{||lanc_prod2001(mtip_lugar,1,cons_grupo[15,1]) })
+                ENDIF
+                IF LEN(cons_grupo) >= 16
+                        nPB_grup[16] := wvw_pbCreate(NIL,46,1,47,39, cons_grupo[16,2]+' - '+cons_grupo[16,1],NIL,{||lanc_prod2001(mtip_lugar,1,cons_grupo[16,1]) })
+                ENDIF
+                limpa(49,5,51,20)
+                botao1(49,5,51,20)
+                @ 50,5  PROMPT '     Voltar     '
+                botao1(52,25,54,40)
+                @ 53,25 PROMPT '  Fecha Parcial '
+                MENU TO opcao
+                IF opcao = 1 .OR. LASTKEY() = 27
+                        i:=0
+                        FOR i= 1 TO LEN(cons_grupo)
+                                WVW_PBDestroy(,nPB_grup[i])
+                        NEXT
+                        //wvw_lclosewindow()
+                        EXIT
+                ELSEIF opcao = 2
+                        Fecha_parc(mtip_lugar,mnum_mesa,mnum_doc,1)
+                        LOOP
+                ENDIF
+        ENDIF
+ENDDO
+i:=0
+FOR i= 1 TO LEN(cons_grupo)+1
+        WVW_PBDestroy(,nPB_grup[i] )
+NEXT
+wvw_lclosewindow()
+RETURN NIL
+***************************** f i m **********************************
+FUNCTION lanc_prod2001(mtip_lug,mnum_lugar,mgrupo)
+**************************************************
+LOCAL opcao,mbt_prod:={},cons_prod := {},mqtd_aux:=0,mqtd_cont := ' ',cons_grupo := {},op_grupo:=0,mopcao:='',;
+      m_cantos:={}
+PRIVATE mcod_merc:=0,mret
+IF mnum_mesa = 9999
+        mnum_grupo :=9999
+        RETURN
+ENDIF
+CLEAR GETS
+op_tela(0,0,55,120,'RELACAO DE PRODUTOS   -   ['+mtip_lug+'-'+STRZERO(mnum_mesa,3)+']'+' - Grupo: '+mgrupo)
+WHILE .T.
+        cons_prod := {}
+        sr_getconnection():exec("SELECT * FROM mastprod WHERE grupo = "+mgrupo+" ORDER BY descri",,.t.,@cons_prod)
+        IF LEN(cons_prod) = 0
+                atencao('Nao existe nenhum PRODUTO...')
+                //wvw_lclosewindow()
+                EXIT
+        ENDIF
+        mbt_prod:={}
+        i:=0
+        FOR i = 1 TO LEN(cons_prod)
+                AADD(mbt_prod,' '+cons_prod[i,2]+' - '+cons_prod[i,1])
+        NEXT
+        AADD(m_cantos,{1,1,50,120})
+
+        WVW_CBSetFont( ,'lucida console',30,20,FW_HEAVY, PROOF_QUALITY ,,,)
+        mret := WVW_CBCreate( ,0,1, 120,mbt_prod,{|nWinNum,nId,nEvent,nIndex|CBhandler(nWinNum,nId,nEvent,nIndex,mtip_lug,mnum_mesa)}, 50,, 0,m_cantos )
+
+        @ 0,107 TO 54,107
+        botao1(5,109,7,119)
+        @ 6,109 PROMPT '  Voltar   '
+        botao1(9,109,11,119)
+        @ 10,109 PROMPT '  Consulta '
+        botao1(13,109,15,119)
+        @ 14,109 PROMPT 'Fecha Parc.'
+        MENU TO opcao
+        IF opcao = 1 .OR. LASTKEY() = 27
+                WVW_CBDestroy(,mret)
+                EXIT
+        ENDIF
+        IF opcao = 2
+                mcod_merc := f4_merc()
+                IF LASTKEY() = 27 .OR. EMPTY(mcod_merc)
+                        LOOP
+                ENDIF
+                h:=0
+                FOR h = 1 TO LEN(cons_prod)
+                        IF STRZERO(mcod_merc,5) $ cons_prod[h,1]
+                                opcao := h
+                                EXIT
+                        ENDIF
+                NEXT
+        ENDIF
+        IF opcao = 3
+                Fecha_parc(mtip_lug,mnum_mesa,mnum_doc,1)
+                LOOP
+        ENDIF
+        //wvw_lclosewindow()
+ENDDO
+SETMODE(50,120)
+WVW_SetFont(,'lucida console',12, 7,FW_HEAVY, PROOF_QUALITY )  // 800X600
+wvw_lclosewindow()
+RETURN NIL
+***************************** f i m **********************************
+STATIC FUNCTION CBhandler(nWinNum,nId,nEvent,nIndex, mtip_lugar,mnum_mesa)
+****************************************************************
+LOCAL cons_parc := {},mentrada,msaida,mintervalo
+
+PRIVATE mqtd := 0,mcod_garcon := 0,mmerc := SPACE(30),mobs:=SPACE(30)
+
+DO CASE
+        CASE nEvent==3 //CBN_SETFOCUS
+                //atencao('CBN_SETFOCUS')
+                * none
+        CASE nEvent==4 //CBN_KILLFOCUS
+                //atencao('CBN_KILLFOCUS')
+                * none
+                if nIndex==0
+                        wvw_pbEnable(nWinNum, nPBid, .t.)
+                else
+                        wvw_pbEnable(nWinNum, nPBid, .f.)
+                endif
+        CASE nEvent==1 //CBN_SELCHANGE
+                mcod_merc := VAL(SUBSTR(WVW_CBGetCurText( nWinNum, nId ),35))
+                op_tela(00,10,22,115,' LANCAMENTO DE PRODUTOS ['+mtip_lugar+'-'+STRZERO(mnum_mesa,3)+']',,'*')
+                WvW_PBSetFont( NIL, "Courier New", 15, 0,)
+                nPBotaoid := wvw_pbCreate(NIL,15,01,16,23, 'FECHAMENTO PARCIAL',NIL,{||Fecha_parc(mtip_lugar,mnum_mesa,mnum_doc)})
+                //WVW_PBEnable( NIL, nPBId, .F. )
+                WHILE .T.
+                        setcor(1)
+                        limpa(1,0,50,120)
+                        exibi_prg(mprg)
+                        mqtd := mcod_garcon := 0
+                        mmerc := SPACE(30)
+                        mobs:=SPACE(30)
+                        mensagem('Preencha os Campos - <ESC> p/Retornar')
+                        @ 7,0 TO 7,120
+                        //DEVPOS(1,1);DEVOUT('Cod.Produto:')
+                        //DEVPOS(2,1);DEVOUT('Descricao..:')
+                        //DEVPOS(3,1);DEVOUT('Quantidade.:')
+                        DEVPOS(8,1);DEVOUT('Preco......:')
+                        DEVPOS(9,1);DEVOUT('Cod.Garcon.:')
+                        DEVPOS(10,1);DEVOUT('Observacao.:')
+                        //WVW_PBEnable( NIL, nPBId, .T. )
+                        cons_parc := {}
+                        sr_getconnection():exec("SELECT * FROM mastmov WHERE num_local = "+sr_cdbvalue(mtip_lugar+STRZERO(mnum_mesa,4))+' AND dat_pag IS NULL ORDER BY hora',,.t.,@cons_parc)
+                        IF LEN(cons_parc) > 0
+                                mentrada := cons_parc[1,4]
+                                msaida   := TIME()
+                                mintervalo := ELAPTIME(mentrada,msaida)
+                                DEVPOS(11, 1);DEVOUT('Entrada....:'+mentrada)
+                                DEVPOS(12, 1);DEVOUT('Saida......:'+msaida)
+                                DEVPOS(13,1);DEVOUT('Duracao....:'+mintervalo)
+                        ENDIF
+                        cons_merc := {}
+                        sr_getconnection():exec("SELECT * FROM mastmesas WHERE tipo = "+sr_cdbvalue(mtip_lugar)+" AND numero = "+sr_cdbvalue(STRZERO(mnum_mesa,4)),,.t.,@cons_merc)
+                        IF LEN(cons_merc) = 0
+                                atencao('MESA/QUARTO nao existe em nossos Arquivo !!!')
+                                WVW_PBDestroy(,nPBotaoid)
+                                //wvw_lclosewindow()
+                                EXIT
+                        ENDIF
+                        WVW_PBEnable( NIL, nPBId, .T. )
+
+                        mped_merc := {}
+                        sr_getconnection():exec("SELECT * FROM mastprod WHERE codigo = "+sr_cdbvalue(STRZERO(mcod_merc,5)),,.t.,@mped_merc)
+                        IF LEN(mped_merc) = 0
+                                atencao('Codigo da mercadoria nao cadastrado')
+                                LOOP
+                        ENDIF
+                        mmerc := mped_merc[1,2]
+
+                        setcor(3)
+                        //DEVPOS(1,14);DEVOUT(STRZERO(mcod_merc,5)+' - '+mped_merc[1,2])
+                        WVW_DrawLabel(,0,1,STRZERO(mcod_merc,5)+' - '+mped_merc[1,2],,,210,, 'arial black',40,17,,,,,)
+
+                        mpre := ' '
+                        limpa(5,80,17,100)
+                        botao(6,80,17,100)
+                        IF FILE(ALLTRIM(m_cfg[11])+'P'+mped_merc[1,1]+'.jpg')
+                                WVW_DrawImage( ,6,80,17,100,ALLTRIM(m_cfg[11])+'P'+mped_merc[1,1]+'.jpg',.T.,.F.)
+                        ELSEIF FILE(ALLTRIM(m_cfg[11])+'P'+mped_merc[1,1]+'.bmp')
+                                WVW_DrawImage( ,6,80,17,100,ALLTRIM(m_cfg[11])+'P'+mped_merc[1,1]+'.bmp',.T.,.F.)
+                        ENDIF
+                        //setcor(3)
+                        //DEVPOS(2,14);DEVOUT(mped_merc[1,2])
+                        //setcor(1)
+                        IF mped_merc[1,7] = 'HR'
+                                mmerc := 'Tempo de Duracao: '+ELAPTIME(mentrada,msaida)
+                        ENDIF
+
+                        mqtd := VAL(pinpad(,'Quantidade:'))
+                        @ 8,14 GET mped_merc[1,6] PICT '9,999.99' WHEN mped_merc[1,7] = 'HR'
+                        READ
+                        IF mqtd = 0
+                                EXIT
+                        ENDIF
+                        mopcao := op_simnao('S','Confirma a Inclusao do PRODUTO'+m_qp+m_qp+' Quantidade:  '+STR(mqtd))
+                        IF mopcao = 'N' .OR. LASTKEY() = 27
+                                WVW_PBDestroy(,nPBotaoid)
+                                CLEAR GETS
+                                //wvw_lclosewindow()
+                                EXIT
+                        ENDIF
+                        cons_mov := {}
+                        sr_getconnection():exec("SELECT * FROM mastmov WHERE num_local = "+sr_cdbvalue(mtip_lugar+STRZERO(mnum_mesa,4))+' AND dat_pag IS NULL',,.t.,@cons_mov)
+                        IF LEN(cons_mov) = 0
+                                IF op_simnao('S','Deseja ABRIR esta MESA/QUARTO') = 'S'
+                                        aret := {}
+                                        sr_getconnection():exec("SELECT MAX(num_doc) FROM mastnummov",,.t.,@aret)
+                                        IF LEN(aret) = 0
+                                                mnum_doc := 1
+                                        ELSE
+                                                mnum_doc := VAL(aret[1,1]) + 1
+                                        ENDIF
+                                        sr_getconnection():exec('INSERT INTO mastnummov (num_doc,data,'+;
+                                                                'hora,SR_DELETED )'+;
+                                                                ' VALUES ('+;
+                                                                sr_cdbvalue(STRZERO(mnum_doc,6))+','+; //1
+                                                                sr_cdbvalue(DATE())+','+; //2
+                                                                sr_cdbvalue(TIME())+','+; //3
+                                                                sr_cdbvalue(' ')+')',,.f.)
+                                ELSE
+                                        LOOP
+                                ENDIF
+                        ELSE
+                                mnun_doc := VAL(cons_mov[1,1])
+                        ENDIF
+                        sr_getconnection():exec('INSERT INTO mastmov ('+;
+                                                'NUM_DOC   ,'+;//1
+                                                'NUM_LOCAL ,'+;//2
+                                                'DATA      ,'+;//3
+                                                'HORA      ,'+;//4
+                                                'COD_PROD  ,'+;//5
+                                                'DESCRI    ,'+;//6
+                                                'QTD       ,'+;//7
+                                                'PRECO     ,'+;//8
+                                                'COD_CLI   ,'+;//9
+                                                'COD_GARCO ,'+;//10
+                                                'OPER      ,'+;//11
+                                                'OBS       ,'+;//12
+                                                'PORTA     ,'+;//13
+                                                'UNIDADE   ,'+;//13
+                                                'SR_DELETED )'+;//14
+                                                ' VALUES ('+;
+                                                sr_cdbvalue(STRZERO(mnum_doc,6))+','+; //1
+                                                sr_cdbvalue(mtip_lugar+STRZERO(mnum_mesa,4))+','+; //2
+                                                sr_cdbvalue(DATE())+','+; //3
+                                                sr_cdbvalue(TIME())+','+; //4
+                                                sr_cdbvalue(STRZERO(mcod_merc,5))+','+; //5
+                                                sr_cdbvalue(mmerc)+','+; //6
+                                                sr_cdbvalue(mqtd)+','+; //7
+                                                sr_cdbvalue(mped_merc[1,6])+','+; //8
+                                                sr_cdbvalue('')+','+; //9
+                                                sr_cdbvalue(STRZERO(mcod_garcon,3))+','+; //10
+                                                sr_cdbvalue(cod_operado)+','+; //11
+                                                sr_cdbvalue(mobs)+','+; //12
+                                                sr_cdbvalue(mped_merc[1,9])+','+; //13
+                                                sr_cdbvalue(mped_merc[1,7])+','+; //8
+                                                sr_cdbvalue(' ')+')',,.f.)//14
+                        //sr_getconnection():exec("UPDATE mastprod SET descri = "+sr_cdbvalue(cons_merc[1,2])+",unidade = "+sr_cdbvalue(cons_merc[1,7])+",pr_venda = "+sr_cdbvalue(cons_merc[1,6])+",tipo = "+sr_cdbvalue(cons_merc[1,3])+" WHERE codigo = "+sr_cdbvalue(mcod),,.f.)
+                        sr_getconnection():exec("COMMIT",,.f.)
+                        WVW_PBDestroy(,nPBotaoid)
+                        //wvw_lclosewindow()
+                        CLEAR GETS
+                        //LOOP
+                        IF mped_merc[1,9] = 4 .OR.  mped_merc[1,9] = 0
+                                EXIT
+                        ENDIF
+                        IF ! imp_arq('FCH_PARC.TXT','R')
+                                EXIT
+                        ENDIF
+                        imprt('M','N+')
+                        DEVPOS(PROW()+1,00);DEVOUT('Mesa.....: '+mtip_lugar+STRZERO(mnum_mesa,4))
+                        DEVPOS(PROW()+1,00);DEVOUT('Data.....: '+DTOC(DATE())+' - Horas: '+TIME())
+                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                        DEVPOS(PROW()+1,00);DEVOUT('Codigo...: '+STRZERO(mcod_merc,5))
+                        DEVPOS(PROW()+1,00);DEVOUT(mmerc)
+                        IF ! EMPTY(mobs)
+                                DEVPOS(PROW()+1,0);DEVOUT('OBS.: '+mobs)
+                        ENDIF
+                        DEVPOS(PROW()+1,00);DEVOUT('Quantidade: '+TRANSFORM(mqtd,'999,999.99'))
+                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                        DEVPOS(PROW()+1,00);DEVOUT('Garcon....: '+STRZERO(mcod_garcon,3))
+                        DEVPOS(PROW()+1,00);DEVOUT('Operador..: '+cod_operado)
+                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                        DEVPOS(PROW()+m_cfg[10],00)     //;DEVOUT(CHR(18))
+                        SETPRC(00,00)
+                        SET DEVI TO SCREEN;SET PRINT TO;SET PRINT OFF
+                        conf_impressao('FCH_PARC.TXT',mped_merc[1,9])
+                        EXIT
+                ENDDO
+                wvw_lclosewindow()
+                RETURN NIL
+                /*
+                atencao(mcodigo+' - '+WVW_CBGetCurText( nWinNum, nId ))
+                WVW_CBGetCurText( nWinNum, nId )
+                if !wvw_cbIsDropped(nWinNum, nId)
+                        * nIndex is 0-based
+                        if nIndex==0
+                                wvw_pbEnable(nWinNum, nPBid, .t.)
+                        else
+                                wvw_pbEnable(nWinNum, nPBid, .f.)
+                        endif
+                        wvw_cbSetFocus(nWinNum, nId)
+                endif
+                */
+ENDCASE
+RETURN NIL

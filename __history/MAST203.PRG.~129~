@@ -1,0 +1,140 @@
+#include "wvwtools.ch"
+#include "inkey.ch"              // constantes de codigos das teclas
+#include "Fileio.ch"             // funcoes de leitura/gravacao de arquivo
+#include "set.ch"                // constantes da funcao SETKEY()
+#include "wingdi.ch"
+#include "winuser.ch"
+#include "common.ch"
+#include "setcurs.ch"
+#include "getexit.ch"
+MEMVAR getlist
+*************************
+* INCLUSAO  PRODUTO
+*************************
+FUNCTION mast203(mtipo_lanca)
+*****************************
+MEMVAR mmen_icms,mdata_sis,nivel_acess
+LOCAL lci,cci,lba,cba,cons_merc:={},m_mesa:={},i:=0,point,m_pos
+PRIVATE MPRG:='MAST203',mtraco := REPLI('=',54)
+IF ! ver_nivel(mprg,'ENTREGA DE PRODUTOS','15',nivel_acess,,'AMBIE')
+        RETURN NIL
+ENDIF
+SETMODE(30,100)
+WVW_SetFont(,"lucida console",15,9,FW_HEAVY,PROOF_QUALITY )  // 800X600
+//WVW_SetFont(,'terminal',19, 13,, PROOF_QUALITY )  // 800X600
+//WVW_SetFont(,'courier',19, 14,, PROOF_QUALITY  )  // 800X600
+
+op_tela(10,00,46,100,' ENTREGA DE PRODUTOS  ['+mprg+']')
+
+lci:=cci:=00
+lba:=35
+cba:=99
+CLEAR GETS
+WHILE .T.
+        setcor(1)
+        limpa(lci,cci,lba,cba)
+        exibi_prg(mprg)
+        WHILE .T.
+                limpa(lci+3,cci+1,lba-3,cba-1)
+                cons_merc := {}
+                                               //  1       2       3    4      5       6     7    8      9       10      11   12   13      14     15
+                sr_getconnection():exec("SELECT num_doc,num_local,data,hora,cod_prod,descri,qtd,preco,cod_cli,cod_garco,oper,obs,dat_pag,porta,entregue,sr_recno FROM mastmov WHERE dat_pag IS NULL AND (entregue IS NULL OR entregue = ' ') AND porta = '2' ORDER BY data,hora",,.t.,@cons_merc)
+                IF LEN(cons_merc) = 0
+                        SUB_BANNER(10,05,'    Nao existe nenhum')
+                        SUB_BANNER(15,05,'    Produto para ser')
+                        SUB_BANNER(20,05,'        ENTREGE...')
+                        timeout(10)
+                        INKEY(1)
+                        IF LASTKEY() = 27
+                                EXIT
+                        ENDIF
+                        LOOP
+                ELSE
+                        i := mcont_doc := 0
+                        m_mesa := {}
+                        m_pos  := {}
+                        FOR i = 1 TO LEN(cons_merc)
+                                //AADD(m_mesa,' '+cons_merc[i,2]+' '+cons_merc[i,5]+' '+cons_merc[i,6]+'  '+TRANSFORM(cons_merc[i,7],'999')+' '+cons_merc[i,12]+' '+cons_merc[i,10]+' '+ELAPTIME(cons_merc[i,4],TIME()))
+                                AADD(m_mesa,cons_merc[i,2]+' '+SUBSTR(cons_merc[i,6],1,40)+'  '+TRANSFORM(cons_merc[i,7],'999')+'  '+cons_merc[i,12]+' '+cons_merc[i,10]+'  '+ELAPTIME(cons_merc[i,4],TIME()))
+                                AADD(m_pos,cons_merc[i,16])
+                                mcont_doc ++
+                        NEXT
+                        mensagem('<ESC> Retorna  -  <ENTER> p/Confirmar')
+                        setcor(3)
+                        DEVPOS(lci+1,cci);DEVOUT('Local')
+                        DEVPOS(lci+1,cci+6);DEVOUT('Produto')
+                        DEVPOS(lci+1,cci+46);DEVOUT(' Qtd.')
+                        DEVPOS(lci+1,COL()+2);DEVOUT('OBSERVACAO')
+                        DEVPOS(lci+1,COL()+20);DEVOUT(' Gc')
+                        DEVPOS(lci+1,COL()+2);DEVOUT('Tempo')
+                        @ lci+2,cci TO lci+2,cba
+                        @ lba-2,cci TO lba-2,cba
+                        DEVPOS(lba-1,cci+1);DEVOUT('Quantidade:')
+                        setcor(1)
+                        DEVPOS(lba-1,cci+13);DEVOUT(STRZERO(mcont_doc,4))
+                        point := ACHOICE(lci+3,cci,lba-3,cba-1,m_mesa,,,point)
+                        //timeout(10)
+                        DO CASE
+                                CASE LASTKEY()=27
+                                        EXIT
+                                CASE LASTKEY() = 13
+                                IF 'S' = op_simnao('S','Confirma a ENTREGA do Produto:')
+                                        sr_getconnection():exec("UPDATE mastmov SET entregue = 'P' WHERE sr_recno = "+sr_cdbvalue(m_pos[point]),,.f.)
+                                        cons_merc := {}
+                                        sr_getconnection():exec("SELECT num_doc,num_local,data,hora,cod_prod,descri,qtd,preco,cod_cli,cod_garco,oper,obs,dat_pag,porta,entregue,sr_recno FROM mastmov WHERE sr_recno = "+sr_cdbvalue(m_pos[point]),,.t.,@cons_merc)
+                                        IF cons_merc[1,14] = '1'
+                                                mporta := m_cfg[5]
+                                        ELSEIF cons_merc[1,14] = '2'
+                                                mporta := m_cfg[6]
+                                        ELSEIF cons_merc[1,14] = '3'
+                                                mporta := m_cfg[7]
+                                        ENDIF
+                                        SET DEVI TO PRINT
+                                        SET PRINT TO (ALLTRIM(m_cfg[12])+'HRB.REL')
+                                        imprt('M','N')
+                                        imprt('M','N+')
+                                        //imprtDEVPOS(PROW()+1,00);DEVOUT(CHR(18))
+                                        DEVPOS(PROW()+1,00);DEVOUT('Mesa.....: '+cons_merc[1,2])
+                                        imprt('M','N-')
+                                        imprt('M','N')
+                                        imprt('M','C')
+                                        //DEVPOS(PROW()+1,00);DEVOUT(CHR(15))
+                                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                        DEVPOS(PROW()+1,00);DEVOUT(CHR(18))
+                                        DEVPOS(PROW(),00);DEVOUT('Codigo...: '+cons_merc[1,5])
+                                        DEVPOS(PROW()+1,00);DEVOUT(cons_merc[1,6])
+                                        IF ! EMPTY(cons_merc[1,12])
+                                                DEVPOS(PROW()+1,0);DEVOUT('OBS.: '+cons_merc[1,12])
+                                        ENDIF
+                                        DEVPOS(PROW()+1,00);DEVOUT('Quantidade: '+TRANSFORM(cons_merc[1,7],'999.99'))
+                                        DEVPOS(PROW()+1,00);DEVOUT(CHR(15))
+                                        DEVPOS(PROW(),00);DEVOUT(mtraco)
+                                        DEVPOS(PROW()+1,00);DEVOUT(CHR(18))
+                                        DEVPOS(PROW(),00);DEVOUT('Garcon....: '+cons_merc[1,10])
+                                        //DEVPOS(PROW()+1,00);DEVOUT('Operador..: '+cod_operado)
+                                        DEVPOS(PROW()+1,00);DEVOUT(CHR(15))
+                                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                        DEVPOS(PROW()+m_cfg[10],00);DEVOUT(CHR(18))
+                                        SETPRC(00,00)
+                                        SET DEVI TO SCREEN;SET PRINT TO;SET PRINT OFF
+                                        IF mporta = 'VIDEO'
+                                                MYRUN('DOSPRINTER '+IF(m_cfg[9]='1','/SEL','/SEL2')+' /DEL '+ALLTRIM(m_cfg[12])+'HRB.REL')
+                                        ELSE
+                                                MYRUN('DOSPRINTER /RAW /DEL '+ALLTRIM(m_cfg[12])+'HRB.REL')
+                                        ENDIF
+                                        sr_getconnection():exec("COMMIT",,.f.)
+
+                                ENDIF
+                        ENDCASE
+                ENDIF
+        ENDDO
+        IF LASTKEY() = 27 .OR. LEN(cons_merc) = 0
+                EXIT
+        ENDIF
+ENDDO
+wvw_lclosewindow()
+WVW_SetFont(,'lucida console',12, 7,FW_HEAVY, PROOF_QUALITY )  // 800X600
+SETMODE(50,120)
+WVW_SetFont(,'lucida console',12, 7,FW_HEAVY, PROOF_QUALITY )  // 800X600
+RETURN NIL
+*********************** f i m ***********************************

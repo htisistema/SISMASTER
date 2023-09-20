@@ -1,0 +1,8 @@
+hbmk2: Processando arquivo de configura‡Æo: C:\hmg.3.0.35\harbour\bin\hbmk.cfg
+hbmk2: Processando: sismaster.hbc
+hbmk2: Linkando... sismaster.exe
+c:/hmg.3.0.35/mingw/bin/../lib/gcc/mingw32/4.4.1/../../../libmingw32.a(main.o):main.c:(.text+0xd2): undefined reference to `WinMain@16'
+collect2: ld returned 1 exit status
+hbmk2: Erro: Executando linkeditor. 1
+gcc.exe .hbmk\win\mingw\sismaster.o _temp.o    -mconsole -Wl,--start-group -lhmg -lhbmysql -lmysql -lcrypt -ledit -leditex -lgraph -lini -lreport -lhbwin -lhbziparc -lhbmzip -lmsvfw32 -lvfw32 -lsddodbc -lrddsql -lsddmy -lhbodbc -lodbc32 -lhbhpdf -lhbvpdf -lhbmemio -lhbsqlit3 -lsqlite3 -lhbfimage -lhbpgsql -lpq -lhbtip -lhbct -lhbmisc -lhbnetio -lxhb -lhbextern -lhbdebug -lhbvm -lhbrtl -lhblang -lhbcpage -lgtcgi -lgtpca -lgtstd -lgtwin -lgtwvt -lgtgui -lhbrdd -lhbuddall -lhbusrrdd -lrddntx -lrddcdx -lrddnsx -lrddfpt -lhbrdd -lhbhsx -lhbsix -lhbmacro -lhbcplr -lhbpp -lhbcommon -lkernel32 -luser32 -lgdi32 -ladvapi32 -lws2_32 -lwinspool -lcomctl32 -lcomdlg32 -lshell32 -luuid -lole32 -loleaut32 -lmpr -lwinmm -lmapi32 -limm32 -lmsimg32 -lwininet -lhbpcre -lhbzlib  -Wl,--end-group -osismaster.exe -LC:/hmg.3.0.35/harbour/lib -LC:/hmg.3.0.35//lib -LC:/helio/sismaster/
+

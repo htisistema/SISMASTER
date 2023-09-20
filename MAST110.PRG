@@ -1,0 +1,248 @@
+MEMVAR getlist
+*************************
+* INCLUSAO  PRODUTO
+*************************
+FUNCTION mast110(mcod)
+**********************
+MEMVAR mmen_icms,mdata_sis,nivel_acess,memp_resa
+LOCAL mcod_merc:=SPACE(5),mproduto:=SPACE(30),munidade,mpr_unit,mdata_cad,lci:=0,cci:=0,lba:=35,cba:=70,mtipo,;
+      cons_merc:={},aret:={},i:=0,nPBid,mporta:= 0,mgrupo:=0,mcomp:=SPACE(60),mcomp1:=SPACE(60),;
+      mncm,mcst,mdesc_livre
+PRIVATE MPRG:='MAST110',mexcluir:=''
+IF mcod = NIL
+        IF ! ver_nivel(mprg+'INCL','INCLUSAO DE PRODUTO','15',nivel_acess,,'AMBIE')
+                RETURN NIL
+        ENDIF
+        op_tela(10,10,24,100,' Inclusao de Produto  ['+mprg+']')
+ELSE
+        IF ! ver_nivel(mprg+'ALT','ALTERACAO DE PRODUTO','15',nivel_acess,,'AMBIE')
+                RETURN NIL
+        ENDIF
+        op_tela(10,10,24,100,' Alteracao de Produto  ['+mprg+']')
+ENDIF
+CLEAR GETS
+mincluir := ''
+WvW_PBSetFont( NIL, "Courier New", 15, 0,)
+nPBid := wvw_pbCreate(NIL,6,55,7,65, 'EXCLUIR',NIL,{||excl_prod(mcod)})
+WVW_PBEnable( NIL, nPBId, .F. )
+WHILE .T.
+        setcor(1)
+        limpa(lci,cci,lba,cba)
+        exibi_prg(mprg)
+        mcod_merc := mgrupo := 0
+        mproduto := SPACE(30)
+        mtipo := 'P'
+        mdata_cad := DATE()
+        mpr_venda := mpr_custo := 0
+        munidade := 'UN'
+        mporta   := 0
+        mncm := SPACE(8)
+        mcst := SPACE(3)
+        mdesc_livre := 'N'
+        mensagem('Preencha os Campos - <ESC> p/Retornar')
+        DEVPOS(lci  ,cci+1);DEVOUT('Grupo.................:')
+        DEVPOS(lci+1,cci+1);DEVOUT('Codigo................:')
+        DEVPOS(lci+2,cci+1);DEVOUT('Descricao do Produto..:')
+        DEVPOS(lci+3,cci+1);DEVOUT('Componentes...........:')
+        DEVPOS(lci+5,cci+1);DEVOUT('Data do Cadastro......:')
+        DEVPOS(lci+6,cci+1);DEVOUT('Unidade...............:')
+        DEVPOS(lci+7,cci+1);DEVOUT('[P]rod.[M]ateria Prima:')
+        DEVPOS(lci+8,cci+1);DEVOUT('Preco de VENDA  R$....:')
+        DEVPOS(lci+9,cci+1);DEVOUT('Preco de Custo  R$....:')
+        DEVPOS(lci+10,cci+1);DEVOUT('Impressao/Video [0,3].:')
+        DEVPOS(lci+11,cci+1);DEVOUT('Codigo do NCM.........:')
+        DEVPOS(lci+12,cci+1);DEVOUT('Codigo do CST.........:')
+        DEVPOS(lci+13,cci+1);DEVOUT('Descricao Livre [s/N].:')
+        IF mcod = NIL
+                mexcluir:=''
+                WVW_PBEnable( NIL, nPBId, .F. )
+                @ lci  ,cci+25 GET mgrupo PICT '999' VALID IF(EMPTY(mgrupo),.F.,.T.)
+                READ
+                IF LASTKEY() = 27
+                        wvw_lclosewindow()
+                        RETURN .T.
+                ENDIF
+                cons_merc := {}
+                sr_getconnection():exec("SELECT * FROM mastgrupo WHERE codigo = "+sr_cdbvalue(STRZERO(mgrupo,3)),,.t.,@cons_merc)
+                sr_getconnection():exec('COMMIT',,.f.)
+                IF LEN(cons_merc) = 0
+                        atencao('GRUPO nao encontrado em nosso Arquivo !!!')
+                        LOOP
+                ENDIF
+                setcor(3)
+                DEVPOS(lci,cci+29);DEVOUT(cons_merc[1,2])
+                setcor(1)
+                cons_merc:={}
+                sr_getconnection():exec("SELECT MAX(codigo) FROM mastprod WHERE grupo = "+sr_cdbvalue(STRZERO(mgrupo,3)),,.t.,@cons_merc)
+                sr_getconnection():exec('COMMIT',,.f.)
+                mcod_merc := cons_merc[1,1] + 1
+                mcod_aux  := cons_merc[1,1] + 1
+                cons_merc := {}
+                sr_getconnection():exec("SELECT * FROM mastprod WHERE codigo = "+sr_cdbvalue(mcod_merc),,.t.,@cons_merc)
+                sr_getconnection():exec('COMMIT',,.f.)
+                IF LEN(cons_merc) > 0
+                        cons_merc:={}
+                        sr_getconnection():exec("SELECT MAX(codigo) FROM mastprod",,.t.,@cons_merc)
+                        sr_getconnection():exec('COMMIT',,.f.)
+                        mcod_merc := cons_merc[1,1] + 1
+                        mcod_aux  := cons_merc[1,1] + 1
+                ENDIF
+                @ lci+1,cci+25 GET mcod_merc PICT '99999' VALID IF(EMPTY(mcod_merc),.F.,.T.)
+                READ
+                IF LASTKEY() = 27
+                        LOOP
+                ENDIF
+                IF mcod_merc > 99999
+                        atencao('O codigo do produto estar maior que o campo do banco de dados...')
+                        LOOP
+                ENDIF
+                mcod_merc := mcod_merc
+                setcor(3)
+                DEVPOS(lci+1,cci+25);DEVOUT(STR(mcod_merc,5))
+                setcor(1)
+                cons_merc := {}
+                sr_getconnection():exec("SELECT * FROM mastprod WHERE codigo = "+sr_cdbvalue(mcod_merc),,.t.,@cons_merc)
+                sr_getconnection():exec('COMMIT',,.f.)
+                IF LEN(cons_merc) > 0
+                        atencao('Codigo ja Existe no Arquivo !!!')
+                        LOOP
+                ENDIF
+
+                mdata_cad := mdata_sis
+                @ lci+2,cci+25 GET mproduto PICT '@!' VALID IF(EMPTY(mproduto),.F.,.T.)
+                READ
+                IF LASTKEY() = 27
+                        LOOP
+                ENDIF
+                mproduto := tira_acento(mproduto)
+                @ lci+3,cci+25 GET mcomp
+                @ lci+4,cci+25 GET mcomp1
+                @ lci+5,cci+25 GET mdata_cad
+                @ lci+6,cci+25 GET munidade PICT '@!'
+                @ lci+7,cci+25 GET mtipo PICT '@!' VALID mtipo $ 'P,M'
+                @ lci+8,cci+25 GET mpr_venda PICT '999,999.99'
+                @ lci+9,cci+25 GET mpr_custo PICT '999,999.99'
+                @ lci+10,cci+25 GET mporta PICT '99' RANGE 0,14 WHEN men_get(1,1,'[0]-Nao Impressora e Video [1]-Imp.Cozinha [2]-Imp.Bar [3]-Imp.Outras - Acrecentar [4]Video')
+                @ lci+11,cci+25 GET mncm PICT '@!'
+                @ lci+12,cci+25 GET mcst PICT '@!'
+                @ lci+13,cci+25 GET mdesc_livre PICT '@!' VALID mdesc_livre $ 'S,N'
+                READ
+                IF LASTKEY() = 27
+                        LOOP
+                ENDIF
+                opcao := op_simnao('S','Confirma a Inclusao do PRODUTO:')
+                IF LASTKEY() = 27 .OR. opcao = 'N'
+                        LOOP
+                ENDIF
+                sr_getconnection():exec('INSERT INTO mastprod ('+;
+                'grupo     ,'+; //5
+                'codigo    ,'+; //5
+                'descri    ,'+; //6
+                'componente,'+; //6
+                'componente1,'+; //6
+                'unidade   ,'+; //7
+                'tipo      ,'+; //8
+                'data      ,'+; //9
+                'pr_venda  ,'+; //10
+                'custo     ,'+; //10
+                'oper      ,'+; //11
+                'porta     ,'+; //12
+                'ncm       ,'+; //12
+                'cst       ,'+; //12
+                'desc_livre,'+; //12
+                'SR_DELETED )'+;
+                ' VALUES ('+;
+                sr_cdbvalue(STRZERO(mgrupo,3)                    )+','+; //5
+                sr_cdbvalue(mcod_merc                            )+','+; //5
+                sr_cdbvalue(mproduto                             )+','+; //6
+                sr_cdbvalue(mcomp                                )+','+; //12
+                sr_cdbvalue(mcomp1                               )+','+; //12
+                sr_cdbvalue(munidade                             )+','+; //12
+                sr_cdbvalue(mtipo                                )+','+; //8
+                sr_cdbvalue(mdata_cad                            )+','+; //10
+                sr_cdbvalue(mpr_venda                            )+','+; //50
+                sr_cdbvalue(mpr_custo                            )+','+; //50
+                sr_cdbvalue(cod_operado                          )+','+; //50
+                sr_cdbvalue(mporta                               )+','+; //50
+                sr_cdbvalue(mncm                                 )+','+; //50
+                sr_cdbvalue(mcst                                 )+','+; //50
+                sr_cdbvalue(mdesc_livre                          )+','+; //50
+                sr_cdbvalue(' ')+')',,.f.)
+                sr_getconnection():exec("COMMIT",,.f.)
+        ELSE
+                WVW_PBEnable( NIL, nPBId, .T. )
+                cons_merc := {}
+                sr_getconnection():exec("SELECT * FROM mastprod WHERE codigo = "+sr_cdbvalue(mcod),,.t.,@cons_merc)
+                sr_getconnection():exec('COMMIT',,.f.)
+                IF LEN(cons_merc) = 0
+                        atencao('Codigo ja Existe no Arquivo !!!')
+                        LOOP
+                ENDIF
+                setcor(3)
+                DEVPOS(lci+1,cci+25);DEVOUT(mcod)
+                DEVPOS(lci+5,cci+25);DEVOUT(cons_merc[1,4])
+                setcor(1)
+                @ lci  ,cci+25 GET cons_merc[1,31] PICT '999' VALID IF(EMPTY(cons_merc[1,31]),.F.,.T.)
+                READ
+                IF LASTKEY() = 27
+                        wvw_lclosewindow()
+                        RETURN .T.
+                ENDIF
+                cons_grupo := {}
+                sr_getconnection():exec("SELECT * FROM mastgrupo WHERE codigo = "+sr_cdbvalue(cons_merc[1,31]),,.t.,@cons_grupo)
+                sr_getconnection():exec('COMMIT',,.f.)
+                IF LEN(cons_grupo) = 0
+                        atencao('GRUPO nao em nosso Arquivo !!!')
+                        LOOP
+                ENDIF
+                setcor(3)
+                DEVPOS(lci,cci+29);DEVOUT(cons_grupo[1,2])
+                setcor(1)
+                @ lci+2,cci+25 GET cons_merc[1,2] PICT '@!' VALID IF(EMPTY(cons_merc[1,2]),.F.,.T.)
+                READ
+                IF ! EMPTY(mexcluir)
+                        mexcluir:=''
+                        EXIT
+                ENDIF
+                IF LASTKEY() = 27
+                        LOOP
+                ENDIF
+                IF ! EMPTY(mexcluir)
+                        mexcluir:=''
+                        EXIT
+                ENDIF
+                cons_merc[1,2] := tira_acento(cons_merc[1,2])
+                @ lci+3,cci+25 GET cons_merc[1,32]
+                @ lci+4,cci+25 GET cons_merc[1,33]
+                @ lci+6,cci+25 GET cons_merc[1,7] PICT '@!'
+                @ lci+7,cci+25 GET cons_merc[1,3] PICT '@!' VALID cons_merc[1,3] $ 'P,M'
+                @ lci+8,cci+25 GET cons_merc[1,6] PICT '999,999.99'
+                @ lci+9,cci+25 GET cons_merc[1,5] PICT '999,999.99'
+                @ lci+10,cci+25 GET cons_merc[1,9] PICT '99' RANGE 0,14 WHEN men_get(1,1,'[0]-Nao Impressora e Video [1]-Imp.Cozinha [2]-Imp.Bar [3]-Imp.Outras - Acrecenta [4]Video')
+                @ lci+11,cci+25 GET cons_merc[1,38] PICT '@!'
+                @ lci+12,cci+25 GET cons_merc[1,39] PICT '@!'
+                @ lci+13,cci+25 GET cons_merc[1,41] PICT '@!' VALID cons_merc[1,41] $ 'S,N'
+                READ
+                IF LASTKEY() = 27 .OR. 'N' = op_simnao('S','Confirma a Inclusao do PRODUTO:')
+                        LOOP
+                ENDIF
+                sr_getconnection():exec("UPDATE mastprod SET descri = "+sr_cdbvalue(cons_merc[1,2])+",unidade = "+sr_cdbvalue(cons_merc[1,7])+",pr_venda = "+sr_cdbvalue(cons_merc[1,6])+",custo = "+sr_cdbvalue(cons_merc[1,5])+",tipo = "+sr_cdbvalue(cons_merc[1,3])+",porta = "+sr_cdbvalue(cons_merc[1,9])+",grupo = "+sr_cdbvalue(cons_merc[1,31])+",componente = "+sr_cdbvalue(cons_merc[1,32])+",componente1 = "+sr_cdbvalue(cons_merc[1,33])+",ncm = "+sr_cdbvalue(cons_merc[1,38])+",cst = "+sr_cdbvalue(cons_merc[1,39])+",desc_livre = "+sr_cdbvalue(cons_merc[1,41])+" WHERE codigo = "+sr_cdbvalue(mcod),,.f.)
+                sr_getconnection():exec("COMMIT",,.f.)
+                EXIT
+        ENDIF
+ENDDO
+wvw_lclosewindow()
+RETURN NIL
+*********************** f i m ***********************************
+FUNCTION excl_prod(m_cod)
+************************
+IF ! ver_nivel(mprg+'EXCL','EXCLUSAO DE PRODUTO','15',nivel_acess,,'AMBIE')
+        RETURN NIL
+ENDIF
+IF LASTKEY() = 27 .OR. 'S' = op_simnao('S','Confirma a EXCLUSAO do PRODUTO:')
+        sr_getconnection():exec("DELETE FROM mastprod  WHERE codigo = "+sr_cdbvalue(m_cod),,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        mexcluir := 1
+        atencao('Este Registro foi EXCLUIDO com sucesso...')
+ENDIF
+RETURN NIL

@@ -1,0 +1,139 @@
+***************************************
+***************************************
+* DESPROTEGER E VERIFICA O COMPUTADOR
+***************************************
+MEMVAR mcaminho
+
+FUNCTION mastercdx(indexar,mfile)
+************
+LOCAL mprg:='SACCDX'
+PRIVATE lci:=01,cci:=00,lba:=25,cba:=80,;
+        cor,matriz :={},i:=0,opcao:=' ',mcont:=0,mcont1:=0,malias,;
+        mreindex,mqtd_ind:=0
+
+IF indexar = 'P'
+        setcor(1)
+        op_tela(09,10,13,91,'VERIFICANDO INTEGRIDADE DAS TABELAS','1')
+        aret := {}
+        AADD(aret,{02,01,03,80})
+        i:=0
+        FOR i = 1 TO 100
+                DEVPOS(00,39);DEVOUT(TRANSFORM(i,'999')+' %')
+                WVW_DrawProgressBar( ,02,01,03,80,aret,i,102,155,,.f.,0 )
+                INKEY(.1)
+                IF LASTKEY() = 27
+                        EXIT
+                ENDIF
+        NEXT
+        wvw_lclosewindow()
+        apaga_hti() //apaga o arquivo de controle "HTI.001"
+        QUIT
+ELSE
+        op_tela(10,01,13,99,' I N D E X A C A O    D O S    A R Q U I V O S ','1')
+ENDIF
+DEVPOS(lci,cci+1);DEVOUT('02> INSOPERA =>'+SPACE(90));DEVPOS(lci+1,cci+1);DEVOUT(SPACE(105))
+IF ! SR_EXISTINDEX('insopera') .OR. (indexar <> NIL .AND. mfile = NIL) .OR. mfile = 'insopera'
+        IF ! AbriArq('insopera','sen','E');RETURN NIL;wvw_lclosewindow();ENDIF
+        INDEX ON sen->snome TAG senha TO ('insopera')
+        INDEX ON sen->scod_op TAG codop TO ('insopera')
+        sen->(DBCLOSEAREA())
+ENDIF
+**********************************************************************************************
+DEVPOS(lci,cci+1);DEVOUT('09> MASTCLI   =>'+SPACE(90));DEVPOS(lci+1,cci+1);DEVOUT(SPACE(105))
+IF ! SR_EXISTINDEX("MASTCLI") .OR. (indexar <> NIL .AND. mfile = NIL) .OR. mfile = 'MASTCLI'
+        IF ! AbriArq('MASTCLI','cli','E');RETURN NIL;wvw_lclosewindow();ENDIF
+        mqtd_ind := 100/2
+        prog(lci,cci+17,00)
+        INDEX ON cli->cod_cli TAG codigo TO ('MASTCLI') // EVAL dbprogress('CODIGO CLIENTE',,lci,cci+35,mqtd_ind*1,cci+17,0)
+        prog(lci,cci+17,50)
+        INDEX ON cli->razao TAG raz TO ('MASTCLI') // EVAL dbprogress('RAZAO',,lci,cci+35,mqtd_ind*2,cci+17,0)
+        prog(lci,cci+17,100)
+        cli->(DBCLOSEAREA())
+ENDIF
+**********************************************************************************************
+DEVPOS(lci,cci+1);DEVOUT('12> MASTPROD  =>'+SPACE(90));DEVPOS(lci+1,cci+1);DEVOUT(SPACE(105))
+IF ! SR_EXISTINDEX('MASTPROD') .OR. (indexar <> NIL .AND. mfile = NIL) .OR. mfile = 'MASTPROD'
+        IF ! AbriArq('MASTPROD','merc','E');RETURN NIL;wvw_lclosewindow();ENDIF
+        mqtd_ind := 100/2
+        prog(lci,cci+17,00)
+        INDEX ON merc->codigo TAG codigo TO ('MASTPROD') // EVAL dbprogress('VALOR VENDA',,lci,cci+35,mqtd_ind*1,cci+17,0)
+        prog(lci,cci+17,50)
+        INDEX ON merc->descri TAG desc TO ('MASTPROD') // EVAL dbprogress('VALOR VENDA',,lci,cci+35,mqtd_ind*3,cci+17,0)
+        prog(lci,cci+17,100)
+        merc->(DBCLOSEAREA())
+ENDIF
+
+DEVPOS(lci,cci+1);DEVOUT('12> MASTMESAS  =>'+SPACE(90));DEVPOS(lci+1,cci+1);DEVOUT(SPACE(105))
+IF ! SR_EXISTINDEX('MASTMESAS') .OR. (indexar <> NIL .AND. mfile = NIL) .OR. mfile = 'MASTMESAS'
+        IF ! AbriArq('MASTMESAS','mesa','E');RETURN NIL;wvw_lclosewindow();ENDIF
+        mqtd_ind := 100/2
+        prog(lci,cci+17,00)
+        INDEX ON mesa->tipo+mesa->numero TAG tipnum TO ('MASTMESAS') // EVAL dbprogress('VALOR VENDA',,lci,cci+35,mqtd_ind*1,cci+17,0)
+        prog(lci,cci+17,100)
+        mesa->(DBCLOSEAREA())
+ENDIF
+DEVPOS(lci,cci+1);DEVOUT('12> MASTFORN  =>'+SPACE(90));DEVPOS(lci+1,cci+1);DEVOUT(SPACE(105))
+IF ! SR_EXISTINDEX('MASTFORN') .OR. (indexar <> NIL .AND. mfile = NIL) .OR. mfile = 'MASTFORN'
+        IF ! AbriArq('MASTFORN','forn','E');RETURN NIL;wvw_lclosewindow();ENDIF
+        ORDCREATE('mastforn','codigo','forn->cod_forn')
+        ORDCREATE('mastforn','nome','forn->razao')
+        ORDCREATE('mastforn','cgc','forn->cgc')
+        ORDCREATE('mastforn','local','forn->local+forn->razao')
+        forn->(DBCLOSEAREA())
+ENDIF
+/*
+**********************************************************************************************
+DEVPOS(lci,cci+1);DEVOUT('08> SACFORN  =>'+SPACE(90));DEVPOS(lci+1,cci+1);DEVOUT(SPACE(105))
+IF ! SR_EXISTINDEX("sacforn") .OR. (indexar <> NIL .AND. mfile = NIL) .OR. mfile = 'sacforn'
+        IF ! AbriArq('SACFORN','forn','E');RETURN NIL;wvw_lclosewindow();ENDIF
+        prog(lci,cci+17,0,'COD_FORN')
+        ORDCREATE('sacforn','codigo','forn->cod_forn')
+        prog(lci,cci+17,30,'RAZAO')
+        ORDCREATE('sacforn','nome','forn->razao')
+        prog(lci,cci+17,60,'CGC')
+        ORDCREATE('sacforn','cgc','forn->cgc')
+        prog(lci,cci+17,70,'LOCAL+RAZAO')
+        ORDCREATE('sacforn','local','forn->local+forn->razao')
+        prog(lci,cci+17,100,' OK')
+        forn->(DBCLOSEAREA())
+ENDIF
+**********************************************************************************************
+*/
+DEVPOS(lci,cci+1);DEVOUT('34> SACCONF  =>'+SPACE(90));DEVPOS(lci+1,cci+1);DEVOUT(SPACE(105))
+IF ! SR_EXISTINDEX("sacconf") .OR. indexar <> NIL
+        IF ! AbriArq('SACCONF','conf','E');RETURN NIL;wvw_lclosewindow();ENDIF
+        INDEX ON conf->descri TAG desc TO ('sacconf')
+        INDEX ON conf->modulo TAG modu TO ('sacconf')
+        prog(lci,cci+17,100,' OK')
+        CLOSE conf
+ENDIF
+DEVPOS(lci,cci+1);DEVOUT('49> SACCID   =>'+SPACE(90));DEVPOS(lci+1,cci+1);DEVOUT(SPACE(105))
+IF ! SR_EXISTINDEX("saccid") .OR. (indexar <> NIL .AND. mfile = NIL) .OR. mfile = 'saccid'
+        IF ! AbriArq('saccid','cid','E');RETURN NIL;wvw_lclosewindow();ENDIF
+        INDEX ON cid->cidade+cid->uf TAG cida TO ('saccid')
+        INDEX ON cid->cod_cid TAG codcida TO ('saccid')
+        prog(lci,cci+17,100,' OK')
+        CLOSE cid
+ENDIF
+
+**********************************************************************************************
+DEVPOS(lci,cci+1);DEVOUT('21> MASTCARTA =>'+SPACE(90));DEVPOS(lci+1,cci+1);DEVOUT(SPACE(105))
+IF ! SR_EXISTINDEX("MASTCARTA") .OR. (indexar <> NIL .AND. mfile = NIL) .OR. mfile = 'MASTCARTA'
+        IF ! AbriArq('MASTCARTA','car','E');RETURN NIL;wvw_lclosewindow();ENDIF
+        INDEX ON car->codigo TAG codigo TO ('MASTCARTA')
+        INDEX ON car->cartao TAG cart TO ('MASTCARTA')
+        prog(lci,cci+17,100,' OK')
+        car->(DBCLOSEAREA())
+ENDIF
+DEVPOS(lci,1);DEVOUT('27> SACOP    =>'+SPACE(90));DEVPOS(1,1);DEVOUT(SPACE(105))
+IF ! SR_EXISTINDEX("sacop") .OR. indexar <> NIL
+        IF ! AbriArq('SACOP','op','E');RETURN NIL;wvw_lclosewindow();ENDIF
+        INDEX ON op->operacao TAG cod_op TO ('sacop')
+        prog(lci+1,17,100,' OK')
+        CLOSE op
+ENDIF
+
+CLOSE ALL
+wvw_lclosewindow()
+RETURN .T.
+

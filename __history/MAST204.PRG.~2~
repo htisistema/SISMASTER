@@ -1,0 +1,63 @@
+MEMVAR getlist
+*************************
+* FECHAMENTO PARCIAL
+*************************
+FUNCTION mast204()
+******************
+MEMVAR mdata_sis,nivel_acess
+LOCAL MPRG:='MAST204',lci,cci,lba,cba,cons_merc:={},mtipo_lanca := 'M'
+PRIVATE mnum_mesa:=0
+IF mtipo_lanca = 'M'
+        IF ! ver_nivel(mprg+'MESA','FECHAMENTO PARCIAL DE MESAS','15',nivel_acess,,'AMBIE')
+                RETURN NIL
+        ENDIF
+        op_tela(10,10,13,90,' FECHAMENTO PARCIAL DE MESAS  ['+mprg+']')
+ELSEIF mtipo_lanca = 'Q'
+        IF ! ver_nivel(mprg+'QTO','FECHAMENTO PARCIAL DE QUARTOS','15',nivel_acess,,'AMBIE')
+                RETURN NIL
+        ENDIF
+        op_tela(10,10,13,90,' FECHAMENTO PARCIAL DE QUARTOS  ['+mprg+']')
+ELSEIF mtipo_lanca = 'C'
+        IF ! ver_nivel(mprg+'CHL','FECHAMENTO PARCIAL DE CHALES','15',nivel_acess,,'AMBIE')
+                RETURN NIL
+        ENDIF
+        op_tela(10,10,13,90,' FECHAMENTO PARCIAL DE CHALES  ['+mprg+']')
+ENDIF
+lci:=cci:=00
+CLEAR GETS
+WHILE .T.
+        setcor(1)
+        limpa(lci,cci,lba,cba)
+        exibi_prg(mprg)
+        mtipo_lanca := 'M'
+        mcod_merc := mnum_mesa := mqtd := mcod_garcon := 0
+        mmerc := SPACE(30)
+        mensagem('Preencha os Campos - <ESC> p/Retornar')
+        DEVPOS(lci+1,cci+1);DEVOUT('Numero MESA:')
+        @ lci+1,cci+13 GET mnum_mesa PICT '9999' VALID IF(EMPTY(mnum_mesa),.F.,.T.) .AND. lim_get() WHEN men_get(,,'Digite o Numero da MESA - [ESC] p/Retonar')
+        READ
+        IF LASTKEY() = 27
+                wvw_lclosewindow()
+                RETURN .T.
+        ENDIF
+        cons_merc := {}
+        sr_getconnection():exec("SELECT * FROM mastmesas WHERE tipo = "+sr_cdbvalue(mtipo_lanca)+" AND numero = "+sr_cdbvalue(STRZERO(mnum_mesa,4)),,.t.,@cons_merc)
+        IF LEN(cons_merc) = 0
+                atencao('MESA nao existe em nossos Arquivo !!!')
+                LOOP
+        ENDIF
+        cons_merc := {}
+        sr_getconnection():exec("SELECT * FROM mastmov WHERE num_local = "+sr_cdbvalue(mtipo_lanca+STRZERO(mnum_mesa,4))+' AND dat_pag IS NULL',,.t.,@cons_merc)
+        IF LEN(cons_merc) = 0
+                atencao('Esta MESA nao estar ABERTA nao podendo ser solicitada !!!')
+                LOOP
+        ENDIF
+        IF LASTKEY() = 27 .OR. 'N' = op_simnao('S','Confirma a FECHAMENTO PARCIAL DA MESA: '+mtipo_lanca+STRZERO(mnum_mesa,4))
+                LOOP
+        ENDIF
+        Fecha_parc(mtipo_lanca,mnum_mesa,cons_merc[1,1])
+        EXIT
+ENDDO
+wvw_lclosewindow()
+RETURN NIL
+*********************** f i m ***********************************

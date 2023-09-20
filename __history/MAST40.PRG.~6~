@@ -1,0 +1,40 @@
+* PRODUTOS SOLICITADO NO DIA
+***************************************
+#INCLUDE "wingdi.ch"
+#INCLUDE "winuser.ch"
+
+FUNCTION mast40(mmanut)
+*****************
+LOCAL MPRG:='SAC40',mtitulo:='PRODUTOS SOLICITADO NO DIA',opcao,;
+      demo_set:={},point:=0,m_mov:={}
+
+IF ! ver_nivel(mprg,mtitulo,'1',nivel_acess,,'AMBIE')
+        RETURN NIL
+ENDIF
+CLEAR GETS
+op_tela(00,00,40,100,mtitulo,,1)
+m_mov:={}
+sr_getconnection():exec("SELECT cod_prod,descri,qtd FROM mastmov WHERE data = "+sr_cdbvalue(mdata_sis)+" AND dat_pag IS NULL GROUP BY cod_prod,cod_prod,descri,descri,qtd,qtd",,.t.,@m_mov)
+//sr_getconnection():exec("SELECT * FROM mastmov WHERE data = "+sr_cdbvalue(mdata_sis)+" AND dat_pag IS NOT NULL",,.t.,@m_mov)
+IF LEN(m_mov)
+        atencao('Nao existe movimento neste dia....')
+        wvw_lclosewindow()
+ENDIF
+WHILE .T.
+        exibi_prg(mprg)
+        setcor(1)
+        i:=0
+        demo_set:={}
+        FOR i = 1 TO LEN(m_mov)
+                AADD(demo_set,m_mov[i,1]+'  '+m_mov[i,2]+'  '+TRANSFORM(m_mov[i,3],'999,999.99'))
+        NEXT
+        mensagem('<ESC> Retorna  -  <ENTER> p/Confirmar')
+        point := ACHOICE(0,1,49,119,demo_set,,,point)
+        DO CASE
+                CASE LASTKEY() = 13
+                        wvw_lclosewindow()
+                        EXIT
+        ENDCASE
+ENDDO
+RETURN NIL
+****************************** F I M ******************************

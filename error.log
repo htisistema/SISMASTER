@@ -1,0 +1,102 @@
+******************************* Error log file ********************************
+
+Date ............: 06/12/12
+Time ............: 10:20:04
+Available Memory : 1612668
+Multi Threading  : No
+VM Optimization  : 0
+Application      : C:\helio\sismaster\mastgrad.EXE
+Operating System : Windows NT Professional 6.01.7601 Service Pack 1
+Compiler         : Borland C++ 5.5.1
+xHarbour Version : xHarbour build 0.99.70 Intl. (SimpLex)
+Build Date       : Dec 15 2006 09:38:44
+
+-------------------------- Environmental Information --------------------------
+
+Exact is ........: Off
+Fixed is ........: Off
+Decimals is at ..: 2
+Date Format is ..: mm/dd/yy
+Epoch is ........: 1900
+Path is .........: 
+Default is ......: 
+Exclusive is ....: On
+SoftSeek is .....: Off
+Unique is .......: Off
+Deleted is ......: Off
+Cancel is .......: On
+Debug is ........: False
+Color is ........: W/N,N/W,N/N,N/N,N/W
+Cursor is .......: 1
+Console is ......: On
+Alternate is ....: Off
+AltFile is ......: 
+Device is .......: SCREEN
+Printer is ......: False
+PrintFile is ....: PRN
+Margin is .......: 0
+Bell is .........: Off
+Confirm is ......: Off
+Escape is .......: On
+Insert is .......: Off
+Intensity is ....: On
+Scoreboard is ...: On
+Delimeters is ...: Off
+Delimchars is ...: ::
+Wrap is .........: Off
+Message is ......: 0
+MCenter is ......: Off
+
+===========================Detailed Work Area Items============================
+
+
+++++++++++++++++++++ Internal Error Handling Information  +++++++++++++++++++++
+
+Subsystem Call ..: BASE
+System Code .....: 1104
+Default Status ..: False
+Description .....: Argument error
+Operation .......: CHR
+Arguments .......:  [ 1] = Type: U
+Involved File ...: 
+Dos Error Code ..: 0
+
+ Trace Through:
+----------------
+CHR                   :       0 in Module: 
+GTRTECLA              :     281 in Module: 
+TRATATERMINAIS        :     120 in Module: 
+MAIN                  :      93 in Module: mastgrad.prg
+
+
+############################## Video Screen Dump ##############################
+
++--------------------------------------------------------------------------------+
+|                                                                                |
+|                                                                                |
+|                                                                                |
+|                                                                                |
+|                                                                                |
+|                                                                                |
+|                                                                                |
+|                                                                                |
+|                                                                                |
+|                                                                                |
+|                                                                                |
+|                                                                                |
+|                                                                                |
+|                                                                                |
+|                                                                                |
+|                                                                                |
+|                                                                                |
+|                                                                                |
+| Pressione ESC para finalizar...                                                |
+|Error BASE/1104  Argument error: CHR Arguments: ( [ 1] = Type: U)               |
+|                                                                                |
+|Error at ...: CHR(0) in Module:                                                 |
+|Called from : GTRTECLA(281) in Module:                                          |
+|Called from : TRATATERMINAIS(120) in Module:                                    |
+|Called from : MAIN(93) in Module: mastgrad.prg                                  |
++--------------------------------------------------------------------------------+
+
+

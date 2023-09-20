@@ -1,0 +1,132 @@
+MEMVAR getlist
+*************************
+* ALTERAR MESAS P/OUTRA ME3SA
+*************************
+FUNCTION mast201(mtipo_lanca)
+*****************************
+MEMVAR mdata_sis,nivel_acess
+LOCAL mnum_mesa:=0,mnum_mesa1:=0,lci,cci,lba,cba,cons_merc:={},aret:={},i:=0
+PRIVATE MPRG:='MAST201'
+IF mtipo_lanca = 'M'
+        IF ! ver_nivel(mprg+'MESA','ALTERACAO DE MESAS','15',nivel_acess,,'AMBIE')
+                RETURN NIL
+        ENDIF
+        op_tela(10,10,16,90,' ALTERACAO DE MESAS  ['+mprg+']')
+ELSEIF mtipo_lanca = 'Q'
+        IF ! ver_nivel(mprg+'QTO','ALTERACAO DE QUARTOS','15',nivel_acess,,'AMBIE')
+                RETURN NIL
+        ENDIF
+        op_tela(10,10,16,90,' ALTERACAO DE QUARTOS  ['+mprg+']')
+ELSEIF mtipo_lanca = 'C'
+        IF ! ver_nivel(mprg+'CHL','ALTERACAO DE CHALES','15',nivel_acess,,'AMBIE')
+                RETURN NIL
+        ENDIF
+        op_tela(10,10,16,90,' ALTERACAO DE CHALES  ['+mprg+']')
+ENDIF
+lci:=cci:=00
+lba:=35
+cba:=99
+CLEAR GETS
+//WvW_PBSetFont( NIL, "Courier New", 15, 0,)
+//nPBid := wvw_pbCreate(NIL,4,60,5,78, 'Fechamento Parcial',NIL,{||Fecha_parc(mtipo_lanca,mnum_mesa)})
+//WVW_PBEnable( NIL, nPBId, .F. )
+WHILE .T.
+        setcor(1)
+        limpa(lci,cci,lba,cba)
+        exibi_prg(mprg)
+        mcod_merc := mnum_mesa := mqtd := mcod_garcon := 0
+        mmerc := SPACE(30)
+        mensagem('Preencha os Campos - <ESC> p/Retornar')
+        DEVPOS(lci  ,cci+1);DEVOUT('Numero MESA ANTERIOR..:')
+        DEVPOS(lci+1,cci+1);DEVOUT('Numero MESA ATUAL.....:')
+
+        @ lci,cci+25 GET mnum_mesa PICT '9999' VALID IF(EMPTY(mnum_mesa),.F.,.T.) .AND. lim_get() WHEN men_get(,,'Digite o Numero da MESA - [ESC] p/Retonar')
+        READ
+        IF LASTKEY() = 27
+                wvw_lclosewindow()
+                RETURN .T.
+        ENDIF
+        WVW_PBEnable( NIL, nPBId, .T. )
+        cons_merc := {}
+        sr_getconnection():exec("SELECT * FROM mastmesas WHERE tipo = 'M' AND numero = "+sr_cdbvalue(STRZERO(mnum_mesa,4)),,.t.,@cons_merc)
+        IF LEN(cons_merc) = 0
+                atencao('MESA nao existe em nossos Arquivo !!!')
+                LOOP
+        ENDIF
+        @ lci,cci+25 GET mnum_mesa1 PICT '9999' VALID IF(EMPTY(mnum_mesa1),.F.,.T.) .AND. lim_get() WHEN men_get(,,'Digite o Numero da MESA - [ESC] p/Retonar')
+        READ
+        IF LASTKEY() = 27
+                LOOP
+        ENDIF
+        cons_merc := {}
+        sr_getconnection():exec("SELECT * FROM mastmesas WHERE tipo = 'M' AND numero = "+sr_cdbvalue(STRZERO(mnum_mesa1,4)),,.t.,@cons_merc)
+        IF LEN(cons_merc) = 0
+                atencao('MESA nao existe em nossos Arquivo !!!')
+                LOOP
+        ENDIF
+        cons_merc := {}
+        sr_getconnection():exec("SELECT * FROM mastmov WHERE num_local = "+sr_cdbvalue(mtipo_lanca+STRZERO(mnum_mesa1,4))+' AND dat_pag IS NULL',,.t.,@cons_merc)
+        IF LEN(cons_merc) > 0
+                atencao('MESA estar ABERTA nao podendo ser solicitada !!!')
+                LOOP
+        ENDIF
+
+        IF LASTKEY() = 27 .OR. 'N' = op_simnao('S','Confirma a ALTERACAO DA MESA: '+STRZERO(mnum_mesa,4)+' para MESA: '+STRZERO(mnum_mesa1,4))
+                LOOP
+        ENDIF
+        sr_getconnection():exec("UPDATE mastmov SET num_local = "+sr_cdbvalue(mtipo_lanca+STRZERO(mnum_mesa1,4))+" WHERE num_local = "+sr_cdbvalue(mtipo_lanca+STRZERO(mnum_mesa,4))+' AND dat_pag IS NULL',,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        fecha_alt(mtip_lanca,mnum_mesa1)
+        EXIT
+ENDDO
+wvw_lclosewindow()
+RETURN NIL
+*********************** f i m ***********************************
+FUNCTION fecha_alt(mtp_lanca,mnum_ms)
+****************************
+LOCAL mqtd_pessoas:=0,mhoras := TIME(),cons_parc,i:=0,mtotal_g,mentrada
+CLEAR GETS
+mhoras := TIME()
+cons_parc := {}
+sr_getconnection():exec("SELECT * FROM mastmov WHERE num_local = "+sr_cdbvalue(mtp_lanca+STRZERO(mnum_ms,4))+' AND dat_pag IS NULL',,.t.,@cons_parc)
+IF LEN(cons_parc) > 0
+        mentrada := cons_parc[1,4]
+        SET DEVI TO PRINT
+        SET PRINT TO (m_cfg[5])
+        DEVPOS(PROW(),00);DEVOUT(CHR(18))
+        DEVPOS(PROW()+1,00);DEVOUT(memp_resa)
+        DEVPOS(PROW()+1,00);DEVOUT(CHR(15))
+        DEVPOS(PROW(),00);DEVOUT(mtraco)
+        DEVPOS(PROW()+1,00);DEVOUT(CHR(18))
+        DEVPOS(PROW(),00);DEVOUT('Mesa.....: '+mtp_lanca+STRZERO(mnum_ms,4))
+        DEVPOS(PROW()+1,00);DEVOUT(CHR(15))
+        DEVPOS(PROW(),00);DEVOUT(mtraco)
+        DEVPOS(PROW()+1,00);DEVOUT('Documento: '+STRZERO(mnum_doc,6)+'  -  Data Emissao: '+DTOC(DATE()))
+        DEVPOS(PROW()+1,00);DEVOUT('Garcon....: '+cons_parc[1,10])
+        //DEVPOS(PROW()+1,00);DEVOUT('Operador..: '+cons_parc[1,4])
+        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+        DEVPOS(PROW()+1,00);DEVOUT(' Cod.   Descricao')
+        DEVPOS(PROW()+1,00);DEVOUT('Quantidade  Valor Unit.  Valor total')
+        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+
+        cons_parc := {}
+        sr_getconnection():exec("SELECT cod_prod,descri,sum(qtd),preco FROM mastmov WHERE num_local = "+sr_cdbvalue(mtp_lanca+STRZERO(mnum_ms,4))+' AND dat_pag IS NULL GROUP BY cod_prod,cod_prod,descri,descri,preco,preco',,.t.,@cons_parc)
+        i := mtotal_g := 0
+        FOR i = 1 TO LEN(cons_parc)
+                DEVPOS(PROW()+1,00);DEVOUT(cons_parc[i,1]+'   '+cons_parc[i,2])
+                DEVPOS(PROW()+1,00);DEVOUT(TRANSFORM(cons_parc[i,3],'999,999.99')+' X '+TRANSFORM(cons_parc[i,4],'999,999.99')+' = '+TRANSFORM(cons_parc[i,3]*cons_parc[i,4],'999,999.99'))
+                mtotal_g := mtotal_g + (cons_parc[i,3]*cons_parc[i,4])
+        NEXT
+        DEVPOS(PROW()+1,00);DEVOUT('                           ----------')
+        DEVPOS(PROW()+1,00);DEVOUT('Total dos Produtos......: '+TRANSFORM(mtotal_g,'999,999.99'))
+        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+        DEVPOS(PROW()+1,00);DEVOUT('Entrada..:'+mentrada+' - Saida:'+mhoras+' - Duracao:'+ELAPTIME(mentrada,mhoras))
+        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+        DEVPOS(PROW()+1,00);DEVOUT(PADL('HRB Sistemas - (81)3755.1489/3325.6663',54))
+        DEVPOS(PROW()+m_cfg[10],00)
+        SETPRC(00,00)
+        SET DEVI TO SCREEN;SET PRINT TO;SET PRINT OFF
+        lertexto(ALLTRIM(m_cfg[5]))
+ENDIF
+RETURN NIL
+

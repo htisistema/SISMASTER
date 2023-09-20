@@ -1,0 +1,421 @@
+************************************
+* INICIO DO SISMASTER : 03/04/2012
+************************************
+//#translate getactive() => MyHBGetActive()
+#include "wvwtools.ch"
+#include "inkey.ch"              // constantes de codigos das teclas
+#include "Fileio.ch"             // funcoes de leitura/gravacao de arquivo
+#include "set.ch"                // constantes da funcao SETKEY()
+#include "wingdi.ch"
+#include "winuser.ch"
+#include "common.ch"
+#include "setcurs.ch"
+#include "getexit.ch"
+//SQLRDD*********************
+#include "sqlrdd.ch"
+#include "firebird.ch"     // Needed if you plan to use native connection to Firebird
+#include "msg.ch"
+*****************************
+#define COM_CALE
+GLOBAL oApp
+
+FUNCTION main(mtc,mecf,mtipo_tela)
+***********************************
+MEMVAR msist,nivel_acess,getlist
+LOCAL mprg := 'SISMASTER',men,f,num,mcgc_aux,mserie,mponto,mtip_t:=' ',mtela_term,mmapear,lin,linha,linhas,marq:='',;
+      matriz:={},op:=' ',cam_dba:={},d:=0,m_aux:={},xcop
+
+PUBLIC mversao     := 'v20.02.12',;
+       mversao_ecf := '2010.1',;
+       msit_tip    := 'SISMASTER',;
+       sistema     := '.: SISMASTER :. Sistema Automacao Hotel e Restaurante',;
+       memp_resa    :='.: HTI Sistemas :.',;
+       mchv_priv    := 'E9D4E1CCA464B7E811C7746E43B11943EC2A03667F78AD66F01ABC50AF188FF76C083829B07AA8175E9E1F1B15CF3A39E48957C71A40E15713E9EF345E405CEFDFB5252BE32CB19A76E291C798CC01F64E19C5F25191CF41E666AE4738837E2FB3746123AEDF821578F09496C81634A6D784E4FBB0837C4EEEC3BAEF1B3F94C3',;
+       mchv_public  := 'CC55E628C3C90F93E5C7B550A9075A52CA999A89D6406CBDEA5508CF4112E00B4D0055E2DEA5BDF7E4AAAE4C4BB4C582DC0EBA14232D2444B949A6FF2DD23FD5B4CDBEAE7A8929D6A3774F4CCD737522F073E86F0724EE886EA493114780EDD87C59A173E0494D3F64DFF91AA7CFF6FD7F1D46AE5BDCA4418AF8E0261491F60D',;
+       mpaf_ecf     := 'POL4322011',;
+       mcnpj_hti    := '11156983000176',;
+       mim_hti      := '4130553       ',;
+       mrazao_hti   := 'J H BELTRAO SERVICOS DE INFORMATICA LTDA. - ME',;
+       mend_hti     := 'PRACA FRANCELINO ARAUJO',;
+       mnum_hti     := '68',;
+       mcomp_hti    := '',;
+       mbairro_hti  := 'CENTRO',;
+       mcidade_hti  := 'TACAIMBO',;
+       muf_hti      := 'PE',;
+       mcep_hti     := '55140000',;
+       mpaf_hti     := 'SISMASTER',;
+       mfone_hti    := '99281.6878',;
+       mpaf_ver     := '2010.1',;
+       mcgc_firm,minsc_firm,;
+       mend_firm,mcid_firm,mfone_firm,muf_firm,;
+       mens,sis_cidade,;
+       tesc,mcaminho:='',mtip_term,;
+       mcodempresa  := '001',;
+       m_tc         :=mtc,;
+       mdata_sis    :=DATE(),;
+       cod_operado  :='   ',;
+       ntask,;
+       mnum_principal := NIL,;
+       m_cfg,;
+       m_set := {},;
+       cons_emp:={},;
+       ncnn:=0,ncnn1:=0,ncnn2:=0,m_line:='ON',m_qp := CHR(13)+CHR(10),;
+       nivel_acess:=' ',;
+       m_color := WVW_GetPalette()
+REQUEST SQLRDD             // SQLRDD should be linked in
+REQUEST SR_FIREBIRD        // Needed if you plan to use native connection to Firebird
+REQUEST DBFCDX
+REQUEST DBFFPT
+*************************************************************************************
+REQUEST HB_CODEPAGE_PT850
+REQUEST HB_NOSTARTUPWINDOW
+REQUEST HB_LANG_ES
+REQUEST HB_CODEPAGE_ES
+REQUEST HB_CODEPAGE_ESMWIN
+REQUEST HB_CODEPAGE_ESWIN
+
+WITH OBJECT ( oApp := WvW_tApplication():New( CurDrive() + ":\" + CurDir() ) )
+        :cImagePath := CurDrive()+ ":\" + Curdir()      //+'\HTILOGO.JPG'
+        :Setup()
+        :SetTitle( sistema+' - '+mversao )
+
+        :SetIcon( CurDrive()+ ":\" + Curdir()+'\HTI.ico' )
+        :lDevelopment := .T.
+END
+WVW_SetIcon( ,,'HTI.ico')
+WvW_SetGet( "RDD"         ,"DBFCDX")
+WvW_SetGet( "CODEPAGE"    ,255)
+WvW_SetGet( "WIN_ROWS"    ,28)
+WvW_SetGet( "WIN_COLS"    ,88)
+
+wvw_SetVertCaret(.F.)
+wvw_setmaincoord(.F.)
+//wvw_setmaincoord(.T.)
+//WVW_SetCodePage(,250)
+wvw_enableshortcuts(0,.T.)
+wvw_setdeflinespacing(1.5)
+//WVW_SetDefLSPACECOLOR(10)
+*/
+wvw_SetPaintRefresh(0)
+wvw_seticon( , "hti.ico" )
+
+SET EVENTMASK TO 159
+SET CONS OFF
+SET WRAP ON
+SET DATE BRITI
+SET DELE ON
+SET EPOCH TO 1950
+
+mdata_sis := DATE()
+lin := MEMOLINE(MEMOREAD('mastercfg.ini'),110,1,,)
+linhas := linha := 0
+linhas := MLCOUNT(MEMOREAD('mastercfg.ini'),110)
+m_cfg := {}
+FOR linha = 1 TO  linhas
+        lin := MEMOLINE(MEMOREAD('mastercfg.ini'),110,linha,,)
+        IF SUBSTR(lin,5,1) = 'C'
+                AADD(m_cfg,ALLTRIM(SUBSTR(lin,30)))
+        ELSE
+                AADD(m_cfg,VAL(SUBSTR(lin,30)))
+        ENDIF
+NEXT
+fclose('mastercfg.ini')
+IF LEN(m_cfg) = 0
+        atencao('Favor verificar o arquivo mastercfg.INI ou entrar em contato com a HTI Sistemas...' )
+        RETURN NIL
+ELSEIF LEN(m_cfg) < 13
+        atencao('Favor verificar o arquivo SACCFG.INI estar faltando algumas linha ou foi alteradas ou entrar em contato com a HTI Sistemas...' )
+        RETURN NIL
+ENDIF
+i:=1
+WVW_SetFont(,'lucida console',12, 7,FW_BOLD, PROOF_QUALITY )  // 800X600
+
+//SETMODE(50,120)
+//WVW_SetFont(,'lucida console',12, 7,FW_HEAVY, PROOF_QUALITY )  // 800X600
+//WVW_SetFont(,'lucida console',12, 7,FW_HEAVY, PROOF_QUALITY )  // 800X600
+//wvw_SetFont(,'Ms Sans Serif' , 14, 10, FW_MEDIUM, DEFAULT_QUALITY )
+
+ncnn := 0
+
+RDDSETDEFAULT('SQLRDD')
+SR_SetMultiLang( .t. )
+SR_SetBaseLang( LANG_PT_BR )
+op_tela(10,15,12,85,'TENTANDO CONEXAO COM O BANCO DE DADOS')
+//WVW_SetFont(,"lucida console",13, 7,, PROOF_QUALITY )  // 800X600
+DEVPOS(01,01);DEVOUT('Tentando CONEXAO com o 1o. BANCO DE DADOS Caminho: ['+ALLTRIM(m_cfg[1])+'], Aguarde um Momento......')
+IF m_cfg[2] = 'S' .AND. ! File('SISMASTER.GDB')
+        IF SQL_SUCCESS = FBCreateDB( 'SISMASTER.GDB', 'SYSDBA', 'masterkey', 300, 'ISO8859_1')
+                atencao('Banco Criado com SUCESSO')
+                m_line := 'ON'
+        ENDIF
+ENDIF
+********** CONECTANDO AO FIREBIRD *************************************************
+IF mtc <> NIL .AND. SUBSTR(mtc,1,3) = 'GDB'
+        //atencao(ALLTRIM(SUBSTR(ALLTRIM(m_cfg[1]),1,LEN(ALLTRIM(m_cfg[1]))-10)+SUBSTR(mtc,4)))
+        cConnString := 'FIREBIRD='+ALLTRIM(SUBSTR(ALLTRIM(m_cfg[1]),1,LEN(ALLTRIM(m_cfg[1]))-10)+SUBSTR(mtc,4))+';uid=SYSDBA;pwd=masterkey;charset=ISO8859_1'
+        nCnn := SR_AddConnection(CONNECT_FIREBIRD,cConnString)
+        If nCnn < 0
+                atencao("Nao foi possivel conectar ao BANCO DE DADOS. Verificar o Caminho do Banco de Dados no mastercfg.INI ["+ALLTRIM(m_cfg[1])+"] ou se o FIREBIRD estar Instalado, Caso nao tenha sucesso contactar com o Administrador da REDE")
+                Quit
+        EndIf
+ELSE
+        cConnString := 'FIREBIRD='+ALLTRIM(m_cfg[1])+';uid=SYSDBA;pwd=masterkey;charset=ISO8859_1'
+        nCnn := SR_AddConnection(CONNECT_FIREBIRD,cConnString)
+        If nCnn < 0
+                atencao("Nao foi possivel conectar ao BANCO DE DADOS. Verificar o Caminho do Banco de Dados no mastercfg.INI ["+ALLTRIM(m_cfg[1])+"] ou se o FIREBIRD estar Instalado, Caso nao tenha sucesso contactar com o Administrador da REDE")
+                Quit
+        EndIf
+ENDIF
+SR_SetActiveConnection(nCnn)
+wvw_lclosewindow()
+m_set:={}
+sr_getconnection():exec("SELECT * FROM sacsetup",,.t.,@m_set)
+tesc := CHR(27)
+memp_resa := SPACE(30)
+WHILE .T.
+        mdata_sis := DATE()
+        mtip_term := m_cfg[2]
+        IF VAL(m_set[1,30]) = 0 .AND. ! EMPTY(m_set[1,30])
+                atencao('EMPRESA SEM NUMERO DE SERIE')
+                EXIT
+        ELSEIF EMPTY(m_set[1,23])
+                atencao('EMPRESA SEM NUMERO DE SERIE')
+                EXIT
+        ELSE    //IF autorizacao(m_set[1,23])
+                num := 80
+                mcodempresa := '001'
+                mcgc_aux := m_set[1,35]
+                mcgc_firm := m_set[1,35]
+                minsc_firm := m_set[1,14]
+                mend_firm := RTRIM(m_set[1,5])+', '+RTRIM(m_set[1,6])+IF(! EMPTY(m_set[1,7]),' - '+RTRIM(m_set[1,7]),'')
+                mcid_firm := RTRIM(m_set[1,9])+'-'+m_set[1,10]
+                mfone_firm := RTRIM(m_set[1,12])
+                sis_cidade := RTRIM(m_set[1,9])
+                IF ! EMPTY(m_set[1,3])
+                        memp_resa := RTRIM(m_set[1,3])
+                ELSE
+                        memp_resa := RTRIM(m_set[1,2])
+                ENDIF
+                *-----------------------------------------------------
+                CLOSE ALL
+                IF ! AbriArq('insopera','sen',,,,,,'N');RETURN NIL;ENDIF
+                *-----------------------------------------------------
+                setcor(1)
+                *************
+                muf_firm := m_set[1,10]
+                IF ! veri_plug();fim(,'*');ENDIF    // Solicitar senha do sistema
+        //ELSE
+          //      atencao('Numero de serie nao esta correto, procure a HTI Sistemas')
+            //    EXIT
+        ENDIF
+ENDDO
+QUIT
+RETURN NIL
+************************** f i m ***************************
+****
+FUNCTION ShowClue( ... )
+****
+LOCAL xMessage
+STATIC lPostP, cMessage := ""
+IF ( lPostP = NIL )
+        cMessage := ""
+ENDIF
+FOR EACH xMessage IN HB_aParams()
+        lIsArray := .F.
+        SWITCH ValType( xMessage )
+        CASE "C"
+        CASE "M"
+                EXIT
+        CASE "N"
+                xMessage := LTrim( Str( xMessage ) )
+                EXIT
+        CASE "D"
+                xMessage := DToC( xMessage )
+                EXIT
+        CASE "L"
+                xMessage := IF( xMessage, ".T.", ".F." )
+                EXIT
+        CASE "O"
+                xMessage := xMessage:className + " Object"
+                EXIT
+        CASE "B"
+                xMessage := "{||...}"
+                EXIT
+        CASE "A"
+                lPostP := lIsArray := .T.
+                EXIT
+                DEFAULT
+                xMessage := "NIL"
+        END
+        cMessage += ( "/" + xMessage )
+NEXT
+WvW_SBsetText( 1, 0, "* " +  cMessage )
+lPostP := NIL
+RETURN (.T.)
+************************** f i m ***************************
+FUNCTION veri_plug()
+********************
+LOCAL cons_conta,cons_prod,mped_merc := {},mtraco := REPLI('=',48),mped_exe := {}
+PRIVATE mtipo_imp:='M',mimp_tipo:=1,marq:=SPACE(35),mcaminho:=''
+wvw_minimize()
+
+WHILE LASTKEY() # 27
+        cons_prod:={}
+        sr_getconnection():exec("SELECT * FROM mastmov WHERE imprimir IS NULL OR imprimir = ''",,.t.,@cons_prod)
+        IF LEN(cons_prod) > 0
+                sr_getconnection():exec("UPDATE mastmov SET unidade = (SELECT unidade FROM mastprod WHERE codigo = mastmov.cod_prod),descri = (SELECT descri FROM mastprod WHERE codigo = mastmov.cod_prod),hora = "+sr_cdbvalue(TIME())+" WHERE num_doc = "+sr_cdbvalue(cons_prod[1,1]),,.f.)
+                sr_getconnection():exec("UPDATE mastmov SET excecao = (SELECT descricao FROM mastexe WHERE id = (SELECT ID_EXCECAO FROM mastexe_itens WHERE id_produto_pedido = mastmov.cod_prod AND id_pedido = mastmov.num_doc)) WHERE num_doc = "+sr_cdbvalue(cons_prod[1,1]),,.f.)
+                sr_getconnection():exec("COMMIT",,.f.)
+                i:=0
+                FOR i = 1 TO LEN(cons_prod)
+                        mped_merc := {}
+                        sr_getconnection():exec("SELECT * FROM mastprod WHERE codigo = "+sr_cdbvalue(cons_prod[i,5]),,.t.,@mped_merc)
+                        IF LEN(mped_merc) = 0
+                                LOOP
+                        ENDIF
+                        IF mped_merc[1,14] = '4' .OR.  mped_merc[1,14] = '0'
+                                EXIT
+                        ENDIF
+                        mped_exe := {}
+                        sr_getconnection():exec("SELECT excecao FROM mastmov WHERE cod_prod = "+sr_cdbvalue(cons_prod[i,5])+" AND num_doc = "+sr_cdbvalue(cons_prod[i,1]),,.t.,@mped_exe)
+                        mensagem(cons_prod[i,5])
+                        IF ! imp_arq('IMP_PROD.TXT','R')
+                                EXIT
+                        ENDIF
+                        //imprt('M','N')
+                        imprt('M','N+')
+                        DEVPOS(PROW()+1,00);DEVOUT('Mesa.....: '+cons_prod[i,21]+STRZERO(VAL(cons_prod[i,2]),4))
+                        DEVPOS(PROW()+1,00);DEVOUT('Data.....: '+DTOC(DATE())+' - Horas: '+TIME())
+                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                        DEVPOS(PROW()+1,00);DEVOUT('Codigo...: '+STRZERO(VAL(cons_prod[i,5]),5))
+                        DEVPOS(PROW()+1,00);DEVOUT(mped_merc[1,2])
+                        IF LEN(mped_exe) > 0
+                                DEVPOS(PROW()+1,00);DEVOUT(ALLTRIM(mped_exe[1,1]))
+                        ENDIF
+                        IF ! EMPTY(cons_prod[i,12])
+                                DEVPOS(PROW()+1,0);DEVOUT('OBS.: '+cons_prod[i,12])
+                        ENDIF
+                        DEVPOS(PROW()+1,00);DEVOUT('Quantidade: '+TRANSFORM(cons_prod[i,7],'999,999.99'))
+                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                        DEVPOS(PROW()+1,00);DEVOUT('Garcon....: '+cons_prod[i,10])
+                        DEVPOS(PROW()+1,00);DEVOUT('Operador..: '+cons_prod[i,11])
+                        DEVPOS(PROW()+1,00);DEVOUT(CHR(15))
+                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                        DEVPOS(PROW()+m_cfg[10],00);DEVOUT(CHR(18))
+                        SETPRC(00,00)
+                        SET DEVI TO SCREEN;SET PRINT TO;SET PRINT OFF
+                        conf_impressao('IMP_PROD.TXT',VAL(SUBSTR(STRZERO(mped_merc[1,9],2),1,1)),1)
+                        sr_getconnection():exec("UPDATE mastmov SET imprimir = '*' WHERE cod_prod = "+sr_cdbvalue(cons_prod[i,5])+" AND num_doc = "+sr_cdbvalue(cons_prod[i,1]),,.f.)
+                        sr_getconnection():exec("COMMIT",,.f.)
+                NEXT
+        ENDIF
+        cons_conta:={}
+        sr_getconnection():exec("SELECT * FROM mastmovcab WHERE status = 'CONTA'",,.t.,@cons_conta)
+        IF LEN(cons_conta) > 0
+                sr_getconnection():exec("UPDATE mastmov SET unidade = (SELECT unidade FROM mastprod WHERE codigo = mastmov.cod_prod) WHERE num_doc = "+sr_cdbvalue(cons_conta[1,2]),,.f.)
+                sr_getconnection():exec("COMMIT",,.f.)
+                i:=0
+                FOR i = 1 TO LEN(cons_conta)
+                        mhoras := TIME()
+                        cons_parc := {}
+                        sr_getconnection():exec("SELECT * FROM mastmov WHERE num_doc = "+sr_cdbvalue(cons_conta[i,2]),,.t.,@cons_parc)
+                        IF LEN(cons_parc) > 0
+                                IF ! imp_arq('FCH_PARC.TXT','R')
+                                        RETURN NIL
+                                ENDIF
+                                mentrada := cons_parc[1,4]
+                                IF FILE('hticabe.jpg')
+                                        DEVPOS(00,03);DEVOUT('"hticabe.jpg"')
+                                        @ PROW()+6,00 SAY mtraco
+                                ELSE
+                                        imprt('M','N+')
+                                        DEVPOS(PROW(),00);DEVOUT(CHR(18))
+                                        DEVPOS(PROW()+1,00);DEVOUT(memp_resa)
+                                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                ENDIF
+                                imprt('M','N+')
+                                DEVPOS(PROW()+1,00);DEVOUT('CNPJ: '+mcgc_firm)
+                                DEVPOS(PROW()+1,00);DEVOUT('Mesa/Quarto: '+cons_parc[1,21]+STRZERO(VAL(cons_parc[1,2]),4))
+                                //DEVPOS(PROW()+1,00);DEVOUT(CHR(15))
+                                DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                /*
+                                IF ! EMPTY(mcliente) .OR. ! EMPTY(mcpfcnpj)
+                                        DEVPOS(PROW()+1,00);DEVOUT('Cliente: '+mcliente)
+                                ENDIF
+                                IF ! EMPTY(mcpfcnpj)
+                                        IF LEN(ALLTRIM(mcpfcnpj))> 11
+                                                DEVPOS(PROW()+1,00);DEVOUT('CNPJ: '+mcpfcnpj)
+                                        ELSE
+                                                DEVPOS(PROW()+1,00);DEVOUT('CPF: '+mcpfcnpj)
+                                        ENDIF
+                                ENDIF
+                                */
+                                DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                DEVPOS(PROW()+1,00);DEVOUT('Documento: '+cons_parc[1,2]+' - Emissao: '+DTOC(DATE())+' - '+'Gc: '+cons_parc[1,10])
+                                DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                DEVPOS(PROW()+1,00);DEVOUT(' Cod.   Descricao')
+                                DEVPOS(PROW()+1,00);DEVOUT('Quantidade  Valor Unit.  Valor total')
+                                DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+
+                                cons_prod := {}
+                                //sr_getconnection():exec("SELECT cod_prod,(select descri FROM mastprod where codigo = mastmov.cod_prod),sum(qtd),preco FROM mastmov WHERE num_doc = "+sr_cdbvalue(cons_conta[i,2])+" AND (NOT unidade = 'KG' OR unidade IS NULL) GROUP BY cod_prod,cod_prod,descri,descri,preco,preco",,.t.,@cons_prod)
+                                sr_getconnection():exec("SELECT cod_prod,descri,sum(qtd),preco,excecao FROM mastmov WHERE num_doc = "+sr_cdbvalue(cons_conta[i,2])+" AND (NOT unidade = 'KG' OR unidade IS NULL) GROUP BY cod_prod,cod_prod,descri,descri,preco,preco,excecao,excecao",,.t.,@cons_prod)
+                                y := mtotal_g := 0
+                                FOR y = 1 TO LEN(cons_prod)
+                                        DEVPOS(PROW()+1,00);DEVOUT(cons_prod[y,1]+'   '+ALLTRIM(cons_prod[y,2]))
+                                        DEVPOS(PROW()+1,00);DEVOUT(TRANSFORM(cons_prod[y,3],'99,999.999')+' x '+TRANSFORM(cons_prod[i,4],'999,999.99')+' = '+TRANSFORM(ROUND(cons_prod[y,3]*cons_prod[y,4],2),'999,999.99'))
+                                        //cons_exe :={}
+                                        //sr_getconnection():exec("SELECT * FROM mastexe_itens WHERE id_pedido = "+sr_cdbvalue(cons_conta[i,2])+" AND (NOT unidade = 'KG' OR unidade IS NULL) GROUP BY cod_prod,cod_prod,descri,descri,preco,preco",,.t.,@cons_exe)
+                                        IF ! EMPTY(cons_prod[y,5])
+                                                DEVPOS(PROW()+1,00);DEVOUT(ALLTRIM(cons_prod[y,5]))
+                                        ENDIF
+                                        mtotal_g := mtotal_g + ROUND((cons_prod[y,3]*cons_prod[y,4]),2)
+                                NEXT
+                                cons_prod := {}
+                                sr_getconnection():exec("SELECT cod_prod,(select descri FROM mastprod where codigo = mastmov.cod_prod),qtd,preco FROM mastmov WHERE num_doc = "+sr_cdbvalue(cons_conta[i,2])+" AND unidade = 'KG'",,.t.,@cons_prod)
+                                y := 0
+                                FOR y = 1 TO LEN(cons_prod)
+                                        DEVPOS(PROW()+1,00);DEVOUT(cons_prod[y,1]+'   '+ALLTRIM(cons_prod[y,2]))
+                                        DEVPOS(PROW()+1,00);DEVOUT(TRANSFORM(cons_prod[y,3],'99,999.999')+' x '+TRANSFORM(cons_prod[y,4],'999,999.99')+' = '+TRANSFORM(ROUND(cons_prod[y,3]*cons_prod[y,4],2),'999,999.99'))
+                                        mtotal_g := mtotal_g + ROUND((cons_prod[y,3]*cons_prod[y,4]),2)
+                        //ATENCAO(cons_prod[Y,1])
+                                NEXT
+                                DEVPOS(PROW()+1,00);DEVOUT('                          ----------')
+                                /*
+                                IF mdez = 'S'
+                                        DEVPOS(PROW()+1,00);DEVOUT('Sub-Total R$............: '+TRANSFORM(mtotal_g,'999,999.99'))
+                                        DEVPOS(PROW()+1,00);DEVOUT('10% Valor R$............: '+TRANSFORM(mtotal_g * .1,'999,999.99'))
+                                        DEVPOS(PROW()+1,00);DEVOUT('                          ----------')
+                                        DEVPOS(PROW()+1,00);DEVOUT('T O T A L R$............: '+TRANSFORM(mtotal_g * 1.1,'999,999.99'))
+                                ELSE
+                                */
+                                        DEVPOS(PROW()+1,00);DEVOUT('T O T A L R$............: '+TRANSFORM(mtotal_g,'999,999.99'))
+                                //ENDIF
+                                DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                //DEVPOS(PROW()+1,00);DEVOUT('Ent.:'+SUBSTR(mentrada,1,5)+' - Saida:'+SUBSTR(mhoras,1,5)+' - Duracao:'+SUBSTR(ELAPTIME(mentrada,mhoras),1,5))
+                                //IF mqtd_pessoas > 1
+                                //        DEVPOS(PROW()+1,00);DEVOUT('Valor por Pessoas R$: '+TRANSFORM(mtotal_g / mqtd_pessoas,'999,999.99'))
+                                //ENDIF
+                                IF ! EMPTY(m_set[1,18])
+                                        DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                        DEVPOS(PROW()+1,00);DEVOUT(m_set[1,18])
+                                ENDIF
+                                IF ! EMPTY(m_set[1,19])
+                                        DEVPOS(PROW()+1,00);DEVOUT(m_set[1,19])
+                                ENDIF
+                                DEVPOS(PROW()+1,00);DEVOUT(mtraco)
+                                DEVPOS(PROW()+1,00);DEVOUT(PADL('HTI Sistemas - '+mfone_hti,48))
+                                DEVPOS(PROW()+m_cfg[10],00);DEVOUT('')
+                                SETPRC(00,00)
+                                SET DEVI TO SCREEN;SET PRINT TO;SET PRINT OFF
+                                conf_impressao('FCH_PARC.TXT')
+                                sr_getconnection():exec("UPDATE mastmovcab SET status = 'ABERTO' WHERE id = "+sr_cdbvalue(cons_conta[i,2]),,.f.)
+                                sr_getconnection():exec("COMMIT",,.f.)
+                        ENDIF
+                NEXT
+        ENDIF
+        //INKEY(0.10,5)
+        INKEY(3)
+ENDDO
+QUIT
+RETURN NIL

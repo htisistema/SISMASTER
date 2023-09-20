@@ -1,0 +1,41 @@
+#include "sqlrdd.ch"
+//#include "pgs.ch"          // Needed if you plan to use native connection to Postgres
+//#include "mysql.ch"        // Needed if you plan to use native connection to MySQL
+//#include "oracle.ch"       // Needed if you plan to use native connection to Oracle
+#include "firebird.ch"     // Needed if you plan to use native connection to Firebird
+#include "msg.ch"
+
+MEMVAR getlist
+************************************************
+* CONVERSAO DO BANCO DE DADOS PANDORA
+************************************************
+FUNCTION masterutil
+********************
+LOCAL i:=0,mcons_est
+
+IF cod_operado <> '999'
+        RETURN NIL
+ENDIF
+mcons_est :={}
+sr_getconnection():exec("SELECT * FROM mastprod",,.t.,@mcons_est)
+op_tela(10,10,25,80,'CONVERSAO DO SISTEMA')
+
+DEVPOS(01,00);DEVOUT('Registro CLIENTES.....: ')
+DEVPOS(02,00);DEVOUT('Restantes.............: ')
+
+opcao := op_simnao('N','Confirma a Operacao:')
+IF opcao = 'N' .OR. LASTKEY() = 27
+        wvw_lclosewindow()
+        RETURN NIL
+ENDIF
+i:=0
+FOR i = 1 TO LEN(mcons_est)
+        sr_getconnection():exec("update mastprod set codigo = "+sr_cdbvalue(STRZERO(mcons_est[i,31],5))+" WHERE codigo = "+sr_cdbvalue(mcons_est[i,1]),,.F.)
+	DEVPOS(04,24);DEVOUT(TRANSFORM(i,'999,999'))
+	DEVPOS(05,24);DEVOUT(TRANSFORM(LEN(mcons_est)-i,'999,999'))
+NEXT
+sr_getconnection():exec("COMMIT",,.F.)
+atencao('Conversao do banco de dados realizada com sucesso....')
+wvw_lclosewindow()
+RETURN NIL
+************************************ F I M ***************************************************

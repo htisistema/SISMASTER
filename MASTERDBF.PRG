@@ -1,0 +1,1133 @@
+***********************
+* FUNCOES DE SMEDDBF
+***********************
+FUNCTION masterdbf
+**************
+LOCAL matriz:={},f:=0
+setcor(1)
+CLOSE ALL
+******************************************************************************************************
+op_tela(10,10,12,70,' Gerando Arquivos de dados ')
+DEVPOS(01,01);DEVOUT('Aguarde um momento. Gerando Arquivos:')
+IF ! SR_EXISTTABLE('insopera')
+        setcor(3);DEVPOS(01,49);DEVOUT(STRZERO(f++,3)+'> INSOPERA')
+        matriz := 'scod_op CHAR(3)'
+        matriz := matriz +',snome CHAR(30)'
+        matriz := matriz +',stipo CHAR(1)'
+        matriz := matriz +',stipo_sis CHAR(1)'
+        matriz := matriz +',ssenha CHAR(8)'
+        matriz := matriz +',sdata_cad DATE'
+        matriz := matriz +',scomissao DECIMAL(6,2)'
+        matriz := matriz +',scom_praz DECIMAL(6,2)'
+        matriz := matriz +',scom_oper DECIMAL(6,2)'
+        matriz := matriz +',scota DECIMAL(12,2)'
+        matriz := matriz +',sult_ent DATE'
+        matriz := matriz +',sult_fim DATE'
+        matriz := matriz +',snivel CHAR(2)'
+        matriz := matriz +',shora_ini CHAR(5)'
+        matriz := matriz +',shora_fim CHAR(5)'
+        matriz := matriz +',sult_e_c DATE'
+        matriz := matriz +',sh_i_c CHAR(5)'
+        matriz := matriz +',sexpira DECIMAL(3)'
+        matriz := matriz +',scod_aut CHAR(17)'
+        matriz := matriz +',sstatus CHAR(1)'
+        matriz := matriz +',sope CHAR(3)'
+        matriz := matriz +',scliente CHAR(5)'
+        matriz := matriz +',sproduto CHAR(5)'
+        matriz := matriz +',svalor DECIMAL(12,2)'
+        matriz := matriz +',sbloq CHAR(1)'
+        matriz := matriz +',smensagem CHAR(150)'
+        matriz := matriz +',sambiente CHAR(5)'
+        matriz := matriz +',doc_apagar CHAR(1)'
+        matriz := matriz +',estoq_min CHAR(1)'
+        matriz := matriz +',estoq_med DECIMAL(5)'
+        matriz := matriz +',plug CHAR(12)'
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR INSOPERA",,.f.)
+        sr_getconnection():exec("CREATE TABLE INSOPERA ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE INSOPERA ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER INSOPERA_SR FOR INSOPERA ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( INSOPERA, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        abriarq('insopera','sen','E')
+        ADIREG()
+        sen-> scod_op := '999'
+        sen-> snome := 'HTI SISTEMAS LTDA.'
+        sen-> ssenha := CRIPTO('0725')
+        sen-> sdata_cad := mdata_sis
+        sen-> snivel := '1'
+        DBCOMMIT()
+        DBUNLOCK()
+        CLOSE sen
+ENDIF
+IF ! SR_EXISTTABLE('sacsetup')
+        setcor(3);DEVPOS(01,49);DEVOUT(STRZERO(f++,3)+'> SACSETUP')
+        matriz:={ }
+        matriz := 'ver CHAR(10)'
+        matriz := matriz +',razao      CHAR(55)'
+        matriz := matriz +',fantasia   CHAR(35)'
+        matriz := matriz +',nome_cab   CHAR(1)'       // 17.07.01
+        matriz := matriz +',end_firma  CHAR(40)'
+        matriz := matriz +',numero     CHAR(6)'         // 25.08.2009
+        matriz := matriz +',complemento CHAR(10)'       // 25.08.2009
+        matriz := matriz +',bairro     CHAR(30)'
+        matriz := matriz +',cidade     CHAR(30)'
+        matriz := matriz +',uf         CHAR(2)'
+        matriz := matriz +',cep        CHAR(8)'
+        matriz := matriz +',fone       CHAR(10)'
+        matriz := matriz +',email      CHAR(50)'
+        matriz := matriz +',insc       CHAR(14)'
+        matriz := matriz +',sysdatlm   CHAR(12)'
+        matriz := matriz +',dataini    DATE'
+        matriz := matriz +',cabecalho  CHAR(1)'
+        matriz := matriz +',rodap1     CHAR(60)'
+        matriz := matriz +',rodap2     CHAR(60)'
+        matriz := matriz +',cli_def    CHAR(5)'
+        matriz := matriz +',chv_public CHAR(256)'
+        matriz := matriz +',md5_ini    CHAR(35)'
+        matriz := matriz +',serie      CHAR(20)'
+        matriz := matriz +',dez_perc   CHAR(1)'
+        matriz := matriz +',usa_grupo  CHAR(1)'
+        matriz := matriz +',tip_lanc   CHAR(1)'
+        matriz := matriz +',qtd_pessoa CHAR(1)'
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        matriz := matriz +',sr_deleted CHAR(1) NOT NULL '
+        matriz := matriz +',cod_acess CHAR(30)'
+        matriz := matriz +',masc_qtd CHAR(14)'
+        matriz := matriz +',masc_vlr CHAR(14)'
+        matriz := matriz +',icm_firma DECIMAL(3,2)'
+        matriz := matriz +',simp_nac CHAR(1)'
+        matriz := matriz +',CNPJ CHAR(14)'
+        sr_getconnection():exec("CREATE GENERATOR SACSETUP",,.f.)
+        sr_getconnection():exec("CREATE TABLE SACSETUP ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE SACSETUP ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER SACSETUP_SR FOR SACSETUP ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( SACSETUP, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+
+        IF FILE('sacsetup.dbf')
+                dbUseArea( .T., "SQLRDD", "sacsetup", "set", .F. )
+                Append from "sacsetup" VIA "DBFCDX"
+        ELSE
+                IF ! AbriArq('sacsetup','set');RETURN NIL;ENDIF
+                ADIREG()
+                set->ver       := mversao
+                set->cabecalho := 'S'
+                set->rodap1    := '*** Agradecemos sua preferencia, Volte Sempre ***'
+        ENDIF
+        DBCOMMITALL()
+        DBUNLOCKALL()
+        set->(DBCLOSEAREA())
+ENDIF
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> SACCONF ')
+IF ! SR_EXISTTABLE('sacconf')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->SACCONF   ')
+        matriz:={}
+        matriz := 'modulo CHAR(20)'
+        matriz := matriz +',descri CHAR(60)'
+        matriz := matriz +',nivel CHAR(9)'
+        matriz := matriz +',data_alt DATE'
+        matriz := matriz +',oper_alt CHAR(3)'
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR SACCONF",,.f.)
+        sr_getconnection():exec("CREATE TABLE SACCONF ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE SACCONF ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER SACCONF_SR FOR SACCONF ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( SACCONF, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> MASTMESAS ')
+IF ! SR_EXISTTABLE('mastmesas')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo -> MASTMESAS   ')
+        matriz:={}
+        matriz := 'tipo CHAR(1)'
+        matriz := matriz +',numero CHAR(4)'
+        matriz := matriz +',descri CHAR(50)'
+        matriz := matriz +',data DATE'
+        matriz := matriz +',preco DECIMAL(12,2)'
+        matriz := matriz +',oper CHAR(3)'
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR MASTMESAS",,.f.)
+        sr_getconnection():exec("CREATE TABLE MASTMESAS ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE MASTMESAS ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER MASTMESAS_SR FOR MASTMESAS ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( MASTMESAS, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> MASTPROD ')
+IF ! SR_EXISTTABLE('MASTPROD')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo -> MASTPROD   ')
+        matriz:={}
+        matriz := 'codigo CHAR(5)'
+        matriz := matriz +',descri CHAR(30)'
+        matriz := matriz +',tipo CHAR(1)'
+        matriz := matriz +',data DATE'
+        matriz := matriz +',custo DECIMAL(12,2)'
+        matriz := matriz +',pr_venda DECIMAL(12,2)'
+        matriz := matriz +',unidade CHAR(3)'
+        matriz := matriz +',saldo DECIMAL(12,3)'
+        matriz := matriz +',porta DECIMAL(2)'
+        matriz := matriz +',prod1 CHAR(5)'
+        matriz := matriz +',prod2 CHAR(5)'
+        matriz := matriz +',prod3 CHAR(5)'
+        matriz := matriz +',prod4 CHAR(5)'
+        matriz := matriz +',prod5 CHAR(5)'
+        matriz := matriz +',prod6 CHAR(5)'
+        matriz := matriz +',prod7 CHAR(5)'
+        matriz := matriz +',prod8 CHAR(5)'
+        matriz := matriz +',prod9 CHAR(5)'
+        matriz := matriz +',prod10 CHAR(5)'
+        matriz := matriz +',qtd1 DECIMAL(12,3)'
+        matriz := matriz +',qtd2 DECIMAL(12,3)'
+        matriz := matriz +',qtd3 DECIMAL(12,3)'
+        matriz := matriz +',qtd4 DECIMAL(12,3)'
+        matriz := matriz +',qtd5 DECIMAL(12,3)'
+        matriz := matriz +',qtd6 DECIMAL(12,3)'
+        matriz := matriz +',qtd7 DECIMAL(12,3)'
+        matriz := matriz +',qtd8 DECIMAL(12,3)'
+        matriz := matriz +',qtd9 DECIMAL(12,3)'
+        matriz := matriz +',qtd10 DECIMAL(12,3)'
+        matriz := matriz +',oper CHAR(3)'
+        matriz := matriz +',grupo CHAR(3)'
+        matriz := matriz +',componente CHAR(60)'
+        matriz := matriz +',componente1 CHAR(60)'
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        matriz := matriz +',sr_deleted CHAR(1) NOT NULL '
+        matriz := matriz +',minimo DECIMAL(12,3)'
+        matriz := matriz +',maximo DECIMAL(12,3)'
+        matriz := matriz +',ncm CHAR(8)'
+        matriz := matriz +',cst CHAR(4)'
+        matriz := matriz +',desc_livre CHAR(1)'
+        sr_getconnection():exec("CREATE GENERATOR MASTPROD",,.f.)
+        sr_getconnection():exec("CREATE TABLE MASTPROD ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE MASTPROD ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER MASTPROD_SR FOR MASTPROD ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( MASTPROD, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> MASTFORN ')
+IF ! SR_EXISTTABLE('MASTFORN')
+        DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->MASTFORN   ')
+        matriz:='cod_forn  CHAR(4) NOT NULL '
+        matriz := matriz + ',razao  CHAR(40) '
+        matriz := matriz + ',tipo  CHAR(4) '
+        matriz := matriz + ',data_cad  DATE '
+        matriz := matriz + ',ult_comp  DATE '
+        matriz := matriz + ',endereco  CHAR(35) '
+        matriz := matriz + ',bairro  CHAR(20) '
+        matriz := matriz + ',cidade  CHAR(25) '
+        matriz := matriz + ',uf  CHAR(2) '
+        matriz := matriz + ',cep  CHAR(9) '
+        matriz := matriz + ',cpostal  CHAR(6) '
+        matriz := matriz + ',email  CHAR(120) '
+        matriz := matriz + ',tel1  CHAR(14) '
+        matriz := matriz + ',tel2  CHAR(14) '
+        matriz := matriz + ',fax  CHAR(14) '
+        matriz := matriz + ',cgc  CHAR(14) '
+        matriz := matriz + ',insc  CHAR(14) '
+        matriz := matriz + ',cpf  CHAR(11) '
+        matriz := matriz + ',carteira  CHAR(1) '
+        matriz := matriz + ',banco  CHAR(1) '
+        matriz := matriz + ',prazo_pag  CHAR(8) '
+        matriz := matriz + ',ct_gerente  CHAR(15) '
+        matriz := matriz + ',ct_vendedo  CHAR(15) '
+        matriz := matriz + ',ct_fatura  CHAR(15) '
+        matriz := matriz + ',ct_cobran  CHAR(15) '
+        matriz := matriz + ',limite  DECIMAL(10,2) '
+        matriz := matriz + ',obs  CHAR(60) '
+        matriz := matriz + ',obs1  CHAR(60) '
+        matriz := matriz + ',obs2  CHAR(60) '
+        matriz := matriz + ',obs3  CHAR(60) '
+        matriz := matriz + ',obs4  CHAR(60) '
+        matriz := matriz + ',obs5  CHAR(60) '
+        matriz := matriz + ',local  CHAR(3) '
+        matriz := matriz + ',pocket  CHAR(1) '
+        matriz := matriz + ',fantasia  CHAR(40) '
+        matriz := matriz + ',sr_recno DECIMAL(15,0) NOT NULL '
+        matriz := matriz + ',sr_deleted CHAR(1)'
+        matriz := matriz + ',forn_desp CHAR(1) '
+        sr_getconnection():exec("CREATE GENERATOR MASTFORN",,.f.)
+        sr_getconnection():exec("CREATE TABLE MASTFORN ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE MASTFORN ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("ALTER TABLE MASTFORN ADD CONSTRAINT MASTFORN_PK PRIMARY KEY (cod_forn)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER MASTFORN_SR FOR MASTFORN ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( MASTFORN, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+**********************************************************************************************
+DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> MASTCLI  ')
+        matriz:='empresa  CHAR(3) '
+        matriz := matriz + ',cod_cli CHAR(5) NOT NULL'
+        matriz := matriz + ',razao  CHAR(40) '
+        matriz := matriz + ',nome  CHAR(40) '
+        matriz := matriz + ',data_cad  DATE '
+        matriz := matriz + ',data_atu  DATE '       //04.02.2007
+        matriz := matriz + ',cadastro  CHAR(1) '       //06.11.01
+        matriz := matriz + ',tipo  CHAR(1) '
+        matriz := matriz + ',nascimento  DATE '
+        matriz := matriz + ',num_ped  CHAR(6) '
+        matriz := matriz + ',ult_comp  DATE '
+        matriz := matriz + ',vlr_comp  DECIMAL(10,2) '
+        matriz := matriz + ',ant_ped  CHAR(6) '
+        matriz := matriz + ',dat_ant  DATE '
+        matriz := matriz + ',vlr_ant  DECIMAL(10,2) '
+        matriz := matriz + ',numped_m  CHAR(6) '
+        matriz := matriz + ',ultcomp_m  DATE '
+        matriz := matriz + ',vlrcomp_m  DECIMAL(10,2) '
+        matriz := matriz + ',tot_comp  DECIMAL(10,2) '
+        matriz := matriz + ',ult_orc  DATE '        //16.01.2003
+        matriz := matriz + ',endereco  CHAR(35) '
+        matriz := matriz + ',bairro  CHAR(20) '
+        matriz := matriz + ',codcid  CHAR(4) '
+        matriz := matriz + ',cidade  CHAR(25) '
+        matriz := matriz + ',uf  CHAR(2) '
+        matriz := matriz + ',cep  CHAR(9) '
+        matriz := matriz + ',email  CHAR(150) '
+        matriz := matriz + ',rota  CHAR(70) '
+        matriz := matriz + ',tel1  CHAR(14) '
+        matriz := matriz + ',tel2  CHAR(14) '
+        matriz := matriz + ',fax  CHAR(14) '
+        matriz := matriz + ',cgc  CHAR(14) '
+        matriz := matriz + ',insc  CHAR(19) '
+        matriz := matriz + ',cpf  CHAR(11) '
+        matriz := matriz + ',rg  CHAR(14) '
+        matriz := matriz + ',orgao  CHAR(10) '
+        matriz := matriz + ',dat_emi  DATE '
+        matriz := matriz + ',comprado  CHAR(15) '
+        matriz := matriz + ',contato  CHAR(15) '
+        matriz := matriz + ',prazo_pag  CHAR(9) '
+        matriz := matriz + ',bloqueio  CHAR(1) '       //06.11.01
+        matriz := matriz + ',spc  CHAR(1) '
+        matriz := matriz + ',area  CHAR(15) '
+        matriz := matriz + ',limite  DECIMAL(10,2) '
+        matriz := matriz + ',atac_vare  CHAR(1) '      // 06.01.2004
+        matriz := matriz + ',dia_atras  DECIMAL(10,2) '
+        matriz := matriz + ',qtd_doc  DECIMAL(10,2) '
+        matriz := matriz + ',obs  CHAR(60) '
+        matriz := matriz + ',nome1  CHAR(40) '
+        matriz := matriz + ',data_nas1  DATE '
+        matriz := matriz + ',nome2  CHAR(40) '
+        matriz := matriz + ',data_nas2  DATE '
+        matriz := matriz + ',nome3  CHAR(40) '
+        matriz := matriz + ',data_nas3  DATE '
+        matriz := matriz + ',nome4  CHAR(40) '
+        matriz := matriz + ',data_nas4  DATE '
+        matriz := matriz + ',nome5  CHAR(40) '
+        matriz := matriz + ',data_nas5  DATE '
+        matriz := matriz + ',desconto  DECIMAL(7,2) '
+        matriz := matriz + ',dia1_ini  CHAR(2) '
+        matriz := matriz + ',dia1_fim  CHAR(2) '
+        matriz := matriz + ',venc1_dup  CHAR(2) '
+        matriz := matriz + ',dia2_ini  CHAR(2) '
+        matriz := matriz + ',dia2_fim  CHAR(2) '
+        matriz := matriz + ',venc2_dup  CHAR(2) '
+
+        matriz := matriz + ',empre_c  CHAR(20) '
+        matriz := matriz + ',cargo_c  CHAR(15) '
+        matriz := matriz + ',salario_c  DECIMAL(10,2) '
+        matriz := matriz + ',end_c  CHAR(35) '
+        matriz := matriz + ',bairro_c  CHAR(20) '
+        matriz := matriz + ',cidade_c  CHAR(25) '
+        matriz := matriz + ',uf_c  CHAR(2) '
+        matriz := matriz + ',cep_c  CHAR(9) '
+        matriz := matriz + ',fone_c1  CHAR(14) '
+        matriz := matriz + ',fone_c2  CHAR(14) '
+        matriz := matriz + ',loja1  CHAR(25) '
+        matriz := matriz + ',tel_loja1  CHAR(14) '
+        matriz := matriz + ',desde1  DATE '
+        matriz := matriz + ',loja2  CHAR(25) '
+        matriz := matriz + ',tel_loja2  CHAR(14) '
+        matriz := matriz + ',desde2  DATE '
+        matriz := matriz + ',nome_r1  CHAR(25) '
+        matriz := matriz + ',fone_r1  CHAR(14) '
+        matriz := matriz + ',nome_r2  CHAR(25) '
+        matriz := matriz + ',fone_r2  CHAR(14) '
+        matriz := matriz + ',banco1  CHAR(10) '
+        matriz := matriz + ',ag1  CHAR(10) '
+        matriz := matriz + ',conta1  CHAR(10) '
+        matriz := matriz + ',banco2  CHAR(10) '
+        matriz := matriz + ',ag2  CHAR(10) '
+        matriz := matriz + ',conta2  CHAR(10) '
+        matriz := matriz + ',cartao1  CHAR(15) '
+        matriz := matriz + ',no1  CHAR(17) '
+        matriz := matriz + ',venc1  DATE '
+        matriz := matriz + ',cartao2  CHAR(15) '
+        matriz := matriz + ',no2  CHAR(17) '
+        matriz := matriz + ',venc2  DATE '
+        matriz := matriz + ',pai  CHAR(40) '
+        matriz := matriz + ',mae  CHAR(40) '
+        matriz := matriz + ',end_cob  CHAR(35) '
+        matriz := matriz + ',bairro_cob  CHAR(20) '
+        matriz := matriz + ',cidade_cob  CHAR(25) '
+        matriz := matriz + ',uf_cob  CHAR(2) '
+        matriz := matriz + ',cep_cob  CHAR(9) '
+        matriz := matriz + ',fone_cob  CHAR(14) '
+        matriz := matriz + ',codvend  CHAR(3) '
+        matriz := matriz + ',codoper  CHAR(3) '
+        matriz := matriz + ',codforn  CHAR(4) '
+        matriz := matriz + ',regiao  CHAR(2) '         // ADM
+        matriz := matriz + ',atividade  CHAR(2) '      // ADM
+        matriz := matriz + ',qtdvis  DECIMAL(4,0) '      // ADM
+        matriz := matriz + ',uvisita  DATE '      // ADM
+        matriz := matriz + ',l_obs1  CHAR(77) '
+        matriz := matriz + ',l_obs2  CHAR(77) '
+        matriz := matriz + ',l_obs3  CHAR(77) '
+        matriz := matriz + ',naturalidade  CHAR(25) '
+        matriz := matriz + ',l_obs5  CHAR(77) '
+        matriz := matriz + ',l_obs6  CHAR(77) '
+        matriz := matriz + ',l_obs7  CHAR(77) '
+        matriz := matriz + ',l_obs8  CHAR(77) '
+        matriz := matriz + ',l_obs9  CHAR(77) '
+        matriz := matriz + ',l_obs10  CHAR(77) '
+        matriz := matriz + ',l_obs11  CHAR(77) '
+        matriz := matriz + ',l_obs12  CHAR(77) '
+        matriz := matriz + ',l_obs13  CHAR(77) '
+        matriz := matriz + ',l_obs14  CHAR(77) '
+        matriz := matriz + ',l_obs15  CHAR(77) '
+        matriz := matriz + ',l_obs16  CHAR(77) '
+        matriz := matriz + ',l_obs17  CHAR(77) '
+        matriz := matriz + ',l_obs18  CHAR(77) '
+        matriz := matriz + ',l_obs19  CHAR(77) '
+        matriz := matriz + ',l_obs20  CHAR(77) '
+        matriz := matriz + ',cod_cond  CHAR(3) '
+        matriz := matriz + ',pocket  CHAR(1) '
+        matriz := matriz + ',cod_profi  CHAR(5) '
+        matriz := matriz + ',numero  CHAR(6) '
+        matriz := matriz + ',complemento  CHAR(10) '
+        matriz := matriz + ',data_bloq  DATE '
+        matriz := matriz + ',obs_bloq  CHAR(60) '
+        matriz := matriz + ',rota1  CHAR(70) '
+        matriz := matriz + ',email1  CHAR(70) '
+        matriz := matriz + ',email2  CHAR(70) '
+        matriz := matriz + ',email3  CHAR(70) '
+        matriz := matriz + ',lim_ant  DECIMAL(10,2) '
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        matriz := matriz +',sr_deleted CHAR(1)'
+        matriz := matriz +',promotor CHAR(3)'
+IF ! SR_EXISTTABLE('MASTCLI')
+        DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->MASTCLI    ')
+        //DBCREATE('saccli  matriz,'SQLRDD')
+        sr_getconnection():exec("CREATE GENERATOR MASTCLI",,.f.)
+        sr_getconnection():exec("CREATE TABLE MASTCLI ("+matriz+" )",,.f.)
+        //atencao('0')
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE MASTCLI ADD UNIQUE (SR_RECNO)",,.f.)
+        //sr_getconnection():exec("ALTER TABLE MASTCLI ADD CONSTRAINT MASTCLI_PK PRIMARY KEY (cod_cli)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER MASTCLI_SR FOR MASTCLI ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( MASTCLI, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+**********************************************************************************************
+DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> SACPROFI')
+IF ! SR_EXISTTABLE('sacprofi')
+        matriz:='cod_profi  CHAR(5) '
+        matriz := matriz + ',profi  CHAR(30) '
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        matriz := matriz +',sr_deleted CHAR(1)'
+        //DBCREATE('sacprofi  matriz,'SQLRDD')
+        sr_getconnection():exec("CREATE GENERATOR SACPROFI",,.f.)
+        sr_getconnection():exec("CREATE TABLE SACPROFI ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE SACPROFI ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER SACPROFI_SR FOR SACPROFI ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( SACPROFI, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> SACUF   ')
+IF ! SR_EXISTTABLE('sacuf')
+        DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->SACUF     ')
+        matriz:='estado  CHAR(20) '
+        matriz := matriz + ',uf  CHAR(2) '
+        matriz := matriz + ',percent  DECIMAL(5,2) '
+        sr_getconnection():exec("CREATE TABLE SACUF ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+**********************************************************************************************
+
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> MASTNUMMOV  ')
+IF ! SR_EXISTTABLE('MASTNUMMOV')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->MASTNUMMOV    ')
+        matriz:={}
+        matriz := 'num_doc CHAR(6)'
+        matriz := matriz +',data DATE'
+        matriz := matriz +',hora CHAR(8)'
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR MASTNUMMOV",,.f.)
+        sr_getconnection():exec("CREATE TABLE MASTNUMMOV ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE MASTNUMMOV ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER MASTNUMMOV_SR FOR MASTNUMMOV ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( MASTNUMMOV, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> MASTMOVCAB  ')
+IF ! SR_EXISTTABLE('MASTMOVCAB')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->MASTMOVCAB    ')
+        matriz:={}
+        matriz := 'data DATE'
+        matriz := matriz +',id INTEGER'
+        matriz := matriz +',status CHAR(10)'
+        matriz := matriz +',nome_comanda CHAR(20)'
+        matriz := matriz +',mesa CHAR(5)'
+        matriz := matriz +',id_usuario CHAR(3)'
+        matriz := matriz +',pessoas INTEGER'
+        matriz := matriz +',obs CHAR(30)'
+        matriz := matriz +',tipo CHAR(1)'
+        sr_getconnection():exec("CREATE GENERATOR MASTMOVCAB",,.f.)
+        sr_getconnection():exec("CREATE TABLE MASTMOVCAB ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER MASTMOVCAB_id FOR MASTMOVCAB ACTIVE BEFORE INSERT POSITION 1 as begin If (new.id is null) then new.ID = gen_id( MASTMOVCAB, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> MASTMOV  ')
+IF ! SR_EXISTTABLE('MASTMOV')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->MASTMOV    ')
+        matriz:={}
+        matriz := 'num_doc CHAR(6)'
+        matriz := matriz +',num_local CHAR(5)'
+        matriz := matriz +',data DATE'
+        matriz := matriz +',hora CHAR(8)'
+        matriz := matriz +',cod_prod INTEGER'
+        matriz := matriz +',descri CHAR(50)'
+        matriz := matriz +',qtd DECIMAL(12,3)'
+        matriz := matriz +',preco DECIMAL(12,2)'
+        matriz := matriz +',cod_cli CHAR(5)'
+        matriz := matriz +',cod_garco CHAR(3)'
+        matriz := matriz +',oper CHAR(3)'
+        matriz := matriz +',obs CHAR(30)'
+        matriz := matriz +',dat_pag DATE'
+        matriz := matriz +',porta CHAR(4)'
+        matriz := matriz +',entregue CHAR(1)'
+        matriz := matriz +',imprimir CHAR(1)'
+        matriz := matriz +',qtd_p DECIMAL(3)'
+        matriz := matriz +',unidade CHAR(3)'
+        matriz := matriz +',dez_perc CHAR(1)'
+        matriz := matriz +',custo DECIMAL(12,2)'
+        matriz := matriz +',tipo CHAR(1)'
+        matriz := matriz +',excecao CHAR(60)'
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR MASTMOV",,.f.)
+        sr_getconnection():exec("CREATE TABLE MASTMOV ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE MASTMOV ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER MASTMOV_SR FOR MASTMOV ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( MASTMOV, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> MASTCAIXA')
+IF ! SR_EXISTTABLE('MASTCAIXA')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->MASTCAIXA  ')
+        matriz:={}
+        matriz := 'mesa CHAR(5)'
+        matriz := matriz +',tipo CHAR(2)'
+        matriz := matriz +',data DATE'
+        matriz := matriz +',nota CHAR(8)'
+        matriz := matriz +',num_dup CHAR(12)'
+        matriz := matriz +',num_ban CHAR(3)'
+        matriz := matriz +',cod_ct CHAR(3)'
+        matriz := matriz +',documento CHAR(12)'
+        matriz := matriz +',venci DATE'
+        matriz := matriz +',valor DECIMAL(10,2)'
+        matriz := matriz +',tipo_comp CHAR(2)'
+        matriz := matriz +',coddesp CHAR(3)'
+        matriz := matriz +',descri1 CHAR(40)'
+        matriz := matriz +',descri2 CHAR(40)'
+        matriz := matriz +',cod_vend CHAR(3)'
+        matriz := matriz +',cod_cli CHAR(5)'
+        matriz := matriz +',cod_opera CHAR(3)'
+        matriz := matriz +',sangria CHAR(1)'
+        matriz := matriz +',op_pg CHAR(3)'
+        matriz := matriz +',pg CHAR(1)'
+        matriz := matriz +',hora CHAR(8)'
+        matriz := matriz +',autoriz CHAR(3)'
+        matriz := matriz +',valor_com DECIMAL(10,2)'
+        matriz := matriz +',comissao DECIMAL(12,6)'
+        matriz := matriz +',tp_desp CHAR(1)'
+        matriz := matriz +',num_pdv CHAR(4)'
+        matriz := matriz +',num_cup CHAR(6)'
+        matriz := matriz +',fechado CHAR(2)'
+        matriz := matriz +',tp_mov CHAR(1)'
+        matriz := matriz +',termina CHAR(10)'
+        matriz := matriz +',c_s CHAR(1)'
+        matriz := matriz +',obs CHAR(40)'
+        matriz := matriz +',data_fecha DATE'
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR MASTCAIXA",,.f.)
+        sr_getconnection():exec("CREATE TABLE MASTCAIXA ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE MASTCAIXA ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER MASTCAIXA_SR FOR MASTCAIXA ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( MASTCAIXA, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+        matriz:={}
+        matriz := 'tipo CHAR(2)'
+        matriz := matriz +',numero CHAR(3)'
+        matriz := matriz +',duplicata CHAR(12)'
+        matriz := matriz +',valor_dup DECIMAL(10,2)'
+        matriz := matriz +',tip_cli CHAR(1)'
+        matriz := matriz +',fornec CHAR(5)'
+        matriz := matriz +',cliente CHAR(40)'
+        matriz := matriz +',c_cpfcnpj CHAR(14)'
+        matriz := matriz +',emissao DATE'
+        matriz := matriz +',venc DATE'
+        matriz := matriz +',datpag DATE'
+        matriz := matriz +',dattra DATE'
+        matriz := matriz +',datope DATE'
+        matriz := matriz +',banco CHAR(1)'
+        matriz := matriz +',agencia CHAR(8)'
+        matriz := matriz +',c_c CHAR(13)'
+        matriz := matriz +',valor DECIMAL(10,2)'
+        matriz := matriz +',vlpago DECIMAL(10,2)'
+        matriz := matriz +',vl_ipi DECIMAL(10,2)'
+        matriz := matriz +',desconto DECIMAL(10,2)'
+        matriz := matriz +',juros DECIMAL(10,2)'
+        matriz := matriz +',juros_d DECIMAL(10,2)'
+        matriz := matriz +',pago CHAR(1)'
+        matriz := matriz +',tip_pg CHAR(2)'
+        matriz := matriz +',mov_cx CHAR(1)'
+        matriz := matriz +',conta CHAR(1)'
+        matriz := matriz +',cheque CHAR(8)'
+        matriz := matriz +',vendedor CHAR(3)'
+        matriz := matriz +',num_ped CHAR(6)'
+        matriz := matriz +',comissao DECIMAL(12,6)'
+        matriz := matriz +',operador CHAR(3)'
+        matriz := matriz +',alt_oper CHAR(3)'
+        matriz := matriz +',doc_tran CHAR(14)'
+        matriz := matriz +',dat_tran DATE'     //12.06.2002
+        matriz := matriz +',cod_forn CHAR(4)'     //27.05.2002
+        matriz := matriz +',forn_desp CHAR(40)'   //11.07.2003
+        matriz := matriz +',baix_parc DATE'    //27.05.2002
+        matriz := matriz +',oper_parc CHAR(3)'    //11.07.2003
+        matriz := matriz +',data_fund DATE'     //09.05.2005
+        matriz := matriz +',motivo CHAR(30)'       //09.05.2005
+        matriz := matriz +',cod_incl CHAR(3)'      //09.05.2005
+        matriz := matriz +',obs CHAR(60)'
+        matriz := matriz +',obs1 CHAR(60)'
+        matriz := matriz +',corrente CHAR(35)'
+        matriz := matriz +',cpfcnpj CHAR(14)'
+        matriz := matriz +',lin1 CHAR(60)'
+        matriz := matriz +',lin2 CHAR(60)'
+        matriz := matriz +',lin3 CHAR(60)'
+        matriz := matriz +',lin4 CHAR(60)'
+        matriz := matriz +',lin5 CHAR(60)'
+        matriz := matriz +',hora_bx CHAR(8)'
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> MASTDUPR ')
+IF ! SR_EXISTTABLE('MASTDUPR')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->MASTDUPR   ')
+        sr_getconnection():exec("CREATE GENERATOR MASTDUPR",,.f.)
+        sr_getconnection():exec("CREATE TABLE MASTDUPR ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE MASTDUPR ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER MASTDUPR_SR FOR MASTDUPR ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( MASTDUPR, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> MASTCRED ')
+IF ! SR_EXISTTABLE('mastcred')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->MASTCRED   ')
+        sr_getconnection():exec("CREATE GENERATOR MASTCRED",,.f.)
+        sr_getconnection():exec("CREATE TABLE MASTCRED ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE MASTCRED ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER MASTCRED_SR FOR MASTCRED ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( MASTCRED, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+**********************************************************************************************
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> mastcarta')
+IF ! SR_EXISTTABLE('mastcarta')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->mastcarta  ')
+        matriz:={}
+        matriz := 'codigo CHAR(3)'
+        matriz := matriz +',cartao CHAR(20)'
+        matriz := matriz +',sigla CHAR(2)'
+        matriz := matriz +',prazo DECIMAL(3)'
+        matriz := matriz +',desconto DECIMAL(5,2)'
+        matriz := matriz +',cod_forn CHAR(4)'
+        matriz := matriz +',tipo_conta CHAR(4)'
+        matriz := matriz +',tipo_venda CHAR(1)'
+        matriz := matriz +',tef CHAR(1)'
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR MASTCARTA",,.f.)
+        sr_getconnection():exec("CREATE TABLE MASTCARTA ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE MASTCARTA ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER MASTCARTA_SR FOR MASTCARTA ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( MASTCARTA, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+**********************************************************************************************
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> MASTDUPP ')
+IF ! SR_EXISTTABLE('MASTDUPP')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->MASTDUPP   ')
+        matriz:={}
+        matriz := 'tipo CHAR(2)'
+        matriz := matriz +',numero CHAR(3)'
+        matriz := matriz +',duplicata CHAR(12)'
+        matriz := matriz +',valor_dup DECIMAL(10,2)'
+        matriz := matriz +',tip_for CHAR(4)'
+        matriz := matriz +',fornec CHAR(4)'
+        matriz := matriz +',cliente CHAR(40)'
+        matriz := matriz +',emissao DATE'
+        matriz := matriz +',venc DATE'
+        matriz := matriz +',datpag DATE'
+        matriz := matriz +',tp_pg CHAR(1)'
+        matriz := matriz +',banco CHAR(3)'
+        matriz := matriz +',agencia CHAR(8)'
+        matriz := matriz +',c_c CHAR(13)'
+        matriz := matriz +',valor DECIMAL(10,2)'
+        matriz := matriz +',vlpago DECIMAL(10,2)'
+        matriz := matriz +',desconto DECIMAL(10,2)'
+        matriz := matriz +',juros DECIMAL(10,2)'
+        matriz := matriz +',pago CHAR(1)'
+        matriz := matriz +',conta CHAR(1)'
+        matriz := matriz +',obs CHAR(60)'
+        matriz := matriz +',obs_b CHAR(60)'
+        matriz := matriz +',nbanco CHAR(3)'
+        matriz := matriz +',cheque CHAR(6)'
+        matriz := matriz +',conta_c CHAR(13)'
+        matriz := matriz +',vendedor CHAR(3)'
+        matriz := matriz +',num_ped CHAR(6)'
+        matriz := matriz +',operador CHAR(3)'
+        matriz := matriz +',dataceite DATE'
+        matriz := matriz +',data_so DATE'
+        matriz := matriz +',dat_receb DATE'
+        matriz := matriz +',ope_receb CHAR(3)'
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR MASTDUPP",,.f.)
+        sr_getconnection():exec("CREATE TABLE MASTDUPP ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE MASTDUPP ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER MASTDUPP_SR FOR MASTDUPP ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( MASTDUPP, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+**********************************************************************************************
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> SACCID  ')
+IF ! SR_EXISTTABLE('saccid')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->SACCID   ')
+        matriz:={}
+        matriz := 'cod_cid CHAR(7)'
+        matriz := matriz +',cidade CHAR(25)'
+        matriz := matriz +',cep CHAR(8)'
+        matriz := matriz +',uf CHAR(2)'
+        matriz := matriz +',cod_ope CHAR(3)'
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR SACCID",,.f.)
+        sr_getconnection():exec("CREATE TABLE SACCID ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE SACCID ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER SACCID_SR FOR SACCID ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( SACCID, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> MASTGRUPO')
+IF ! SR_EXISTTABLE('MASTGRUPO')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->MASTGRUPO  ')
+        matriz:={}
+        matriz := 'codigo CHAR(3)'
+        matriz := matriz +',grupo CHAR(20)'
+        matriz := matriz +',data_cad DATE'
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR MASTGRUPO",,.f.)
+        sr_getconnection():exec("CREATE TABLE MASTGRUPO ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE MASTGRUPO ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER MASTGRUPO_SR FOR MASTGRUPO ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( MASTGRUPO, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> SACMOVNT               ')
+        matriz:='empresa  CHAR(3) '
+        matriz := matriz + ',tipo_nota  CHAR(1) '
+        matriz := matriz + ',documento  CHAR(10) '
+        matriz := matriz + ',conjunta  CHAR(8) '
+        matriz := matriz + ',serie  CHAR(4) '
+        matriz := matriz + ',modelo  CHAR(2) '
+        matriz := matriz + ',num_ecf  CHAR(10) '
+        matriz := matriz + ',num_ped  CHAR(6) '
+        matriz := matriz + ',emissao  DATE '
+        matriz := matriz + ',gru_sub  CHAR(5) '
+        matriz := matriz + ',codigo  CHAR(5) '
+        matriz := matriz + ',produto  CHAR(40) '
+        matriz := matriz + ',especie  CHAR(4) '
+        matriz := matriz + ',cod_fab  CHAR(4) '
+        matriz := matriz + ',fabrica  CHAR(40) '
+        matriz := matriz + ',unidade  CHAR(3) '
+        matriz := matriz + ',data_s_e  DATE '
+        matriz := matriz + ',ent_sai  CHAR(1) '
+        matriz := matriz + ',quantd  DECIMAL(12,3) '
+        matriz := matriz + ',pr_venda  DECIMAL(10,4) '
+        matriz := matriz + ',vl_vend  DECIMAL(10,4) '
+        matriz := matriz + ',vl_fatura  DECIMAL(10,4) '
+        matriz := matriz + ',pr_unit  DECIMAL(10,4) '
+        matriz := matriz + ',cust_mer  DECIMAL(10,4) '
+        matriz := matriz + ',vl_merc  DECIMAL(10,4) '
+        matriz := matriz + ',cod_vend  CHAR(3) '
+        matriz := matriz + ',cod_oper  CHAR(3) '
+        matriz := matriz + ',comissao  DECIMAL(6,2) '
+        matriz := matriz + ',montador  CHAR(3) '
+        matriz := matriz + ',montador1  CHAR(3) '
+        matriz := matriz + ',cod_cli  CHAR(5) '
+        matriz := matriz + ',cliente  CHAR(40) '
+        matriz := matriz + ',cid_cli  CHAR(20) '
+        matriz := matriz + ',uf_cli  CHAR(2) '
+        matriz := matriz + ',insc_cli  CHAR(14) '
+        matriz := matriz + ',cgc_cli  CHAR(14) '
+        matriz := matriz + ',cpf_cli  CHAR(14) '
+        matriz := matriz + ',icm  DECIMAL(10,2) '
+        matriz := matriz + ',icm_f  DECIMAL(10,5) '
+        matriz := matriz + ',icm_sub  DECIMAL(10,5) '
+        matriz := matriz + ',vlr_icmsub  DECIMAL(12,5) '
+        matriz := matriz + ',base_icmsu  DECIMAL(12,5) '
+        matriz := matriz + ',desc_icm  DECIMAL(12,5) '
+        matriz := matriz + ',dia1  CHAR(2) '
+        matriz := matriz + ',dia2  CHAR(2) '
+        matriz := matriz + ',dia3  CHAR(2) '
+        matriz := matriz + ',frete  DECIMAL(10,2) '
+        matriz := matriz + ',encargo_f  DECIMAL(10,2) '
+        matriz := matriz + ',disp_asse  DECIMAL(10,2) '
+        matriz := matriz + ',desc1  DECIMAL(10,2) '
+        matriz := matriz + ',desc2  DECIMAL(10,2) '
+        matriz := matriz + ',desc3  DECIMAL(10,2) '
+        matriz := matriz + ',ipi_aliq  DECIMAL(10,2) '
+        matriz := matriz + ',ipi  DECIMAL(10,2) '
+        matriz := matriz + ',peso  DECIMAL(8,3) '
+        matriz := matriz + ',peso_liq  DECIMAL(8,3) '
+        matriz := matriz + ',alimento  CHAR(1) '
+        matriz := matriz + ',bebida  DECIMAL(6,2) '
+        matriz := matriz + ',tipo  CHAR(2) '
+        matriz := matriz + ',isento  CHAR(1) '
+        matriz := matriz + ',sittrib  CHAR(4) '
+        matriz := matriz + ',tp_venda  CHAR(2) '
+        matriz := matriz + ',cond_vezes  CHAR(3) '
+        matriz := matriz + ',cond_intev  CHAR(2) '
+        matriz := matriz + ',cod_nat  CHAR(5) '
+        matriz := matriz + ',chassis  CHAR(20) '
+        matriz := matriz + ',descri1  CHAR(60) '
+        matriz := matriz + ',descri2  CHAR(60) '
+        matriz := matriz + ',descri3  CHAR(60) '
+        matriz := matriz + ',descri4  CHAR(60) '
+        matriz := matriz + ',descri5  CHAR(60) '
+        matriz := matriz + ',cancel  CHAR(1) '
+        matriz := matriz + ',obs1  CHAR(60) '
+        matriz := matriz + ',obs2  CHAR(60) '
+        matriz := matriz + ',obs3  CHAR(60) '
+        matriz := matriz + ',obs4  CHAR(60) '
+        matriz := matriz + ',obs5  CHAR(60) '
+        matriz := matriz + ',obs6  CHAR(60) '
+        matriz := matriz + ',cod_nota  CHAR(1) '
+        matriz := matriz + ',vlr_icm  DECIMAL(15,2) '
+        matriz := matriz + ',base_icm  DECIMAL(15,2) '
+        matriz := matriz + ',norm_ele  CHAR(1) '
+        matriz := matriz + ',hora_mov  CHAR(8) '
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+IF ! SR_EXISTTABLE('sacmovnt')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->SACMOVNT   ')
+        sr_getconnection():exec("CREATE GENERATOR SACMOVNT",,.f.)
+        sr_getconnection():exec("CREATE TABLE SACMOVNT ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE SACMOVNT ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER SACMOVNT_SR FOR SACMOVNT ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( SACMOVNT, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+IF ! SR_EXISTTABLE('saccst')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo -> SACCST')
+        matriz:='cst  CHAR(4) '
+        matriz := matriz + ',descri  CHAR(120) '
+        matriz := matriz + ',sittrib  CHAR(1) '
+        matriz := matriz + ',datacad  DATE '
+        matriz := matriz + ',oper  CHAR(3) '
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR SACCST",,.f.)
+        sr_getconnection():exec("CREATE TABLE SACCST ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE SACCST ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER SACCST_SR FOR SACCST ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( SACCST, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('000','Tributada Integralmente','T',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('010','Tributada e com cobran?a do ICMS por substituicao tributaria','F',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('020','Com reducao de base de calculo','T',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('030','Isenta ou nao tributada e com cobran?a do ICMS por substituicao tributaria','I',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('040','Isenta','I',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('041','Nao Tributada','N',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('050','Suspensao','N',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('051','Diferimento','T',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('060','ICMS cobrado anteriormente por substituicao tributaria','F',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('070','Com reducao base de calculo e cobran?a do ICMS por substituicao tributaria','F',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('090','Outras','N',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('101','Tributada pelo Simples Nacional com permiss?o de cr?dito                                                            ' ,'N',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('102','Tributada pelo Simples Nacional sem permiss?o de cr?dito                                                            ' ,'N',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('103','Isen??o do ICMS no Simples Nacional para faixa de receita bruta                                                     ' ,'N',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('201','Tributada pelo Simples Nacional com permiss?o de cr?dito e com cobran?a do ICMS por substitui??o tribut?ria         ' ,'N',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('202','Tributada pelo Simples Nacional sem permiss?o de cr?dito e com cobran?a do ICMS por substitui??o tribut?ria         ' ,'N',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('203','Isen??o do ICMS no Simples Nacional para faixa de receita bruta e com cobran?a do ICMS por substitui??o tribut?ria  ' ,'N',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('300','Imune                                                                                                               ' ,'N',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('400','N?o tributada pelo Simples Nacional                                                                                 ' ,'N',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('500','ICMS cobrado anteriormente por substitui??o tribut?ria (substitu?do) ou por antecipa??o                             ' ,'N',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("INSERT INTO saccst (cst,descri,sittrib,datacad,SR_DELETED) VALUES ('900','OUTROS ','N',"+sr_cdbvalue(DATE())+",' ')",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+
+ENDIF
+IF ! SR_EXISTTABLE('sacnonfc')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo -> sacnonfc')
+        matriz:='numero  CHAR(6) '
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR SACNONFC",,.f.)
+        sr_getconnection():exec("CREATE TABLE SACNONFC ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE SACNONFC ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER SACNONFC_SR FOR SACNONFC ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( SACNONFC, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+IF ! SR_EXISTTABLE('SACNCM')
+        matriz:='codigo  CHAR(8) '
+	matriz := matriz + ',descri  CHAR(512) '
+	matriz := matriz + ',perc1  DECIMAL(7,2) '
+	matriz := matriz + ',perc2  DECIMAL(7,2) '
+	matriz := matriz + ',perc3  DECIMAL(7,2) '
+	matriz := matriz + ',ex  CHAR(2) '
+	matriz := matriz + ',tabela  CHAR(2) '
+	matriz := matriz + ',aliqnac  DECIMAL(7,2) '
+	matriz := matriz + ',aliqimp  DECIMAL(7,2) '
+	matriz := matriz + ',cest  CHAR(7) '
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR SACNCM",,.f.)
+        sr_getconnection():exec("CREATE TABLE SACNCM ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE SACNCM ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER SACNCM_SR FOR SACNCM ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( SACNCM, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> SACOP   ')
+IF ! SR_EXISTTABLE('sacop')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->SACOP     ')
+        matriz:='operacao  CHAR(5) '
+        matriz := matriz + ',descr_op  CHAR(40) '
+        matriz := matriz + ',credito  CHAR(1) '
+        matriz := matriz + ',sai_ent  CHAR(1) '
+        matriz := matriz + ',tipo  CHAR(1) '
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR SACOP",,.f.)
+        sr_getconnection():exec("CREATE TABLE SACOP ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE SACOP ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER SACOP_SR FOR SACOP ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( SACOP, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> SACNOTA ')
+IF ! SR_EXISTTABLE('sacnota')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->SACNOTA   ')
+        matriz:='data_nt  DATE '
+        matriz := matriz + ',numero  CHAR(6) NOT NULL '
+        matriz := matriz + ',serie  CHAR(3) NOT NULL '
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR SACNOTA",,.f.)
+        sr_getconnection():exec("CREATE TABLE SACNOTA ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE SACNOTA ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER SACNOTA_SR FOR SACNOTA ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( SACNOTA, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+
+ENDIF
+matriz:='empresa  CHAR(3) '
+matriz := matriz + ',tip_sef  CHAR(2) '
+matriz := matriz + ',tipo_nota  CHAR(1) '
+matriz := matriz + ',cod_nota  CHAR(1) '
+matriz := matriz + ',documento  CHAR(12) '
+matriz := matriz + ',serie  CHAR(4) '
+matriz := matriz + ',modelo  CHAR(2) '
+matriz := matriz + ',auxiliar  CHAR(10) '
+matriz := matriz + ',num_ped  CHAR(6) '
+matriz := matriz + ',emissao  DATE '
+matriz := matriz + ',ent_sai  CHAR(1) '
+matriz := matriz + ',cod_cli  CHAR(5) '
+matriz := matriz + ',cliente  CHAR(40) '
+matriz := matriz + ',cid_cli  CHAR(25) '
+matriz := matriz + ',uf_cli  CHAR(2) '
+matriz := matriz + ',insc_cli  CHAR(14) '
+matriz := matriz + ',cgc_cli  CHAR(14) '
+matriz := matriz + ',cpf_cli  CHAR(14) '
+matriz := matriz + ',cod_vend  CHAR(3) '
+matriz := matriz + ',vl_base  DECIMAL(10,2) '
+matriz := matriz + ',vl_icm  DECIMAL(10,2) '
+matriz := matriz + ',vl_icmsu  DECIMAL(10,2) '
+matriz := matriz + ',vlr_icmsub  DECIMAL(12,5) '
+matriz := matriz + ',base_icmsu  DECIMAL(12,5) '
+matriz := matriz + ',desc_icm  DECIMAL(12,5) '
+matriz := matriz + ',aliq_icm  DECIMAL(12,2) '
+matriz := matriz + ',vl_nota  DECIMAL(10,2) '
+matriz := matriz + ',vl_prod  DECIMAL(10,2) '
+matriz := matriz + ',peso  DECIMAL(10,2) '
+matriz := matriz + ',peso_liq  DECIMAL(10,2) '
+matriz := matriz + ',tip_frete  CHAR(1) '
+matriz := matriz + ',frete  DECIMAL(10,2) '
+matriz := matriz + ',encargo_f  DECIMAL(10,2) '
+matriz := matriz + ',disp_asse  DECIMAL(10,2) '
+matriz := matriz + ',ipi  DECIMAL(10,2) '
+matriz := matriz + ',cod_nat  CHAR(5) '
+matriz := matriz + ',cancel  CHAR(1) '
+matriz := matriz + ',obs1  CHAR(60) '
+matriz := matriz + ',obs2  CHAR(60) '
+matriz := matriz + ',obs3  CHAR(60) '
+matriz := matriz + ',obs4  CHAR(60) '
+matriz := matriz + ',obs5  CHAR(60) '
+matriz := matriz + ',obs6  CHAR(60) '
+matriz := matriz + ',num_cont  CHAR(12) '
+matriz := matriz + ',chnfe  CHAR(55) '
+matriz := matriz + ',camnfe  CHAR(90) '
+matriz := matriz + ',obs7  CHAR(60) '
+matriz := matriz + ',obs8  CHAR(60) '
+matriz := matriz + ',obs9  CHAR(60) '
+matriz := matriz + ',obs10  CHAR(60) '
+matriz := matriz + ',obs11  CHAR(60) '
+matriz := matriz + ',obs12  CHAR(60) '
+matriz := matriz + ',obs13  CHAR(60) '
+matriz := matriz + ',obs14  CHAR(60) '
+matriz := matriz + ',obs15  CHAR(60) '
+matriz := matriz + ',obs16  CHAR(60) '
+matriz := matriz + ',obs17  CHAR(60) '
+matriz := matriz + ',obs18  CHAR(60) '
+matriz := matriz + ',obs19  CHAR(60) '
+matriz := matriz + ',obs20  CHAR(60) '
+matriz := matriz + ',norm_ele  CHAR(1) '
+matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+//matriz := matriz + ',modelo  CHAR(2) '
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> SACTOTNT')
+IF ! SR_EXISTTABLE('sactotnt')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->SACTOTNT  ')
+        //DBCREATE('sactotnt  matriz,'SQLRDD')
+        sr_getconnection():exec("CREATE GENERATOR SACTOTNT",,.f.)
+        sr_getconnection():exec("CREATE TABLE SACTOTNT ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE SACTOTNT ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER SACTOTNT_SR FOR SACTOTNT ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( SACTOTNT, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> SACLOG  ')
+IF ! SR_EXISTTABLE('saclog')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->SACLOG   ')
+        matriz:='data_sis  DATE '
+        matriz := matriz + ',data  DATE '
+        matriz := matriz + ',hora  CHAR(8) '
+        matriz := matriz + ',tipo  CHAR(10) '
+        matriz := matriz + ',aut_oper  CHAR(3) '
+        matriz := matriz + ',cod_oper  CHAR(3) '
+        matriz := matriz + ',cod_vend  CHAR(3) '
+        matriz := matriz + ',cod_cli  CHAR(5) '
+        matriz := matriz + ',cod_forn  CHAR(4) '
+        matriz := matriz + ',cod_prod  CHAR(5) '
+        matriz := matriz + ',documento  CHAR(10) '
+        matriz := matriz + ',quantd1  DECIMAL(14,3) '
+        matriz := matriz + ',quantd2  DECIMAL(14,3) '
+        matriz := matriz + ',valor1  DECIMAL(14,3) '
+        matriz := matriz + ',valor2  DECIMAL(14,3) '
+        matriz := matriz + ',venc1  DATE '
+        matriz := matriz + ',venc2  DATE '
+        matriz := matriz + ',modulo  CHAR(20) '
+        matriz := matriz + ',descri  CHAR(60) '
+        matriz := matriz + ',cod_aut  CHAR(17) '
+        matriz := matriz + ',terminal  CHAR(15) '
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR SACLOG",,.f.)
+        sr_getconnection():exec("CREATE TABLE SACLOG ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE SACLOG ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER SACLOG_SR FOR SACLOG ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( SACLOG, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> SACCADDE')
+IF ! SR_EXISTTABLE('saccadde')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->SACCADDE  ')
+        matriz:='codigo  CHAR(3) NOT NULL '
+        matriz := matriz + ',desc1  CHAR(40) '
+        matriz := matriz + ',desc2  CHAR(40) '
+        matriz := matriz +',sr_recno DECIMAL(15,0) NOT NULL '
+        sr_getconnection():exec("CREATE GENERATOR SACCADDE",,.f.)
+        sr_getconnection():exec("CREATE TABLE SACCADDE ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE SACCADDE ADD UNIQUE (SR_RECNO)",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("ALTER TABLE SACCADDE ADD CONSTRAINT SACCADDE_PK PRIMARY KEY (codigo)",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+        sr_getconnection():exec("CREATE TRIGGER SACCADDE_SR FOR SACCADDE ACTIVE BEFORE INSERT POSITION 0 as begin If (new.SR_RECNO is null) then new.SR_RECNO = gen_id( SACCADDE, 1); end",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> MASTEXCE')
+IF ! SR_EXISTTABLE('MASTEXCE')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->MASTEXCE  ')
+        matriz:='id  INTEGER '
+        matriz := matriz + ',descricao  CHAR(60) '
+        matriz := matriz + ',grupo  CHAR(3) '
+        matriz := matriz +',preco DECIMAL(12,2)'
+        sr_getconnection():exec("CREATE TABLE MASTEXCE ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> MASTEXE_ITENS')
+IF ! SR_EXISTTABLE('MASTEXE_ITENS')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->MASTEXE_ITENS  ')
+        matriz := 'id CHAR(12) '
+        matriz := matriz +',quantidade DECIMAL(12,2)'
+        matriz := matriz +',id_produto_pedido CHAR(12) '
+        matriz := matriz +',id_excecao INTEGER '
+        matriz := matriz +',id_pedido CHAR(12) '
+        //sr_getconnection():exec("CREATE GENERATOR MASTMESATV",,.f.)
+        sr_getconnection():exec("CREATE TABLE MASTEXE_ITENS ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> MASTMESATV')
+IF ! SR_EXISTTABLE('MASTMESATV')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->MASTMESATV  ')
+        matriz := 'mesa  CHAR(12) '
+        //sr_getconnection():exec("CREATE GENERATOR MASTMESATV",,.f.)
+        sr_getconnection():exec("CREATE TABLE MASTMESATV ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+
+setcor(3);DEVPOS(01,01);DEVOUT(STRZERO(f++,3)+'] Verificando o Arquivo -> MASTRESERVA')
+IF ! SR_EXISTTABLE('MASTRESERVA')
+        setcor(3);DEVPOS(02,01);DEVOUT(STRZERO(f++,3)+'] Criando o Arquivo ->MASTRESERVA  ')
+        matriz :=        + 'quarto  CHAR(4) '
+        matriz := matriz + ',data_inclusao DATE '
+        matriz := matriz + ',hora_inclusao CHAR(8) '
+        matriz := matriz + ',oper_inclusao CHAR(3) '
+        matriz := matriz + ',obs_inclusao CHAR(60) '
+        matriz := matriz + ',Cliente  CHAR(5) '
+        matriz := matriz + ',data_reserva  DATE '
+        matriz := matriz + ',reserva  CHAR(10) '
+        matriz := matriz + ',data_inicial  DATE '
+        matriz := matriz + ',data_final  DATE '
+        matriz := matriz + ',Fornecedor  CHAR(4) '
+        matriz := matriz + ',reserva_forn  CHAR(10) '
+        matriz := matriz + ',valor DECIMAL(12,2) '
+        matriz := matriz + ',Status  CHAR(1) '
+        matriz := matriz + ',data_checkin  DATE '
+        matriz := matriz + ',hora_checkin CHAR(8) '
+        matriz := matriz + ',obs_checkin CHAR(60) '
+        matriz := matriz + ',oper_checkin CHAR(3) '
+        matriz := matriz + ',data_checkout  DATE '
+        matriz := matriz + ',hora_checkout CHAR(8) '
+        matriz := matriz + ',obs_checkout CHAR(60) '
+        matriz := matriz + ',oper_checkout CHAR(3) '
+        sr_getconnection():exec("CREATE TABLE MASTRESERVA ("+matriz+" )",,.f.)
+        sr_getconnection():exec("COMMIT",,.f.)
+ENDIF
+
+
+
+
+**********************************************************************************************
+setcor(1)
+CLOSE ALL
+abriarq('sacsetup','set')
+*-----------------------------------------
+/*
+IF ! EMPTY(SUBSTR(set->sysdatlm,1,6))
+        IF cod_operado <> '999' .AND. DATE() > CTOD(DCRIPTO(SUBSTR(set->sysdatlm,1,2))+'/'+DCRIPTO(SUBSTR(set->sysdatlm,3,2))+'/'+DCRIPTO(SUBSTR(set->sysdatlm,5,2)))
+                CLEAR
+                QUIT
+        ENDIF
+ENDIF
+IF ! EMPTY(SUBSTR(set->sysdatlm,7,6))
+        IF cod_operado <> '999' .AND. DATE() > CTOD(DCRIPTO(SUBSTR(set->sysdatlm,7,2))+'/'+DCRIPTO(SUBSTR(set->sysdatlm,9,2))+'/'+DCRIPTO(SUBSTR(set->sysdatlm,11,2)))
+                erro()
+        ENDIF
+ENDIF
+*/
+*************************************************************
+wvw_lclosewindow()
+RETURN NIL
+***************************************** F I M *****************************************
