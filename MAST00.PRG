@@ -16,6 +16,7 @@
 #define NBotao10  909
 #define NBotao11  910
 #define NBotao12  911
+#define NBotao13  912
 
 #define MENUARQ_1  1
 #define MENUARQ_2  2
@@ -272,6 +273,7 @@ if m_cfg[3] = 'S'
         WVW_TBAddButton( ,NBotao5,,'<F>echar Parcial',1)
         WVW_TBAddButton( ,NBotao6,,'<CTRL+F> NFC-e',1)
         WVW_TBAddButton( ,NBotao10,,'<CTRL+E> NF-e',1)
+        WVW_TBAddButton( ,NBotao13,,'PLANILHA DE CUSTO',1)
         WVW_TBAddButton( ,NBotao7,,'<ESC> Sair',1)
 ELSE
         WVW_TBCreate( , .T.,TBSTYLE_FLAT            , 0,55,50)
@@ -832,6 +834,8 @@ IF nKey=1024
                 mast203()
         ELSEIF MenuId=NBotao10      //ENTREGA DE PRODUTOS
                 sac211()
+        ELSEIF MenuId=NBotao13      //PLANILHA DE CUSTO
+                mastcusto()
         ELSEIF MenuId=MENUARQ_1 // CADASTRO MESAS
                 f5_mesas()
         ELSEIF MenuId=MENUARQ_2 // CADASTRO PRODUTOS

@@ -1,7 +1,7 @@
 <!--
 ################################################
 # xDevStudio Project - xdev@kssoftware.com.br  #
-# Created @ 30/05/2023 12:25:08                #
+# Created @ 27/09/2023 10:07:15                #
 #                                              #
 ### Standard xDev Config - Layout v1.5 #########
 -->
@@ -127,4 +127,5 @@
    <unit filename="MAST700.PRG" compile="Sim">
    <unit filename="MAST710.PRG" compile="Sim">
    <unit filename="MAST750.PRG" compile="Sim">
+   <unit filename="MASTCUSTO.PRG" compile="Sim">
 </project>

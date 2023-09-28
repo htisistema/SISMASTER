@@ -67,7 +67,8 @@ c0w32.obj +
 "c:\HTI\sismaster\MAST54.obj"  + 
 "c:\HTI\sismaster\MAST700.obj"  + 
 "c:\HTI\sismaster\MAST710.obj"  + 
-"c:\HTI\sismaster\MAST750.obj", + 
+"c:\HTI\sismaster\MAST750.obj"  + 
+"c:\HTI\sismaster\MASTCUSTO.obj", + 
 "C:\HTI\SISMASTER\sismaster.EXE", +   
 "C:\HTI\SISMASTER\sismaster.map", +   
 lang.lib +     
