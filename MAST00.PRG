@@ -996,10 +996,8 @@ IF nKey=1024
         ELSEIF MenuId=MENUUTIL_1
                 dbf_sql()
         ELSEIF MenuId=MENUSAI_1 .OR. MenuId=NBotao7
-                IF 'S' = op_simnao('N','Deseja FINALIZAR O SISTEMA:')
-                        fim('SISCOM','*')
-                        RETURN NIL
-                ENDIF
+                fim('SISCOM','*')
+                RETURN NIL
         ELSEIF MenuId=MENUUTIL_70
                 arq_ncm()
         ELSEIF MenuId=MENUSAI_3 .OR. MenuId=NBotao7

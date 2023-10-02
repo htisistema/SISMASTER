@@ -1,0 +1,18 @@
+Error BASE/1132  Error de rango: acceso al array
+Funcoes: MASTCUSTO.PRG->MASTCUSTO(87)
+Funcoes: MAST00.PRG->AFTERINKEY(838)
+Funcoes: MAST00.PRG->(b)MASTER0(753)
+Funcoes: ->INKEY(0)
+Funcoes: MAST00.PRG->MASTER0(757)
+Funcoes: MASTFUN.PRG->SENHA(406)
+Funcoes: SISMASTER.PRG->MAIN(535)
+********************************************************************************
+Data e Hora........: 02/10/23 - 10:44:57
+Empresa............: RESTAURANTE PANELA DE BARRO
+Sistema/Atualizacao: .: SISMASTER :. Sistema Automacao Hotel e Restaurante - v23.06.14b
+Usuario do Sistema.: 999
+Nome do Executavel.: C:\HTI\SISMASTER\sismaster.EXE
+Nome do Micro......: HELIO-PC - Nome Terminal: Helio
+Memoria Disponivel.: 2097151 - Espaço em Disco....: 13736108032
+Pasta de Diretorio.: HTI\SISMASTER
+Sistema Operacional: Windows NT Professional 6.02.9200
