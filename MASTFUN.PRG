@@ -3509,17 +3509,17 @@ IF LEN(aret) = 0
         ENDIF
 ELSE
         IF li = NIL .AND. ci = NIL
-                mcliente := aret[1,3]
-                mcpf := aret[1,34]
-                mcgc := aret[1,32]
+                mcliente := aret[1,2]
+                mcpf := aret[1,23]
+                mcgc := aret[1,21]
                 RETURN .T.
         ENDIF
-        mcliente := aret[1,3]
-        mcpf := aret[1,34]
-        mcgc := aret[1,32]
-        vcid  := aret[1,24]
+        mcliente := aret[1,2]
+        mcpf := aret[1,23]
+        mcgc := aret[1,21]
+        vcid  := aret[1,13]
         setcor(3)
-        DEVPOS(li,ci);DEVOUT(aret[1,3])
+        DEVPOS(li,ci);DEVOUT(aret[1,2])
         setcor(1)
 ENDIF
 RETURN .T.

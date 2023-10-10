@@ -286,6 +286,7 @@ ELSE
         WVW_TBAddButton( ,NBotao5,ALLTRIM(m_cfg[12])+'conta.bmp','<F>echar Parcial',IF(FILE(ALLTRIM(m_cfg[12])+'conta.bmp'),0,1),.F.)
         WVW_TBAddButton( ,NBotao6,ALLTRIM(m_cfg[12])+'nfce.bmp','<CTRL+F> NFC-e',IF(FILE(ALLTRIM(m_cfg[12])+'nfce.bmp'),0,1),.F.)
         WVW_TBAddButton( ,NBotao10,ALLTRIM(m_cfg[12])+'nfe.bmp','<CTRL+E> NF-e',IF(FILE(ALLTRIM(m_cfg[12])+'nfe.bmp'),0,1),.F.)
+        WVW_TBAddButton( ,NBotao13,ALLTRIM(m_cfg[12])+'recebimento.bmp','PLANILHA DE CUSTO',IF(FILE(ALLTRIM(m_cfg[12])+'recebimento.bmp'),0,1),.F.)
         WVW_TBAddButton( ,NBotao7,ALLTRIM(m_cfg[12])+'sair.bmp','<ESC> Sair',IF(FILE(ALLTRIM(m_cfg[12])+'sair.bmp'),0,1),.F.)
 ENDIF
 
