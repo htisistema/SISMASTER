@@ -342,7 +342,7 @@ WHILE .T.
                                         LOOP
                                 ENDIF
                                 mcons_ped := {}
-                                sr_getconnection():exec("SELECT * FROM mastmov WHERE num_local = "+sr_cdbvalue("M"+STRZERO(mnum_ped,4))+' AND dat_pag IS NULL',,.t.,@mcons_ped)
+                                sr_getconnection():exec('SELECT * FROM mastmov WHERE num_local = '+sr_cdbvalue(STR(mnum_ped))+' AND tipo = 'M' and dat_pag IS NULL',,.t.,@mcons_ped)
                                 IF LEN(mcons_ped) = 0
                                         atencao('Mesa nao encontrada ou nao estar ABERTA... !!!')
                                         wvw_lclosewindow()

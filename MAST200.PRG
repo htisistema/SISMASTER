@@ -1244,7 +1244,8 @@ WHILE .T.
         mpre := ' '
         limpa(12,40,25,70)
         botao(12,40,25,70)
-        //atencao(ALLTRIM(m_cfg[11])+'P'+mped_merc[1,1]+'.jpg')
+        /*
+        atencao(ALLTRIM(m_cfg[11])+'P'+mped_merc[1,1]+'.jpg')
         IF FILE(ALLTRIM(m_cfg[11])+'P'+mped_merc[1,1]+'.jpg')
                 WVW_DrawImage( ,12,40,25,70,ALLTRIM(m_cfg[11])+'P'+mped_merc[1,1]+'.jpg',.T.,.F.)
         ELSEIF FILE(ALLTRIM(m_cfg[11])+'P'+mped_merc[1,1]+'.bmp')
@@ -1410,7 +1411,9 @@ WHILE .T.
         DEVPOS(PROW()+m_cfg[10],00);DEVOUT(CHR(18))
         SETPRC(00,00)
         SET DEVI TO SCREEN;SET PRINT TO;SET PRINT OFF
-        conf_impressao('FCH_PARC.TXT',VAL(SUBSTR(STRZERO(mped_merc[1,9],2),1,1)))
+        ATENCAO(STR(int(mped_merc[1,9])))
+
+        conf_impressao('FCH_PARC.TXT',int(mped_merc[1,9]))
         LOOP
 ENDDO
 SETMODE(50,120)

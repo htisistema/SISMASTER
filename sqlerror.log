@@ -14755,3 +14755,19 @@ RetCode           :         -1
 SR_FIREBIRD:EXEC     Linha : 299
 MASTERDBF     Linha : 417
 MAIN     Linha : 430	
+02/12/23 12:02:54: SQLExecDirect Error
+Dynamic SQL Error - Native error code 335544569
+Command sent to database : 
+SELECT * FROM mastmov WHERE num_local = '    50' AND tipo = "M" and dat_pag IS NULL
+Steatment handle  :          0
+Connection handle : 
+RetCode           :         -1
+	SR_FIREBIRD:RUNTIMEERR     Linha : 726
+SR_FIREBIRD:EXEC     Linha : 299
+SACNFCE     Linha : 345
+AFTERINKEY     Linha : 831
+(b)MASTER0     Linha : 754
+INKEY     Linha : 0
+MASTER0     Linha : 758
+SENHA     Linha : 406
+MAIN     Linha : 535	
