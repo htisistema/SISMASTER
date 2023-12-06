@@ -5496,7 +5496,7 @@ FUNCTION enviar_nfe(mret)
 *************************
 LOCAL m_retorno,lin,linhas,linha,mmen,marq_sai
 
-m_retorno := IBR_comando('NFE.EnviarNFe',{mret,1,1,0,0,1},30,.T.)       //IBR_comando('NFE.EnviarNFe',{mret,1,1,1,1,1})
+m_retorno := IBR_comando('NFE.EnviarNFe',{mret,1,1,1,0,1},30,.T.)       //IBR_comando('NFE.EnviarNFe',{mret,1,1,1,1,1})
 //ATENCAO(m_retorno+' 2')
 IF 'Autorizado o uso da NF-e' $ m_retorno
         RETURN .T.
