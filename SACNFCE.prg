@@ -341,8 +341,9 @@ WHILE .T.
                                         wvw_lclosewindow()
                                         LOOP
                                 ENDIF
+                                //atencao('SELECT * FROM mastmov WHERE num_local = '+sr_cdbvalue(alltrim(STR(mnum_ped)))+" AND tipo = 'M' and dat_pag IS NULL",,.t.,@mcons_ped)
                                 mcons_ped := {}
-                                sr_getconnection():exec('SELECT * FROM mastmov WHERE num_local = '+sr_cdbvalue(STR(mnum_ped))+' AND tipo = 'M' and dat_pag IS NULL',,.t.,@mcons_ped)
+                                sr_getconnection():exec('SELECT * FROM mastmov WHERE num_local = '+sr_cdbvalue(alltrim(STR(mnum_ped)))+" AND tipo = 'M' and dat_pag IS NULL",,.t.,@mcons_ped)
                                 IF LEN(mcons_ped) = 0
                                         atencao('Mesa nao encontrada ou nao estar ABERTA... !!!')
                                         wvw_lclosewindow()
@@ -351,7 +352,6 @@ WHILE .T.
                                 ENDIF
                                 mpago := ' '
                                 p := mtot_ := 0
-                                mcod_cli := VAL(mcons_ped[1,23])
                                 FOR p = 1 TO LEN(mcons_ped)
                                         mtot_ := mtot_ + (mcons_ped[p,7]*mcons_ped[p,8])
                                 NEXT
@@ -377,7 +377,7 @@ WHILE .T.
                                                 LOOP
                                         ENDIF
                                         DEVPOS(00,02);DEVOUT('    Codigo           Produto')
-                                        WVW_DrawLabel(,01,02,mcons_ped[p,5]+' - '+SUBSTR(mcons_ped[p,6],1,20),,,,, 'arial black',60,20,,,,,)
+                                        //WVW_DrawLabel(,01,02,mcons_ped[p,5]+' - '+SUBSTR(mcons_ped[p,6],1,20),,,,, 'arial black',60,20,,,,,)
                                         //WVW_DrawLabel(,04,02,'             '+SUBSTR(mcons_ped[p,7],21),,,,, 'arial black',60,20,,,,,)
                                         mcod_merc := mcons_ped[p,5]
                                         mp_venda := iat(mcons_ped[p,8],2)
@@ -425,11 +425,12 @@ WHILE .T.
                                         mdesconto := mpreco := 0
                                         cont_itens ++
                                         misento := vercst(cons_merc[1,39])
+
                                         //                  1               2          3      4       5         6              7
                                         IF (misento = 'I' .OR. misento = 'N' .OR. misento = 'F')
-                                                AADD(m_nota,{cons_merc[1,39],cons_merc[1,7],mquantd,0    ,mvlr_fat,cons_merc[1,1],cons_merc[1,39]})
+                                                AADD(m_nota,{cons_merc[1,39],cons_merc[1,7],mquantd,0    ,mvlr_fat,cons_merc[1,1],cons_merc[1,39],mmerc})
                                         ELSE
-                                                AADD(m_nota,{cons_merc[1,39],cons_merc[1,7],mquantd,mperc,mvlr_fat,cons_merc[1,1],cons_merc[1,39]})
+                                                AADD(m_nota,{cons_merc[1,39],cons_merc[1,7],mquantd,mperc,mvlr_fat,cons_merc[1,1],cons_merc[1,39],mmerc})
                                         ENDIF
                                         AADD(m_matriz,{cons_merc[1,2],mquantd,mvlr_fat})
                                         mdesconto := 0
@@ -532,7 +533,6 @@ WHILE .T.
                         ENDIF
                 ELSEIF EMPTY(mmerc)
                         mcod_merc := f4_merc(,,STRZERO(mvarejo,1),mperc)
-                        //mcod_merc := VAL(f4_merc(,,STRZERO(mvarejo,1),mperc))
                         IF EMPTY(mcod_merc)
                                 LOOP
                         ENDIF
@@ -575,7 +575,8 @@ WHILE .T.
                         botao(12,01,26,53)
                 	WVW_DrawImage( ,12,01,26,53,ALLTRIM(m_cfg[12])+'HTIFIRMA.JPG',.T.,.F.)
                 ENDIF
-                IF EMPTY(mcod_bc) .AND. EMPTY(mmerc)
+                IF EMPTY(mcod_merc) .AND. EMPTY(mmerc)
+                        atencao('ok')
                         WVW_RESTSCREEN(,lci,55,lba,cba-1,tela_,.T.)
                         LOOP
                 ENDIF
@@ -615,32 +616,6 @@ WHILE .T.
                 WVW_DrawLabel(,06,70,TRANSFORM(mvlr_fat,ALLTRIM('@E 999,999.99')),,,240,, 'arial black',60,30,,,,,)
                 setcor(1)
                 mmerc := cons_merc[1,2]
-                IF cons_merc[1,41] = "S"
-                        @ 29,14 GET mmerc PICT '@!'
-                        READ
-                ENDIF
-                IF LASTKEY() = 27;LOOP;ENDIF
-                /*
-                IF SUBSTR(STR(mcod_bc),1,1) = '2'  .AND. (LEN(RTRIM(mcod_bc)) > 5 .OR. VAL(mcod_bc) = 0)
-                        IF ALLTRIM(m_set[1,179]) = 'TOLEDO'
-                                IF m_set[1,159] = 'V'
-                                        mquantd := (VAL(SUBSTR(mcod_bc,8,5))/100) / mvlr_fat
-                                ELSE
-                                        mquantd := (VAL(SUBSTR(mcod_bc,8,5))/1000)
-                                ENDIF
-                        ELSE
-                                IF m_set[1,159] = 'V'
-                                        mquantd := (VAL(SUBSTR(mcod_bc,8,5))/1000)
-                                ELSE
-                                        mquantd := (VAL(SUBSTR(mcod_bc,8,5))/100) / mvlr_fat
-                                ENDIF
-                        ENDIF
-                        DEVPOS(lba-3,53);DEVOUTPICT(mquantd,ALLTRIM(m_set[1,99]))
-                        DEVPOS(lba-3,65);DEVOUTPICT(mvlr_fat,ALLTRIM(m_set[1,98]))
-                        mcomissao := cons_merc[1,26]
-                        setcor(1)
-                ELSE
-                */
                         setcor(1)
                         mensagem("<F8> para consultar aplicacao do produto")
                         mmasc_qtd := unidade(cons_merc[1,7])
@@ -863,13 +838,14 @@ WHILE .T.
         //GO TOP
         ***************
         @ li  ,09 GET mcod_vend PICT "999" VALID IF(EMPTY(mcod_vend),.F.,ven(@mcod_vend,li,14)) WHEN  EMPTY(mnum_ped) .AND. EMPTY(mnum_pv)
-        @ li+1,09 GET mcod_cli PICT "99999" VALID ver_cli(mcod_cli,li+1,16)
+        //@ li+1,09 GET mcod_cli PICT "99999" VALID ver_cli(mcod_cli,li+1,16)
         //@ li+2,09 GET mcpf PICT "@@R 999.999.999-99"  WHEN mcod_cli = 0
         //@ li+3,09 GET mcgc PICT "@@R 99.999.999/9999-99" WHEN mcpf = SPACE(11)        //VALID IF(mcgc = SPACE(14),.T.,ver_cgc(mcgc)) WHEN mcpf = SPACE(11)
         READ
         IF LASTKEY() = 27
                 LOOP
         ENDIF
+        /*
         cons_cli := {}
         sr_getconnection():exec("SELECT * FROM mastcli WHERE cod_cli = "+sr_cdbvalue(STRZERO(mcod_cli,5)),,.t.,@cons_cli)
         IF LEN(cons_cli) = 0
@@ -881,14 +857,15 @@ WHILE .T.
                 mcgc := cons_cli[1,21]
                 minsc := cons_cli[1,22]
         ENDIF
+        */
         setcor(3)
-        DEVPOS(li+1,09);DEVOUT(STRZERO(mcod_cli,5))
-        DEVPOS(li+1,16);DEVOUT(cons_cli[1,2])
+        //DEVPOS(li+1,09);DEVOUT(STRZERO(mcod_cli,5))
+        //DEVPOS(li+1,16);DEVOUT(cons_cli[1,2])
         DEVPOS(li+2,09);DEVOUTPICT(mcpf,"@@R 999.999.999-99")
         DEVPOS(li+3,09);DEVOUTPICT(mcgc,"@@R 99.999.999/9999-99")
         setcor(1)
-        IF EMPTY(cons_cli[1,23]) .AND. EMPTY(cons_cli[1,21])
-                @ li+1,16 GET cons_cli[1,2] PICT "@!"
+        //IF EMPTY(cons_cli[1,23]) .AND. EMPTY(cons_cli[1,21])
+        //        @ li+1,16 GET cons_cli[1,2] PICT "@!"
                 @ li+2,09 GET mcpf PICT "@@R 999.999.999-99"    //VALID IF(cons_cli[1,23] = SPACE(11),.T.,pesq_cpf(cons_cli[1,23],'cli',))        //VALID ver_cpf(cons_cli[1,34])
                 @ li+3,09 GET mcgc PICT "@@R 99.999.999/9999-99" WHEN mcpf = SPACE(11)        //VALID IF(cons_cli[1,21] = SPACE(14),.T.,pesq_cgc(cons_cli[1,21],'cli',,'cli')) WHEN EMPTY(cons_cli[1,23])  //VALID ver_cgc(cons_cli[1,32])
                 READ
@@ -896,7 +873,7 @@ WHILE .T.
                         DBUNLOCKALL()
                         LOOP
                 ENDIF
-        ENDIF
+        //ENDIF
         mcons_emi := {}
         sr_getconnection():exec("SELECT * FROM saccid WHERE cidade = "+sr_cdbvalue(RTRIM(m_set[1,9]))+" AND uf = "+sr_cdbvalue(RTRIM(m_set[1,10])),,.t.,@mcons_emi)
         IF LEN(mcons_emi) = 0 .OR. EMPTY(mcons_emi[1,1])
@@ -1530,8 +1507,8 @@ WHILE .T.
                 mdata_nfe := DTOC(mdata_sis)+' '+time()
                 m_set[1,23] := STRTRAN(m_set[1,23],'-','')
                 m_set[1,23] := STRTRAN(m_set[1,23],'.','')
-                cons_cli[1,21] := STRTRAN(cons_cli[1,21],'-','')
-                cons_cli[1,21] := STRTRAN(cons_cli[1,21],'.','')
+                //cons_cli[1,21] := STRTRAN(cons_cli[1,21],'-','')
+                //cons_cli[1,21] := STRTRAN(cons_cli[1,21],'.','')
                 mindIEDest := '9'
                 sLinhas := sLinhas + 'NaturezaOperacao= VENDA PARA DENTRO DO ESTADO'+ m_qp + ; //'Modelo='+ALLTRIM(mmodelo)                      + m_qp + ;
                                 'Modelo=65'                      + m_qp + ;
@@ -1563,8 +1540,8 @@ WHILE .T.
                                 'CRT='+mcrt                                         + m_qp + ;
                                 '[Destinatario]'                                + m_qp + ;
                                 IF( ! EMPTY(mcpf),'CNPJ='+ALLTRIM(mcpf),'CNPJ='+ALLTRIM(mcgc))+ m_qp+; //'CNPJ='+ALLTRIM(cons_cli[1,23])                 + m_qp +;
-                                'indIEDest=9'                                   + m_qp + ; //'indIEDest='+mindIEDest                         + m_qp + ;
-                                'NomeRazao='+cons_cli[1,1]+' - '+ALLTRIM(cons_cli[1,2]) + m_qp  //+ ;
+                                'indIEDest=9'                                   + m_qp
+                                //'NomeRazao='+cons_cli[1,1]+' - '+ALLTRIM(cons_cli[1,2]) + m_qp  //+ ;
                 mbase_icm := i := mtot_nota := 0
                 FOR i = 1 TO LEN(m_nota)
                         IF m_nota[i,5] = 0
@@ -1640,89 +1617,62 @@ WHILE .T.
                                                       'vpag='+ALLTRIM(TRANSFORM(iat(m_recebe[y,10],'A'),'999999.99'))+ m_qp
                         ENDIF
                 NEXT
-                cons_cli[1,2] := cons_cli[1,2] + '-'
                 sLinhas := slinhas +    '[DadosAdicionais]'+ m_qp + ;
-                                        'Complemento= Op.:'+cod_operado+' - Val Aprox Tributos R$:'+ALLTRIM(TRANSFORM(mtot_imposto,'999999.99'))+' ('+ALLTRIM(TRANSFORM((mtot_imposto/mtot_nota)*100,'999999.99'))+'%) Fonte: IBPT   Cliente: '+cons_cli[1,2]+ m_qp +;
+                                        'Complemento= Op.:'+cod_operado+' - Val Aprox Tributos R$:'+ALLTRIM(TRANSFORM(mtot_imposto,'999999.99'))+' ('+ALLTRIM(TRANSFORM((mtot_imposto/mtot_nota)*100,'999999.99'))+'%) Fonte: IBPT '+ m_qp +;
                                         '[infRespTec]'+ m_qp + ;
                                         'CNPJ='+mcnpj_hti+ m_qp + ;
                                         'xContato=Jose Helio de Araujo Beltrao Junior'+ m_qp + ;
                                         'email=helioaraujobeltrao@gmail.com'+ m_qp + ;
                                         'fone=081992816878'
-                                mretorno := ''
-                                mretorno := IBR_comando('NFE.CriarNFe',{sLinhas},,3)
-                                mensagem('CRIANDO A NFE No. '+mretorno)
-                                IF EMPTY(mretorno)
-                                        RETURN NIL
-                                ELSE
-                                        //mretorno :=ALLTRIM(SUBSTR(mretorno,LEN(mretorno)-51))
-                                        mretorno :=ALLTRIM(SUBSTR(mretorno,4))
-                                ENDIF
-                                //atencao(mretorno+' A')
-
-                                //mretorno := ALLTRIM(m_cfg[16])+mretorno
-                                //atencao(mretorno+' B')
-
-                                mensagem('ASSINANDO a Nota No. '+mretorno)
-                                IF IBR_comando('NFE.AssinarNFe',{mretorno},,3) = ' '
-                                        RETURN NIL
-                                ENDIF
-                                mensagem('VALIDANDO a Nota No. '+mretorno)
-                                IF IBR_comando('NFE.ValidarNFe',{mretorno},,3) = ' '
-                                        RETURN NIL
-                                ENDIF
-                                mensagem('ENVIANDO a Nota No. '+mretorno)
-                                enviar_nfe(mretorno)
-                                mensagem('IMPRIMINDO O DANFE No. '+mretorno)
-                                mret := IBR_comando('NFE.ImprimirDanfe('+mretorno+')',,100)
-                                atencao(mret)
-                        SR_BEGINTRANSACTION()
-                        TRY
-
-                        IF ! EMPTY(mchnfe)
-                                        ccomm := "UPDATE sactotnt SET chnfe = " + sr_cdbvalue(mchnfe)
-                                        ccomm := ccomm +",camnfe = "+ sr_cdbvalue(mretorno)+" WHERE documento = " + sr_cdbvalue('NF'+mdocumento)
-                                        ccomm := ccomm + " AND serie = " + sr_cdbvalue(mserie_not)
-                                        ccomm := ccomm + " AND emissao = " + sr_cdbvalue(mdata)
-                                        ccomm := ccomm + " AND cod_cli = " + sr_cdbvalue(STRZERO(mcod_cli,5))
-                                IF msai_ent = 'S'
-                                        ccomm := ccomm + " AND ent_sai = 'S'"
-                                ELSEIF msai_ent = 'E'
-                                        ccomm := ccomm + " AND ent_sai = 'E'"
-                                ENDIF
-                                sr_getconnection():exec(ccomm,,.f.)
-                        ENDIF
-                        sr_getconnection():exec('COMMIT',,.f.)
-                        CATCH e
-                                SR_ENDTRANSACTION()
-                        END
-                //ENDIF
-
-                /*
-                IF ! EMPTY(m_email) .AND. op_simnao('S','Deseja enviar EMAIL para o Cliente') = 'S'
-                        op_tela(10,10,11,70,'Enviar EMAIL')
-                        DEVPOS(00,00);DEVOUT('Email de Destino:')
-                        @ 00,18 GET m_email VALID IF(EMPTY(m_email),.F.,.T.)
-                        READ
-                        IF LASTKEY() # 27
-                                m_ret := IBR_comando('NFE.ENVIAREMAIL('+m_email+','+mretorno+',1)',,3)
-                                atencao(m_ret)
-                                wvw_lclosewindow()
-                        ELSE
-                                wvw_lclosewindow()
-                        ENDIF
+                mretorno := ''
+                mretorno := IBR_comando('NFE.CriarNFe',{sLinhas},,3)
+                mensagem('CRIANDO A NFE No. '+mretorno)
+                IF EMPTY(mretorno)
+                        RETURN NIL
+                ELSE
+                        //mretorno :=ALLTRIM(SUBSTR(mretorno,LEN(mretorno)-51))
+                        mretorno :=ALLTRIM(SUBSTR(mretorno,4))
                 ENDIF
-                */
-                //fim_fecha('Val Aprox Tributos R$:'+ALLTRIM(TRANSFORM(mtot_imposto,'999999.99'))+' ('+ALLTRIM(TRANSFORM((mtot_imposto/mtot_nota)*100,'999999.99'))+'%) Fonte:IBPT'+m_qp+'HTI SISTEMAS 81'+mfone_hti+'-Aplic:'+mpaf_hti+' '+mpaf_ver+m_qp+;
-                //                ALLTRIM(m_set[1,25]+m_set[1,26])+' - Vend.:'+STRZERO(mcod_vend,3)+IF(msem_cx = 1,' - S/C',''))
+                //atencao(mretorno+' A')
+
+                //mretorno := ALLTRIM(m_cfg[16])+mretorno
+                //atencao(mretorno+' B')
+
+                mensagem('ASSINANDO a Nota No. '+mretorno)
+                IF IBR_comando('NFE.AssinarNFe',{mretorno},,3) = ' '
+                        RETURN NIL
+                ENDIF
+                mensagem('VALIDANDO a Nota No. '+mretorno)
+                IF IBR_comando('NFE.ValidarNFe',{mretorno},,3) = ' '
+                        RETURN NIL
+                ENDIF
+                mensagem('ENVIANDO a Nota No. '+mretorno)
+                enviar_nfe(mretorno)
+                // mensagem('IMPRIMINDO O DANFE No. '+mretorno)
+                // mret := IBR_comando('NFE.ImprimirDanfe('+mretorno+')',,100)
+                //atencao(mret)
+                SR_BEGINTRANSACTION()
+                TRY
+
+                IF ! EMPTY(mchnfe)
+                                ccomm := "UPDATE sactotnt SET chnfe = " + sr_cdbvalue(mchnfe)
+                                ccomm := ccomm +",camnfe = "+ sr_cdbvalue(mretorno)+" WHERE documento = " + sr_cdbvalue('NF'+mdocumento)
+                                ccomm := ccomm + " AND serie = " + sr_cdbvalue(mserie_not)
+                                ccomm := ccomm + " AND emissao = " + sr_cdbvalue(mdata)
+                                ccomm := ccomm + " AND cod_cli = " + sr_cdbvalue(STRZERO(mcod_cli,5))
+                        IF msai_ent = 'S'
+                                ccomm := ccomm + " AND ent_sai = 'S'"
+                        ELSEIF msai_ent = 'E'
+                                ccomm := ccomm + " AND ent_sai = 'E'"
+                        ENDIF
+                        sr_getconnection():exec(ccomm,,.f.)
+                ENDIF
+                sr_getconnection():exec('COMMIT',,.f.)
+                CATCH e
+                        SR_ENDTRANSACTION()
+                END
+
                 mtot_imposto := 0
-                /*
-                fim_fecha(IF(! EMPTY(mnum_pv),'PV: '+STRZERO(mnum_pv,10)+m_qp,'')+;
-                                IF(muf_firm = 'MG','Minas Legal:'+m_cnpj+' '+SUBSTR(DTOC(mdata_sis),1,2)+SUBSTR(DTOC(mdata_sis),4,2)+SUBSTR(DTOC(mdata_sis),7,2)+' '+ALLTRIM(TRANSFORM(iat(mtot_nota,2)*100,'99999999'))+m_qp,'')+;
-                                IF(muf_firm = 'RJ','Cupom Mania:'+m_cnpj+' '+SUBSTR(DTOC(mdata_sis),1,2)+SUBSTR(DTOC(mdata_sis),4,2)+SUBSTR(DTOC(mdata_sis),7,2)+' '+ALLTRIM(TRANSFORM(iat(mtot_nota,2)*100,'99999999'))+m_qp,'')+;
-                                IF(muf_firm = 'PB','PARAIBA LEGAL - RECEITA CIDADA'+m_qp+'TORPEDO PREMIADO:'+m_cnpj+' '+SUBSTR(DTOC(mdata_sis),1,2)+SUBSTR(DTOC(mdata_sis),4,2)+SUBSTR(DTOC(mdata_sis),7,2)+' '+ALLTRIM(TRANSFORM(iat(mtot_nota,2)*100,'99999999'))+' '+mcpf_cnpj+m_qp,'')+;
-                                ALLTRIM(m_set[1,25])+' - Vend.:'+STRZERO(mcod_vend,3)+IF(msem_cx = 1,' - S/C',''))
-                                //ALLTRIM(m_set[1,25]+m_set[1,26])+' - Vend.:'+STRZERO(mcod_vend,3)+IF(msem_cx = 1,' - S/C',''))
-                */
                 SET CENTURY OFF
                 IF m_flag_f = 'T'
                         //ATENCAO(NumeroCupom+' - '+mind_tef+' - '+transform(mvalor,'999,999.99'))
@@ -1784,7 +1734,7 @@ WHILE .T.
                                 m_recebe[i,1]                          ,;//3
                                 m_recebe[i,2]                          ,;//4
                                 IF(EMPTY(IF(! EMPTY(mnum_ped),mnum_ped,mnum_pv)),'CP'+mdocumento,'PD'+STRZERO(IF(! EMPTY(mnum_ped),mnum_ped,mnum_pv),6)),;//5
-                                STRZERO(mcod_cli,5)                    ,;//6
+                                '00001'                    ,;//6
                                 STRZERO(mcod_vend,3)                   ,;//7
                                 cod_operado                            ,;//8
                                 TIME()                                 ,;//9
@@ -1841,14 +1791,14 @@ WHILE .T.
                         cComm  := SR_SQLCodeGen(apCode,;
                                {mdata_sis                              ,;//2
                                 m_recebe[i,1]                          ,;//3
-                                STRZERO(mcod_cli,5)                    ,;//5
-                                mcliente                               ,;//6
+                                '00001'                                ,;//5
+                                'CONSUMIDOR'                                ,;//6
                                 m_recebe[i,6]                          ,;//7
                                 cod_operado                            ,;//11
                                 STRZERO(mcod_vend,3)                   ,;//12
                                 STRZERO(IF(! EMPTY(mnum_ped),mnum_ped,mnum_pv),6)                    ,;//13
                                 'C'                                    ,;//16
-                                IF(! EMPTY(cons_cli[1,23]),cons_cli[1,23],'.'),;//17
+                                '.'                                    ,;//17
                                 IF(m_recebe[i,1] = 'FI' .OR. m_recebe[i,1] = 'CT',m_recebe[i,8],m_recebe[i,3]),;//18
                                 mnum_dup                                ,;//19
                                 m_recebe[i,10]                          ,;//20
@@ -1864,103 +1814,6 @@ WHILE .T.
                 NEXT
                 i := 0
                 mensagem('Atualizando o MOVIMENTO....')
-                /*
-                SR_BEGINTRANSACTION()
-                FOR i = 1 TO LEN(m_codigo)
-                        IF EMPTY(m_codigo[i]);LOOP;ENDIF
-                        IF m_matriz[i,45] = 1;LOOP;ENDIF
-                                aret:={}
-                                sr_getconnection():exec("UPDATE mastprod SET dat_ult_s = "+sr_cdbvalue(mdata_sis)+" WHERE cod_merc = "+sr_cdbvalue(m_codigo[i]),,.f.)
-                        //sr_getconnection():exec('COMMIT',,.f.)
-                        mcampo_arq :=  'empresa     ,';//1      mov-> empresa     :=
-                                      +'num_ped     ,';//2      mov-> num_ped     :=
-                                      +'data_ped    ,';//3      mov-> data_ped    :=
-                                      +'documento   ,';//4      mov-> documento   :=
-                                      +'codigo      ,';//5      mov-> codigo      :=
-                                      +'gru_sub     ,';//6      mov-> gru_sub     :=
-                                      +'produto     ,';//7      mov-> produto     :=
-                                      +'especie     ,';//8      mov-> especie     :=
-                                      +'cod_fab     ,';//9      mov-> cod_fab     :=
-                                      +'fabrica     ,';//10     mov-> fabrica     :=
-                                      +'data_s_e    ,';//11     mov-> data_s_e    :=
-                                      +'ent_sai     ,';//12     mov-> ent_sai     :=
-                                      +'quantd      ,';//13     mov-> quantd      :=
-                                      +'pr_venda    ,';//14     mov-> pr_venda    :=
-                                      +'vl_vend     ,';//15     mov-> vl_vend     :=
-                                      +'cod_vend    ,';//16     mov-> cod_vend    :=
-                                      +'cod_oper    ,';//17     mov-> cod_oper    :=
-                                      +'cod_cli     ,';//18     mov-> cod_cli     :=
-                                      +'cliente     ,';//19     mov-> cliente     :=
-                                      +'vl_fatura   ,';//20     mov-> vl_fatura   :=
-                                      +'tipo        ,';//21     mov-> tipo        :=
-                                      +'pr_unit     ,';//22     mov-> pr_unit     :=
-                                      +'cust_mer    ,';//23     mov-> cust_mer    :=
-                                      +'isento      ,';//24     mov-> isento      :=
-                                      +'comissao    ,';//25     mov->comissao
-                                      +'tp_venda    ,';//26     mov-> tp_venda    :=
-                                      +'cond_vezes  ,';//27     mov-> cond_vezes  :=
-                                      +'cond_intev   ' //28     mov-> cond_intev  :=
-                        aret := {}
-                        cComm  := "INSERT INTO sacmov ("+mcampo_arq+",sr_deleted) VALUES (?,?,?,?,?,?,?,?,?,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,? ,' ')"
-                        apCode := SR_SQLParse( cComm, @nErr, @nPos )
-                        cComm  := SR_SQLCodeGen(apCode,;
-                               {mcodempresa             ,;//1
-                                STRZERO(IF(! EMPTY(mnum_ped),mnum_ped,mnum_pv),6)     ,;//2
-                                mdata_sis               ,;//3
-                                'CP'+mdocumento         ,;//4
-                                m_codigo[i]             ,;//5
-                                m_matriz[i,4]           ,;//6
-                                m_matriz[i,5]           ,;//7
-                                m_matriz[i,23]          ,;//8
-                                m_matriz[i,10]          ,;//9
-                                SUBSTR(m_matriz[i,11],1,30),;//10
-                                mdata_sis               ,;//11
-                                "S"                     ,;//12
-                                m_matriz[i,1]           ,;//13
-                                m_matriz[i,8]           ,;//14
-                                m_matriz[i,2]           ,;//15
-                                STRZERO(mcod_vend,3)    ,;//16
-                                cod_operado             ,;//17
-                                STRZERO(mcod_cli,5)     ,;//18
-                                SUBSTR(mcliente,1,30)   ,;//19
-                                m_matriz[i,2]           ,;//20
-                                "02"                    ,;//21
-                                m_matriz[i,9]           ,;//22
-                                m_matriz[i,18]          ,;//23
-                                m_matriz[i,13]          ,;//24
-                                IF(mtipo_comp = "AV",m_matriz[i,15] + mcom_ven,m_matriz[i,15] + mcom_ap),;//25
-                                mtipo_comp              ,;//26
-                                mcond_vezes             ,;//27
-                                mcond_intev              ;//28
-                                },sr_getconnection():nsystemid)
-                                sr_getconnection():exec(ccomm,,.f.)
-                NEXT
-                IF ! EMPTY(mnum_pv)
-                        mensagem('Atualizando o ARQUIVO DE PRE-PEDIDO....')
-                                aret:={}
-                                cComm  := "UPDATE sacpv SET "
-                                ccomm := ccomm +"ppag  = '*'"
-                                ccomm := ccomm +",pdatapag = "+sr_cdbvalue(mdata_sis)
-                                ccomm := ccomm +",phora_pg = "+sr_cdbvalue(TIME())
-                                ccomm := ccomm +",pnum_pdv = "+sr_cdbvalue(mnum_ecf)
-                                ccomm := ccomm +",pnum_cup = "+sr_cdbvalue(mdocumento)
-                                ccomm := ccomm +" WHERE pnum_ped = "+sr_cdbvalue(STRZERO(mnum_pv,6))
-                                sr_getconnection():exec(ccomm,,.f.)
-                ELSEIF ! EMPTY(mnum_ped)
-                        //mensagem('Atualizando o ARQUIVO DE PEDIDO....')
-                                aret:={}
-                                cComm  := "UPDATE sacped_s SET "
-                                ccomm := ccomm +"ppag  = '*'"
-                                ccomm := ccomm +",pdatapag = "+sr_cdbvalue(mdata_sis)
-                                ccomm := ccomm +",phora_pg = "+sr_cdbvalue(TIME())
-                                ccomm := ccomm +",pnum_pdv = "+sr_cdbvalue(mnum_ecf)
-                                ccomm := ccomm +",pnum_cup = "+sr_cdbvalue(mdocumento)
-                                ccomm := ccomm +" WHERE pnum_ped = "+sr_cdbvalue(STRZERO(mnum_ped,6))
-                                sr_getconnection():exec(ccomm,,.f.)
-                ENDIF
-                sr_committransaction()
-                sr_endtransaction()
-                */
                 mensagem('Atualizando o CONTA A PAGAR....')
                 c := i := 0
                 FOR i = 1 TO LEN(m_recebe)
@@ -2006,6 +1859,7 @@ WHILE .T.
                                         sr_cdbvalue('Pedido:'+STRZERO(IF(! EMPTY(mnum_ped),mnum_ped,mnum_pv),6)+' DESCONTO DE CARTAO')+','+; //18
                                         sr_cdbvalue(' ')+')',,.f.)
                 NEXT
+                /*
                 mensagem('Atualizando o CREDITO....')
                 i := 0
                 FOR i = 1 TO LEN(m_recebe)
@@ -2042,41 +1896,8 @@ WHILE .T.
                                 ENDIF
                         ENDIF
                 NEXT
+                */
         ENDIF
-        /*
-        IF msem_cx = 1 .AND. EMPTY(mnum_ped)
-                i := 0
-                FOR i = 1 TO LEN(m_codigo)
-                        IF EMPTY(m_codigo[i]);LOOP;ENDIF
-                        SR_BEGINTRANSACTION()
-                                cons_merc := {}
-                                sr_getconnection():exec("SELECT * FROM mastprod WHERE codigo = "+sr_cdbvalue(m_codigo[i]),,.t.,@cons_merc)
-                                mlinha := cons_merc[1,2]+cons_merc[1,8]+cons_merc[1,9]+cons_merc[1,14]+STRZERO((cons_merc[1,56] + m_matriz[i,1])*1000,13)+STRZERO(iat(cons_merc[1,46])*100,14)+cons_merc[1,68]
-                                sr_getconnection():exec("UPDATE mastprod SET saldo_mer = saldo_mer + "+sr_cdbvalue(m_matriz[i,1])+",chv_cript = "+sr_cdbvalue(criptografia(mlinha,'C'))+" WHERE cod_merc = "+sr_cdbvalue(m_codigo[i]),,.f.)
-                                sr_getconnection():exec('INSERT INTO logproduto (data_sis,data,'+;
-                                                        'hora,cod_prod,quantd,saldo_ant,saldo_pos,cod_oper,prog,terminal,'+;
-                                                        'processo,ent_sai,SR_DELETED )'+;
-                                                        ' VALUES ('+;
-                                                        sr_cdbvalue(DATE())+','+; //1
-                                                        sr_cdbvalue(mdata_sis)+','+; //2
-                                                        sr_cdbvalue(TIME())+','+; //3
-                                                        sr_cdbvalue(STRZERO(mcod_merc,5))+','+; //4
-                                                        sr_cdbvalue(mquantd)+','+; //5
-                                                        sr_cdbvalue(cons_merc[1,56])+','+; //6
-                                                        sr_cdbvalue(cons_merc[1,56] + m_matriz[i,1])+','+; //7
-                                                        sr_cdbvalue(cod_operado)+','+; //8
-                                                        sr_cdbvalue('sac23nfce')+','+; //9
-                                                        sr_cdbvalue(LEFT(NETNAME(),15))+','+; //12
-                                                        sr_cdbvalue('CUPOM S/C: '+mdocumento)+','+; //11
-                                                        sr_cdbvalue('E')+','+; //11
-                                                        sr_cdbvalue(' ')+')',,.f.)
-
-                                sr_committransaction()
-                        SR_ENDTRANSACTION()
-                NEXT
-        ENDIF
-        sr_getconnection():exec('COMMIT',,.f.)
-        */
         mpago := ' '
         mabrir_cp := m_flag_f := " "
         ASIZE(m_codigo,0)

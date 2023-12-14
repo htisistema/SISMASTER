@@ -221,7 +221,7 @@ WHILE .T.
                 @ lci+10,cci+25 GET cons_merc[1,9] PICT '99' RANGE 0,14 WHEN men_get(1,1,'[0]-Nao Impressora e Video [1]-Imp.Cozinha [2]-Imp.Bar [3]-Imp.Outras - Acrecenta [4]Video')
                 @ lci+11,cci+25 GET cons_merc[1,38] PICT '@!'
                 @ lci+12,cci+25 GET cons_merc[1,39] PICT '@!'
-                @ lci+13,cci+25 GET cons_merc[1,41] PICT '@!' VALID cons_merc[1,41] $ 'S,N'
+                //@ lci+13,cci+25 GET cons_merc[1,41] PICT '@!' VALID cons_merc[1,41] $ 'S,N'
                 READ
                 IF LASTKEY() = 27 .OR. 'N' = op_simnao('S','Confirma a Inclusao do PRODUTO:')
                         LOOP

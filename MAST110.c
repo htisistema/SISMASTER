@@ -1,15 +1,15 @@
 /*
  * xHarbour build 0.99.70 Intl. (SimpLex)
- * Generated C source code from <MAST110.PRG>
- * Command: C:\xHarbour997\bin\harbour.exe C:\HTI\SISMASTER\MAST110.PRG /q /oc:\HTI\sismaster\MAST110.c /M /N -DxHB -DXHB_0990 -DXHB_0991 -DXHB_0992 -DXHB_0993 -DXHB_0994 -DXHB_09941 -DXHB_09950 -DXHB_09951a -DXHB_09951 -DXHB_09951b -DXHB_0996 -DXHB_09960 -DXHB_09961 -DXHB_09961B -DXHB_0997 -DXHB_09970 
- * Created: 2023.09.27 10:14:44 (Borland C++ 5.5.1)
+ * Generated C source code from <MAST110.000>
+ * Command: C:\xHarbour997\bin\harbour.exe C:\HTI\SISMASTER\MAST110.000 /q /oc:\HTI\sismaster\MAST110.c /M /N -DxHB -DXHB_0990 -DXHB_0991 -DXHB_0992 -DXHB_0993 -DXHB_0994 -DXHB_09941 -DXHB_09950 -DXHB_09951a -DXHB_09951 -DXHB_09951b -DXHB_0996 -DXHB_09960 -DXHB_09961 -DXHB_09961B -DXHB_0997 -DXHB_09970 
+ * Created: 2023.12.14 15:04:01 (Borland C++ 5.5.1)
  */
 
 #include "hbvmpub.h"
 #include "hbpcode.h"
 #include "hbinit.h"
 
-#define __PRG_SOURCE__ "MAST110.PRG"
+#define __PRG_SOURCE__ "MAST110.000"
 
 HB_FUNC( MAST110 );
 HB_FUNC( EXCL_PROD );
@@ -2051,7 +2051,7 @@ HB_FUNC( MAST110 )
 	HB_P_PUSHSTRSHORT, 1,	/* 1 */
 	0, 
 	HB_P_POPVARIABLE, 3, 0,	/* MEXCLUIR */
-	HB_P_JUMP, 249, 5,	/* 1529 (abs: 06503) */
+	HB_P_JUMP, 116, 5,	/* 1396 (abs: 06370) */
 /* 04977 */ HB_P_LINEOFFSET, 197,	/* 207 */
 	HB_P_PUSHSYMNEAR, 30,	/* LASTKEY */
 	HB_P_PUSHNIL,
@@ -2070,7 +2070,7 @@ HB_FUNC( MAST110 )
 	HB_P_PUSHSTRSHORT, 1,	/* 1 */
 	0, 
 	HB_P_POPVARIABLE, 3, 0,	/* MEXCLUIR */
-	HB_P_JUMP, 211, 5,	/* 1491 (abs: 06503) */
+	HB_P_JUMP, 78, 5,	/* 1358 (abs: 06370) */
 /* 05015 */ HB_P_LINEOFFSET, 204,	/* 214 */
 	HB_P_PUSHSYMNEAR, 41,	/* TIRA_ACENTO */
 	HB_P_PUSHNIL,
@@ -2437,55 +2437,7 @@ HB_FUNC( MAST110 )
 	HB_P_ARRAYPUSH,
 	HB_P_SENDSHORT, 0,
 	HB_P_POP,
-/* 05898 */ HB_P_LINEOFFSET, 214,	/* 224 */
-	HB_P_PUSHSYMNEAR, 24,	/* SETPOS */
-	HB_P_PUSHNIL,
-	HB_P_PUSHLOCALNEAR, 7,	/* LCI */
-	HB_P_ADDINT, 13, 0,	/* 13*/
-	HB_P_PUSHLOCALNEAR, 8,	/* CCI */
-	HB_P_ADDINT, 25, 0,	/* 25*/
-	HB_P_DOSHORT, 2,
-	HB_P_PUSHSYMNEAR, 25,	/* AADD */
-	HB_P_PUSHNIL,
-	HB_P_PUSHMEMVAR, 9, 0,	/* GETLIST */
-	HB_P_PUSHSYMNEAR, 47,	/* __GETA */
-	HB_P_PUSHNIL,
-	HB_P_PUSHBLOCK, 12, 0,	/* 12 */
-	0, 0,	/* number of local parameters (0) */
-	1, 0,	/* number of local variables (1) */
-	12, 0,	/* CONS_MERC */
-	HB_P_PUSHLOCALNEAR, 255,	/* localvar1 */
-	HB_P_ENDBLOCK,
-	HB_P_PUSHSTRSHORT, 10,	/* 10 */
-	'c', 'o', 'n', 's', '_', 'm', 'e', 'r', 'c', 0, 
-	HB_P_PUSHSTRSHORT, 3,	/* 3 */
-	'@', '!', 0, 
-	HB_P_PUSHBLOCK, 24, 0,	/* 24 */
-	0, 0,	/* number of local parameters (0) */
-	1, 0,	/* number of local variables (1) */
-	12, 0,	/* CONS_MERC */
-	HB_P_PUSHLOCALNEAR, 255,	/* localvar1 */
-	HB_P_ONE,
-	HB_P_ARRAYPUSH,
-	HB_P_PUSHBYTE, 41,	/* 41 */
-	HB_P_ARRAYPUSH,
-	HB_P_PUSHSTRSHORT, 4,	/* 4 */
-	'S', ',', 'N', 0, 
-	HB_P_INSTRING,
-	HB_P_ENDBLOCK,
-	HB_P_PUSHNIL,
-	HB_P_ONE,
-	HB_P_PUSHBYTE, 41,	/* 41 */
-	HB_P_ARRAYGEN, 2, 0,	/* 2 */
-	HB_P_FUNCTIONSHORT, 6,
-	HB_P_DOSHORT, 2,
-	HB_P_MESSAGE, 28, 0,	/* DISPLAY */
-	HB_P_PUSHMEMVAR, 9, 0,	/* GETLIST */
-	HB_P_PUSHBYTE, 255,	/* -1 */
-	HB_P_ARRAYPUSH,
-	HB_P_SENDSHORT, 0,
-	HB_P_POP,
-/* 06000 */ HB_P_LINEOFFSET, 215,	/* 225 */
+/* 05898 */ HB_P_LINEOFFSET, 215,	/* 225 */
 	HB_P_PUSHSYMNEAR, 29,	/* READMODAL */
 	HB_P_PUSHNIL,
 	HB_P_PUSHMEMVAR, 9, 0,	/* GETLIST */
@@ -2498,14 +2450,14 @@ HB_FUNC( MAST110 )
 	HB_P_DOSHORT, 7,
 	HB_P_ARRAYGEN, 0, 0,	/* 0 */
 	HB_P_POPMEMVAR, 9, 0,	/* GETLIST */
-/* 06022 */ HB_P_LINEOFFSET, 216,	/* 226 */
+/* 05920 */ HB_P_LINEOFFSET, 216,	/* 226 */
 	HB_P_PUSHSYMNEAR, 30,	/* LASTKEY */
 	HB_P_PUSHNIL,
 	HB_P_FUNCTIONSHORT, 0,
 	HB_P_PUSHBYTE, 27,	/* 27 */
 	HB_P_EQUAL,
 	HB_P_DUPLICATE,
-	HB_P_JUMPTRUENEAR, 51,	/* 51 (abs: 06084) */
+	HB_P_JUMPTRUENEAR, 51,	/* 51 (abs: 05982) */
 	HB_P_PUSHSTRSHORT, 2,	/* 2 */
 	'N', 0, 
 	HB_P_PUSHSYMNEAR, 44,	/* OP_SIMNAO */
@@ -2517,9 +2469,9 @@ HB_FUNC( MAST110 )
 	HB_P_FUNCTIONSHORT, 2,
 	HB_P_EQUAL,
 	HB_P_OR,
-	HB_P_JUMPFALSENEAR, 5,	/* 5 (abs: 06089) */
-	HB_P_JUMP, 0, 234,	/* -5632 (abs: 00454) */
-/* 06089 */ HB_P_LINEOFFSET, 219,	/* 229 */
+	HB_P_JUMPFALSENEAR, 5,	/* 5 (abs: 05987) */
+	HB_P_JUMP, 102, 234,	/* -5530 (abs: 00454) */
+/* 05987 */ HB_P_LINEOFFSET, 219,	/* 229 */
 	HB_P_MESSAGE, 32, 0,	/* EXEC */
 	HB_P_PUSHSYMNEAR, 33,	/* SR_GETCONNECTION */
 	HB_P_PUSHNIL,
@@ -2655,18 +2607,6 @@ HB_FUNC( MAST110 )
 	HB_P_ARRAYPUSH,
 	HB_P_FUNCTIONSHORT, 1,
 	HB_P_PLUS,
-	HB_P_PUSHSTRSHORT, 15,	/* 15 */
-	',', 'd', 'e', 's', 'c', '_', 'l', 'i', 'v', 'r', 'e', ' ', '=', ' ', 0, 
-	HB_P_PLUS,
-	HB_P_PUSHSYMNEAR, 34,	/* SR_CDBVALUE */
-	HB_P_PUSHNIL,
-	HB_P_PUSHLOCALNEAR, 12,	/* CONS_MERC */
-	HB_P_ONE,
-	HB_P_ARRAYPUSH,
-	HB_P_PUSHBYTE, 41,	/* 41 */
-	HB_P_ARRAYPUSH,
-	HB_P_FUNCTIONSHORT, 1,
-	HB_P_PLUS,
 	HB_P_PUSHSTRSHORT, 17,	/* 17 */
 	' ', 'W', 'H', 'E', 'R', 'E', ' ', 'c', 'o', 'd', 'i', 'g', 'o', ' ', '=', ' ', 0, 
 	HB_P_PLUS,
@@ -2679,7 +2619,7 @@ HB_FUNC( MAST110 )
 	HB_P_FALSE,
 	HB_P_SENDSHORT, 3,
 	HB_P_POP,
-/* 06479 */ HB_P_LINEOFFSET, 220,	/* 230 */
+/* 06346 */ HB_P_LINEOFFSET, 220,	/* 230 */
 	HB_P_MESSAGE, 32, 0,	/* EXEC */
 	HB_P_PUSHSYMNEAR, 33,	/* SR_GETCONNECTION */
 	HB_P_PUSHNIL,
@@ -2690,15 +2630,15 @@ HB_FUNC( MAST110 )
 	HB_P_FALSE,
 	HB_P_SENDSHORT, 3,
 	HB_P_POP,
-/* 06503 */ HB_P_LINEOFFSET, 224,	/* 234 */
+/* 06370 */ HB_P_LINEOFFSET, 224,	/* 234 */
 	HB_P_PUSHSYMNEAR, 31,	/* WVW_LCLOSEWINDOW */
 	HB_P_PUSHNIL,
 	HB_P_DOSHORT, 0,
-/* 06510 */ HB_P_LINEOFFSET, 225,	/* 235 */
+/* 06377 */ HB_P_LINEOFFSET, 225,	/* 235 */
 	HB_P_PUSHNIL,
 	HB_P_RETVALUE,
 	HB_P_ENDPROC
-/* 06515 */
+/* 06382 */
    };
 
    hb_vmExecute( pcode, symbols, NULL );
