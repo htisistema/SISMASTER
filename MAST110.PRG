@@ -226,7 +226,7 @@ WHILE .T.
                 IF LASTKEY() = 27 .OR. 'N' = op_simnao('S','Confirma a Inclusao do PRODUTO:')
                         LOOP
                 ENDIF
-                sr_getconnection():exec("UPDATE mastprod SET descri = "+sr_cdbvalue(cons_merc[1,2])+",unidade = "+sr_cdbvalue(cons_merc[1,7])+",pr_venda = "+sr_cdbvalue(cons_merc[1,6])+",custo = "+sr_cdbvalue(cons_merc[1,5])+",tipo = "+sr_cdbvalue(cons_merc[1,3])+",porta = "+sr_cdbvalue(cons_merc[1,9])+",grupo = "+sr_cdbvalue(cons_merc[1,31])+",componente = "+sr_cdbvalue(cons_merc[1,32])+",componente1 = "+sr_cdbvalue(cons_merc[1,33])+",ncm = "+sr_cdbvalue(cons_merc[1,38])+",cst = "+sr_cdbvalue(cons_merc[1,39])+",desc_livre = "+sr_cdbvalue(cons_merc[1,41])+" WHERE codigo = "+sr_cdbvalue(mcod),,.f.)
+                sr_getconnection():exec("UPDATE mastprod SET descri = "+sr_cdbvalue(cons_merc[1,2])+",unidade = "+sr_cdbvalue(cons_merc[1,7])+",pr_venda = "+sr_cdbvalue(cons_merc[1,6])+",custo = "+sr_cdbvalue(cons_merc[1,5])+",tipo = "+sr_cdbvalue(cons_merc[1,3])+",porta = "+sr_cdbvalue(cons_merc[1,9])+",grupo = "+sr_cdbvalue(cons_merc[1,31])+",componente = "+sr_cdbvalue(cons_merc[1,32])+",componente1 = "+sr_cdbvalue(cons_merc[1,33])+",ncm = "+sr_cdbvalue(cons_merc[1,38])+",cst = "+sr_cdbvalue(cons_merc[1,39])+" WHERE codigo = "+sr_cdbvalue(mcod),,.f.)
                 sr_getconnection():exec("COMMIT",,.f.)
                 EXIT
         ENDIF
