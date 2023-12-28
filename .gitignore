@@ -3,3 +3,4 @@
 *.c
 *.obj
 *.gdb
+*.GDB
