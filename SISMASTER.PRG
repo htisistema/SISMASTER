@@ -25,7 +25,7 @@ MEMVAR msist,nivel_acess,getlist
 LOCAL mprg := 'SISMASTER',men,f,num,mcgc_aux,mserie,mponto,mtip_t:=' ',mtela_term,mmapear,lin,linha,linhas,marq:='',;
       matriz:={},op:=' ',cam_dba:={},d:=0,m_aux:={},xcop
 
-PUBLIC mversao     := 'v23.12.14',;
+PUBLIC mversao     := 'v24.07.03',;
        mversao_ecf := '2010.1',;
        msit_tip    := 'SISMASTER',;
        sistema     := '.: SISMASTER :. Sistema Automacao Hotel e Restaurante',;

@@ -2,7 +2,7 @@
  * xHarbour build 0.99.70 Intl. (SimpLex)
  * Generated C source code from <SISMASTER.PRG>
  * Command: C:\xHarbour997\bin\harbour.exe C:\HTI\SISMASTER\SISMASTER.PRG /q /oc:\HTI\sismaster\SISMASTER.c /M /N -DxHB -DXHB_0990 -DXHB_0991 -DXHB_0992 -DXHB_0993 -DXHB_0994 -DXHB_09941 -DXHB_09950 -DXHB_09951a -DXHB_09951 -DXHB_09951b -DXHB_0996 -DXHB_09960 -DXHB_09961 -DXHB_09961B -DXHB_0997 -DXHB_09970 
- * Created: 2023.12.14 14:20:03 (Borland C++ 5.5.1)
+ * Created: 2024.07.03 16:31:56 (Borland C++ 5.5.1)
  */
 
 #include "hbvmpub.h"
@@ -348,7 +348,7 @@ HB_FUNC( MAIN )
 	HB_P_POPLOCALNEAR, 22,	/* M_AUX */
 /* 00056 */ HB_P_LINEOFFSET, 35,	/* 61 */
 	HB_P_PUSHSTRSHORT, 10,	/* 10 */
-	'v', '2', '3', '.', '1', '2', '.', '1', '4', 0, 
+	'v', '2', '4', '.', '0', '7', '.', '0', '3', 0, 
 	HB_P_PUSHSTRSHORT, 7,	/* 7 */
 	'2', '0', '1', '0', '.', '1', 0, 
 	HB_P_PUSHSTRSHORT, 10,	/* 10 */

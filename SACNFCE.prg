@@ -1601,21 +1601,28 @@ WHILE .T.
 
                 y:=0
                 FOR y = 1 TO LEN(m_recebe)
-                        sLinhas := slinhas +    '[pag'+STRZERO(Y,3)+']'+ m_qp + ;
-                                                'tpIntegra=2'+ m_qp
+                        sLinhas := slinhas +    '[pag'+STRZERO(Y,3)+']'+ m_qp
+                                                //'tpIntegra=2'+ m_qp
                         IF m_recebe[y,1] = 'CH'
                                 sLinhas := slinhas + 'tpag=02'+ m_qp + ;
-                                                      'vpag='+ALLTRIM(TRANSFORM(iat(m_recebe[y,10],'A'),'999999.99'))+ m_qp
+                                                      'vpag='+ALLTRIM(TRANSFORM(iat(m_recebe[y,10],'A'),'999999.99'))+ m_qp + ;
+                                                      'indpag=1'+ m_qp
+
                         ELSEIF m_recebe[y,1] = 'CT'
                                 sLinhas := slinhas + 'tpag=03'+ m_qp + ;
-                                                      'vpag='+ALLTRIM(TRANSFORM(iat(m_recebe[y,10],'A'),'999999.99'))+ m_qp
+                                                      'vpag='+ALLTRIM(TRANSFORM(iat(m_recebe[y,10],'A'),'999999.99'))+ m_qp +;
+                                                      'indpag=1'+ m_qp + ;
+                                                      'tpIntegra=2'+ m_qp
                         ELSEIF m_recebe[y,1] = 'DU'
                                 sLinhas := slinhas + 'tpag=05'+ m_qp + ;
-                                                      'vpag='+ALLTRIM(TRANSFORM(iat(m_recebe[y,10],'A'),'999999.99'))+ m_qp
+                                                      'vpag='+ALLTRIM(TRANSFORM(iat(m_recebe[y,10],'A'),'999999.99'))+ m_qp +;
+                                                      'indpag=1'+ m_qp
                         ELSE
                                 sLinhas := slinhas + 'tpag=01'+ m_qp + ;
-                                                      'vpag='+ALLTRIM(TRANSFORM(iat(m_recebe[y,10],'A'),'999999.99'))+ m_qp
+                                                      'vpag='+ALLTRIM(TRANSFORM(iat(m_recebe[y,10],'A'),'999999.99'))+ m_qp + ;
+                                                      'indpag=0'+ m_qp
                         ENDIF
+
                 NEXT
                 sLinhas := slinhas +    '[DadosAdicionais]'+ m_qp + ;
                                         'Complemento= Op.:'+cod_operado+' - Val Aprox Tributos R$:'+ALLTRIM(TRANSFORM(mtot_imposto,'999999.99'))+' ('+ALLTRIM(TRANSFORM((mtot_imposto/mtot_nota)*100,'999999.99'))+'%) Fonte: IBPT '+ m_qp +;

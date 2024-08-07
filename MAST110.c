@@ -1,15 +1,15 @@
 /*
  * xHarbour build 0.99.70 Intl. (SimpLex)
- * Generated C source code from <MAST110.000>
- * Command: C:\xHarbour997\bin\harbour.exe C:\HTI\SISMASTER\MAST110.000 /q /oc:\HTI\sismaster\MAST110.c /M /N -DxHB -DXHB_0990 -DXHB_0991 -DXHB_0992 -DXHB_0993 -DXHB_0994 -DXHB_09941 -DXHB_09950 -DXHB_09951a -DXHB_09951 -DXHB_09951b -DXHB_0996 -DXHB_09960 -DXHB_09961 -DXHB_09961B -DXHB_0997 -DXHB_09970 
- * Created: 2023.12.14 15:04:01 (Borland C++ 5.5.1)
+ * Generated C source code from <MAST110.PRG>
+ * Command: C:\xHarbour997\bin\harbour.exe C:\HTI\SISMASTER\MAST110.PRG /q /oc:\HTI\sismaster\MAST110.c /M /N -DxHB -DXHB_0990 -DXHB_0991 -DXHB_0992 -DXHB_0993 -DXHB_0994 -DXHB_09941 -DXHB_09950 -DXHB_09951a -DXHB_09951 -DXHB_09951b -DXHB_0996 -DXHB_09960 -DXHB_09961 -DXHB_09961B -DXHB_0997 -DXHB_09970 
+ * Created: 2024.07.03 16:31:56 (Borland C++ 5.5.1)
  */
 
 #include "hbvmpub.h"
 #include "hbpcode.h"
 #include "hbinit.h"
 
-#define __PRG_SOURCE__ "MAST110.000"
+#define __PRG_SOURCE__ "MAST110.PRG"
 
 HB_FUNC( MAST110 );
 HB_FUNC( EXCL_PROD );
